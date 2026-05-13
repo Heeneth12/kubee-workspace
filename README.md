@@ -65,3 +65,7 @@ ng build kubee-app
 ng build kubee-admin
 
 ```
+
+
+after you make any ui component in kubee-ui you need to run this command to access 
+npx ng build kubee-ui
