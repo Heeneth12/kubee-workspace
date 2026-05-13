@@ -2,11 +2,10 @@ import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LucideAngularModule, Search, Building2, Mail, Phone, MapPin, Zap, ChevronDown, UserPlus, CheckCircle2, XCircle, Clock } from 'lucide-angular';
-import { DrawerService } from '../../../layouts/components/drawer/drawerService';
-import { ToastService } from '../../../layouts/components/toast/toastService';
 import { TenantModel } from '../../user-management/models/tenant.model';
 import { UserManagementService } from '../../user-management/userManagement.service';
 import { ContactService } from '../contacts.service';
+import { DrawerService, ToastService } from 'kubee-ui';
 
 @Component({
   selector: 'app-my-network',

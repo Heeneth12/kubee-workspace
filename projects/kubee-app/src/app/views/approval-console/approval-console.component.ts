@@ -3,25 +3,20 @@ import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ApprovalConsoleService } from './approval-console.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms'; // Import FormsModule for the drawer inputs
-import { LoaderService } from '../../layouts/components/loader/loaderService';
-import { ModalService } from '../../layouts/components/modal/modalService';
-import { ToastService } from '../../layouts/components/toast/toastService';
+import { ConfirmationModalService, DatePickerConfig, DateRangeEmit, DrawerService, LoaderService, ModalService, ToastService } from 'kubee-ui';
 import { Settings2Icon, CircleX, CircleCheckBig, Package, AlertCircle, TrendingUp, Zap, List, LucideAngularModule, FileTextIcon, Loader2, Calendar, Percent, CheckCircle2, XCircle, ArrowRight, ClipboardListIcon, Clock, FileText, ShieldCheck, Search, RotateCcw, CheckCircle, FileSignature, Check, Plus } from 'lucide-angular';
 import { StandardTableComponent } from "../../layouts/components/standard-table/standard-table.component";
 import { HeaderAction, PaginationConfig, TableAction, TableActionConfig, TableColumn } from '../../layouts/components/standard-table/standard-table.model';
-import { DrawerService } from '../../layouts/components/drawer/drawerService';
 import { ApprovalConfigModel, ApprovalFilterModel, ApprovalRequestModel, ApprovalStatsModel, ApprovalType } from './approval-console.model';
 import { APPROVAL_COLUMN } from '../../layouts/config/tableConfig';
 import { SalesOrderModal } from '../sales/sales-order/sales-order.modal';
 import { SalesOrderService } from '../sales/sales-order/sales-order.service';
 import { StockAdjustmentDetailModel } from '../stock/models/stock-adjustment.model';
 import { StockService } from '../stock/stock.service';
-import { DatePickerConfig, DateRangeEmit } from '../../layouts/UI/date-picker/date-picker.component';
 import { StatCardConfig, StatGroupComponent } from '../../layouts/UI/stat-group/stat-group.component';
 import { FilterOption } from '../../layouts/UI/filter-dropdown/filter-dropdown.component';
-import { ConfirmationModalService } from '../../layouts/UI/confirmation-modal/confirmation-modal.service';
-import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-approval-console',

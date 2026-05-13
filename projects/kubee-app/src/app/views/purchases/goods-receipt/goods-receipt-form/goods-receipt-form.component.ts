@@ -2,10 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PurchaseService } from '../../purchase.service';
-import { ToastService } from '../../../../layouts/components/toast/toastService';
-import { LoaderService } from '../../../../layouts/components/loader/loaderService';
+import { DrawerService, LoaderService, ModalService, ToastService } from 'kubee-ui';
 import { PurchaseOrderModel } from '../../models/po.model';
-import { ModalService } from '../../../../layouts/components/modal/modalService';
 
 @Component({
   selector: 'app-goods-receipt-form',
@@ -136,7 +134,7 @@ export class GoodsReceiptFormComponent implements OnInit {
         expiryDate: new Date(item.expiryDate).getTime()
       }))
     };
-    
+
     this.loaderSvc.show();
     this.purchaseService.createGrn(payload,
       (res: any) => {

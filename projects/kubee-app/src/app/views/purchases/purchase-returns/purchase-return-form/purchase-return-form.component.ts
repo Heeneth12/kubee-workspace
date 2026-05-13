@@ -2,10 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit, Optional } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PurchaseService } from '../../purchase.service';
-import { ToastService } from '../../../../layouts/components/toast/toastService';
-import { LoaderService } from '../../../../layouts/components/loader/loaderService';
+import { DrawerService, LoaderService, ModalService, ToastService } from 'kubee-ui';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
-import { ModalService } from '../../../../layouts/components/modal/modalService';
 import { GrnModel } from '../../models/grn.model';
 
 @Component({

@@ -17,8 +17,8 @@ import {
 } from 'lucide-angular';
 import { HttpErrorResponse } from '@angular/common/http';
 import { BulkUploadService } from './bulk-upload.service';
-import { LoaderService } from '../loader/loaderService';
-import { ToastService } from '../toast/toastService';
+import { LoaderService } from '../../../../../../kubee-ui/src/lib/components/loader/loaderService';
+import { ToastService } from '../../../../../../kubee-ui/src/lib/components/toast/toastService';
 import { TabCardComponent, TabItem } from "../../UI/tab-card/tab-card.component";
 
 type UploadStatus = 'idle' | 'selected' | 'uploading' | 'success' | 'error';

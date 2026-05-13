@@ -26,10 +26,10 @@ import {
 } from 'lucide-angular';
 import { AuthService } from '../../guards/auth.service';
 import { UserInitResponse } from '../../models/Init-response.model';
-import { ToastService } from '../toast/toastService';
+import { ToastService } from '../../../../../../kubee-ui/src/lib/components/toast/toastService';
 import { UserManagementService } from '../../../views/user-management/userManagement.service';
 import { UserAddressModel, UserModel } from '../../../views/user-management/models/user.model';
-import { ModalService } from '../modal/modalService';
+import { ModalService } from 'kubee-ui';
 import { FileManagerService } from '../../../views/file-manager/file-manager.service';
 
 export interface NotificationRow {

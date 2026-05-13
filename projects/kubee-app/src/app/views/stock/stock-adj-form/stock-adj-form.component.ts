@@ -2,9 +2,7 @@ import { CommonModule, Location } from '@angular/common';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, Subject, Subscription } from 'rxjs';
-import { DrawerService } from '../../../layouts/components/drawer/drawerService';
-import { LoaderService } from '../../../layouts/components/loader/loaderService';
-import { ToastService } from '../../../layouts/components/toast/toastService';
+import { DrawerService, LoaderService, ToastService } from 'kubee-ui';
 import { StockService } from '../stock.service';
 import { ItemStockSearchModel, BatchDetailModel, StockFilterModel } from '../models/stock.model';
 import { Router } from '@angular/router';
@@ -155,7 +153,7 @@ export class StockAdjFormComponent implements OnInit, OnDestroy {
       // FIX: Check if batches exist and grab the buyPrice from the first one
       let defaultPrice = 0;
       if (item.batches && item.batches.length > 0) {
-        defaultPrice = item.batches[0].buyPrice; 
+        defaultPrice = item.batches[0].buyPrice;
       }
       row.patchValue({
         itemId: item.itemId,
@@ -176,16 +174,16 @@ export class StockAdjFormComponent implements OnInit, OnDestroy {
   }
 
   onBatchChange(index: number, event: any) {
-  const selectedBatchNum = event.target.value;
-  const batches = this.selectedItemBatches.get(index) || [];
-  const selectedBatch = batches.find(b => b.batchNumber === selectedBatchNum);
+    const selectedBatchNum = event.target.value;
+    const batches = this.selectedItemBatches.get(index) || [];
+    const selectedBatch = batches.find(b => b.batchNumber === selectedBatchNum);
 
-  if (selectedBatch) {
-    this.items.at(index).patchValue({
-      unitPrice: selectedBatch.buyPrice
-    });
+    if (selectedBatch) {
+      this.items.at(index).patchValue({
+        unitPrice: selectedBatch.buyPrice
+      });
+    }
   }
-}
 
   // --- Form Array Getters ---
   get items(): FormArray {
@@ -254,8 +252,8 @@ export class StockAdjFormComponent implements OnInit, OnDestroy {
       payload,
       (response: any) => {
         this.loaderSvc.hide();
-        const msg = this.requiresApproval 
-          ? 'Stock Adjustment sent for Approval' 
+        const msg = this.requiresApproval
+          ? 'Stock Adjustment sent for Approval'
           : 'Stock Adjustment saved successfully';
         this.toastSvc.show(msg, 'success');
         this.back();

@@ -5,7 +5,7 @@ import { AuthService } from '../../layouts/guards/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
-import { ToastService } from '../../layouts/components/toast/toastService';
+import { ToastService } from '../../../../../kubee-ui/src/lib/components/toast/toastService';
 import { ForgotPasswordModel, ResendOtpModel, ResetPasswordModel } from './auth.model';
 import { CommonService } from '../../layouts/service/common/common.service';
 import { MarketingRequestDto, SupportCategory, SupportPriority } from '../../layouts/models/user-request.model';
@@ -241,7 +241,7 @@ export class AuthComponent implements OnInit, OnDestroy, AfterViewInit {
       sourceName: 'Auth Page Demo Login',
       metadata: { reason: this.authForm.get('reason')!.value },
     };
-    
+
     this.commonService.createRequest('mkt', payload,
       (res: any) => {
         this.executeLogin({ email: 'demo@ezh.com', password: 'Pass1234' });

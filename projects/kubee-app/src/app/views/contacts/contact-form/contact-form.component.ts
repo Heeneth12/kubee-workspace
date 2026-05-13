@@ -4,7 +4,7 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } fr
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ContactService } from '../contacts.service';
 import { AddressType, ContactModel, ContactType } from '../contacts.model';
-import { ToastService } from '../../../layouts/components/toast/toastService';
+import { ToastService } from '../../../../../../kubee-ui/src/lib/components/toast/toastService';
 
 @Component({
   selector: 'app-contact-form',

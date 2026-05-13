@@ -5,20 +5,16 @@ import { FormsModule } from '@angular/forms';
 import { StandardTableComponent } from "../../../layouts/components/standard-table/standard-table.component";
 import { SalesOrderFilterModal, SalesOrderModal } from './sales-order.modal';
 import { Router } from '@angular/router';
-import { DrawerService } from '../../../layouts/components/drawer/drawerService';
 import { PaginationConfig, TableAction, TableActionConfig } from '../../../layouts/components/standard-table/standard-table.model';
-import { ToastService } from '../../../layouts/components/toast/toastService';
 import { SalesOrderService } from './sales-order.service';
 import { ArrowRight, BadgeIndianRupee, Clock, FileText, ListCheck, ListChevronsUpDown, XCircle } from 'lucide-angular';
-import { LoaderService } from '../../../layouts/components/loader/loaderService';
-import { DatePickerConfig, DateRangeEmit } from '../../../layouts/UI/date-picker/date-picker.component';
-import { OrderTrackerComponent } from '../../../layouts/components/order-tracker/order-tracker.component';
 import { StatCardConfig, StatGroupComponent } from '../../../layouts/UI/stat-group/stat-group.component';
 import { SALES_ORDER_ACTIONS, SALES_ORDER_COLUMNS, SALES_ORDER_DATE_CONFIG, SALES_ORDER_FILTER_OPTIONS } from '../salesConfig';
-import { ConfirmationModalService } from '../../../layouts/UI/confirmation-modal/confirmation-modal.service';
+import { ConfirmationModalService, DatePickerConfig, DateRangeEmit, DrawerService, LoaderService, ToastService } from 'kubee-ui';
 import { SalesOrderFormComponent } from './sales-order-form/sales-order-form.component';
 import { debounceTime, Subject } from 'rxjs';
 import { InvoiceFormComponent } from '../invoices/invoice-form/invoice-form.component';
+import { OrderTrackerComponent } from '../../../layouts/components/order-tracker/order-tracker.component';
 
 @Component({
   selector: 'app-sales-order',

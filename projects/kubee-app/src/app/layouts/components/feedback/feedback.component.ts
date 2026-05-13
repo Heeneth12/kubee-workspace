@@ -6,9 +6,8 @@ import {
   Bug, Lightbulb, MessageSquare, Star, Send, Image as ImageIcon,
   CheckCircle2, ChevronRight, ChevronLeft, BarChart2, X, Paperclip
 } from 'lucide-angular';
-import { ModalService } from '../modal/modalService';
+import { ModalService, ToastService } from 'kubee-ui';
 import { CommonService } from '../../service/common/common.service';
-import { ToastService } from '../toast/toastService';
 import { CreateAppRequestModel, SupportCategory, SupportPriority } from '../../models/user-request.model';
 
 export type FeedbackTab = 'rating' | 'feature' | 'bug' | 'contact' | 'nps';

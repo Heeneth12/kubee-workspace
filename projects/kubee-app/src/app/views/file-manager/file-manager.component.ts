@@ -12,8 +12,7 @@ import {
   FILE_REFERENCE_TYPES, FILE_TYPES
 } from './file-manager.model';
 import { AuthService } from '../../layouts/guards/auth.service';
-import { ModalService } from '../../layouts/components/modal/modalService';
-import { ToastService } from '../../layouts/components/toast/toastService';
+import { ModalService, ToastService } from 'kubee-ui';
 
 @Component({
   selector: 'app-file-manager',

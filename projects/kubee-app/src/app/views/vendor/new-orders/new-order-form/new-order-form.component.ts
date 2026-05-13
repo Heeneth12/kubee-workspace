@@ -3,8 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { debounceTime, distinctUntilChanged, Subject, switchMap, of } from 'rxjs';
-import { LoaderService } from '../../../../layouts/components/loader/loaderService';
-import { ToastService } from '../../../../layouts/components/toast/toastService';
+import { LoaderService } from '../../../../../../../kubee-ui/src/lib/components/loader/loaderService';
+import { ToastService } from '../../../../../../../kubee-ui/src/lib/components/toast/toastService';
 import { ItemService } from '../../../items/item.service';
 import { ItemModel, ItemSearchFilter } from '../../../items/models/Item.model';
 import { LucideAngularModule, Search, ShoppingBag, XIcon, Check, ChevronRight, Eye, Mail, SaveIcon, FileText, Settings, Paperclip, Upload, Trash2 } from "lucide-angular";
@@ -122,7 +122,7 @@ export class NewOrderFormComponent implements OnInit {
     const price = row.get('unitPrice')?.value || 0;
     const disc = row.get('discount')?.value || 0;
     const tax = row.get('tax')?.value || 0;
-    
+
     let total = (qty * price) - disc + tax;
     return Math.max(0, total);
   }

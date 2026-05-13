@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
 import { SearchResult, SearchService, SearchCategory } from './search-modal.service';
-import { ModalService } from '../modal/modalService';
+import { ModalService } from 'kubee-ui';
 import { LucideAngularModule, Search, Loader2, Package, ShoppingCart, Users, Folder, ChevronRight, FileText, Clock, X } from 'lucide-angular';
 import { NavItem, APP_NAVIGATION_MAP } from './searchConfig';
 

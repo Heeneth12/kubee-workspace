@@ -2,18 +2,16 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, HostListener, Input, OnInit, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ToastService } from '../../../../layouts/components/toast/toastService';
 import { SalesOrderService } from '../../sales-order/sales-order.service';
 import { SalesOrderModal } from '../../sales-order/sales-order.modal';
 import { InvoiceService } from '../invoice.service';
-import { LoaderService } from '../../../../layouts/components/loader/loaderService';
+import { LoaderService } from '../../../../../../../kubee-ui/src/lib/components/loader/loaderService';
 import { ArrowLeft, BoxIcon, CalculatorIcon, Check, ChevronRight, ChevronsLeftRight, CreditCard, EyeIcon, FileText, HistoryIcon, LucideAngularModule, QrCode, ReceiptIndianRupee, SaveIcon, Search, SettingsIcon, ShoppingBag, Trash, Truck, TruckIcon, User, XIcon } from "lucide-angular";
 import { InvoiceModal, InvoiceItemModal, DeliveryOption, InvoiceFilterModal } from '../invoice.modal';
 import { InvoiceHeaderComponent } from "../../../../layouts/components/invoice-header/invoice-header.component";
 import { AddressType, UserModel } from '../../../user-management/models/user.model';
 import { UserManagementService } from '../../../user-management/userManagement.service';
-import { DrawerService } from '../../../../layouts/components/drawer/drawerService';
-import { ModalService } from '../../../../layouts/components/modal/modalService';
+import { DrawerService, ModalService, ToastService } from 'kubee-ui';
 import { ItemSearchComponent } from '../../../../layouts/components/item-search/item-search.component';
 
 @Component({

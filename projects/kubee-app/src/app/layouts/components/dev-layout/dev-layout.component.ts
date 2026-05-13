@@ -32,11 +32,11 @@ import {
   Calendar
 } from 'lucide-angular';
 import { AuthService } from '../../guards/auth.service';
-import { ModalService } from '../modal/modalService';
 import { NotificationsComponent } from '../notifications/notifications.component';
 import { DropdownMenuItem, CustomDropdownComponent } from '../../UI/custom-dropdown/custom-dropdown.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { DrawerService } from '../drawer/drawerService';
+import { DrawerService, ModalService } from 'kubee-ui';
+
 import { SearchModalComponent } from '../search-modal/search-modal.component';
 
 @Component({

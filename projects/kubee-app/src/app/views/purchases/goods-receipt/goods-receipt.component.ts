@@ -3,14 +3,12 @@ import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core'
 import { Router } from '@angular/router';
 import { StandardTableComponent } from '../../../layouts/components/standard-table/standard-table.component';
 import { PaginationConfig, TableAction, TableActionConfig, TableColumn } from '../../../layouts/components/standard-table/standard-table.model';
-import { LoaderService } from '../../../layouts/components/loader/loaderService';
-import { ToastService } from '../../../layouts/components/toast/toastService';
-import { ModalService } from '../../../layouts/components/modal/modalService';
+import { LoaderService, ModalService, ToastService } from 'kubee-ui';
 import { PurchaseService } from '../purchase.service';
 import { GrnFilterModel, GrnModel } from '../models/grn.model';
 import { PurchaseReturnFormComponent } from '../purchase-returns/purchase-return-form/purchase-return-form.component';
 import { ArrowRight } from 'lucide-angular';
-import { DatePickerConfig, DateRangeEmit } from '../../../layouts/UI/date-picker/date-picker.component';
+import { DatePickerConfig, DateRangeEmit } from '../../../../../../kubee-ui/src/lib/components/date-picker/date-picker.component';
 import { GRN_COLUMN, GRN_DATE_CONFIG, GRN_FILTER_OPTIONS } from '../purchasesConfig';
 
 @Component({
@@ -186,7 +184,7 @@ export class GoodsReceiptComponent implements OnInit {
     return date.toISOString().split('T')[0];
   }
 
-  
+
   onFilterUpdate($event: Record<string, any>) {
     console.log("Received filter update:", $event);
     this.grnFilter.grnStatuses = $event['status'] || null;

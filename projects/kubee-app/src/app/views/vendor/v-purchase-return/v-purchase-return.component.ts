@@ -2,11 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FilePlusCorner } from 'lucide-angular';
-import { LoaderService } from '../../../layouts/components/loader/loaderService';
-import { ModalService } from '../../../layouts/components/modal/modalService';
+import { LoaderService } from '../../../../../../kubee-ui/src/lib/components/loader/loaderService';
 import { PaginationConfig, TableColumn, TableActionConfig, HeaderAction, TableAction } from '../../../layouts/components/standard-table/standard-table.model';
-import { ToastService } from '../../../layouts/components/toast/toastService';
-import { DatePickerConfig, DateRangeEmit } from '../../../layouts/UI/date-picker/date-picker.component';
+import { ToastService } from '../../../../../../kubee-ui/src/lib/components/toast/toastService';
+import { DatePickerConfig, DateRangeEmit } from '../../../../../../kubee-ui/src/lib/components/date-picker/date-picker.component';
 import { PurchaseReturnModel } from '../../purchases/models/pr.model';
 import { PurchaseService } from '../../purchases/purchase.service';
 import { StandardTableComponent } from "../../../layouts/components/standard-table/standard-table.component";
@@ -53,7 +52,6 @@ export class VPurchaseReturnComponent {
   constructor(
     private purchaseService: PurchaseService,
     private router: Router,
-    private modalService: ModalService,
     private toastService: ToastService,
     private loaderSvc: LoaderService,
     private authSvs: AuthService

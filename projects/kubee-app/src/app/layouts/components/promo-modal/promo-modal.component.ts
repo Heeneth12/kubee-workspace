@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { TutorialService } from '../../service/common/tutorial.service';
-import { ModalService } from '../modal/modalService';
+import { ModalService } from 'kubee-ui';
 
 @Component({
   selector: 'app-promo-modal',
@@ -23,7 +23,7 @@ export class PromoModalComponent {
     const hasSeenTour = localStorage.getItem(this.STORAGE_KEY);
     if (hasSeenTour === 'true') {
       this.isVisible = false;
-    }else{
+    } else {
       this.isVisible = true;
     }
   }

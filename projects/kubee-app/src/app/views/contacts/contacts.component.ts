@@ -1,8 +1,6 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { DrawerService } from '../../layouts/components/drawer/drawerService';
-import { ToastService } from '../../layouts/components/toast/toastService';
 import { ContactService } from './contacts.service';
 import { ContactFilter, ContactModel } from './contacts.model';
 import { Router } from '@angular/router';
@@ -12,6 +10,7 @@ import { CONTACT_COLUMNS } from '../../layouts/config/tableConfig';
 import { ArrowRight, Building2, Calendar, CheckCircle2, ChevronDown, CreditCard, FilePlusCorner, FileText, Mail, MapPin, Phone, User, UserPlus, XCircle, Zap, Search, LucideAngularModule } from 'lucide-angular';
 import { UserManagementService } from '../user-management/userManagement.service';
 import { TenantModel } from '../user-management/models/tenant.model';
+import { DrawerService, ToastService } from 'kubee-ui';
 
 @Component({
   selector: 'app-contacts',
@@ -102,11 +101,11 @@ export class ContactsComponent implements OnInit {
   ngOnInit() {
     this.getAllContacts();
     this.contactService.getMyNetwork(
-      (res:any)=>{
+      (res: any) => {
         console.log(res);
       },
-      (err:any)=>{
-        
+      (err: any) => {
+
       }
     )
   }

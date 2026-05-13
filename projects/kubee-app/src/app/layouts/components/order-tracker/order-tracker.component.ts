@@ -4,8 +4,8 @@ import { SalesOrderService } from '../../../views/sales/sales-order/sales-order.
 import { InvoiceService } from '../../../views/sales/invoices/invoice.service';
 import { SalesOrderModal } from '../../../views/sales/sales-order/sales-order.modal';
 import { InvoiceModal } from '../../../views/sales/invoices/invoice.modal';
-import { LoaderService } from '../loader/loaderService';
-import { ToastService } from '../toast/toastService';
+import { LoaderService } from '../../../../../../kubee-ui/src/lib/components/loader/loaderService';
+import { ToastService } from '../../../../../../kubee-ui/src/lib/components/toast/toastService';
 import { StepConfig } from "../../UI/stepper/stepper.component";
 import { User, ReceiptText, Truck, ReceiptIndianRupee, LucideAngularModule, Copy, Calendar, Package, ArrowRight, ArrowLeft, Download } from 'lucide-angular';
 import { DeliveryService } from '../../../views/sales/delivery/delivery.service';
@@ -16,9 +16,9 @@ import { PaymentSymmaryComponent } from '../../../views/payments/payment-symmary
 import { InvoicePaymentSummaryModal } from '../../../views/payments/payment.modal';
 import { PaymentService } from '../../../views/payments/payment.service';
 import { InvoiceFormComponent } from '../../../views/sales/invoices/invoice-form/invoice-form.component';
-import { ConfirmationModalService } from '../../UI/confirmation-modal/confirmation-modal.service';
-import { DrawerService } from '../drawer/drawerService';
-import { ModalService } from '../modal/modalService';
+import { ConfirmationModalService } from '../../../../../../kubee-ui/src/lib/components/confirmation-modal/confirmation-modal.service';
+import { DrawerService } from 'kubee-ui';
+import { ModalService } from 'kubee-ui';
 
 @Component({
   selector: 'app-order-tracking',

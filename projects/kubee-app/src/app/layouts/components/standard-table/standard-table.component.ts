@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { TableColumn, TableRow, LoadMode, PaginationConfig, TableAction, Density, TableActionConfig, HeaderAction } from './standard-table.model';
 import { LucideAngularModule, Filter, Calendar, Download, Edit, Trash2, EyeIcon, MoreVertical, ArrowRight, RotateCcw, Settings, Package, Plus, FileText, StickyNote } from 'lucide-angular';
 import { UserCardComponent } from "../../UI/user-card/user-card.component";
-import { DatePickerConfig, DateRangeEmit, DatePickerComponent } from '../../UI/date-picker/date-picker.component';
+import { DatePickerConfig, DateRangeEmit, DatePickerComponent } from '../../../../../../kubee-ui/src/lib/components/date-picker/date-picker.component';
 import { FilterOption, FilterDropdownComponent } from '../../UI/filter-dropdown/filter-dropdown.component';
 import { debounceTime, distinctUntilChanged, Subject, Subscription } from 'rxjs';
 import { SkeletonLoaderComponent } from "../../UI/skeleton-loader/skeleton-loader.component";

@@ -34,10 +34,9 @@ import { TenantModel } from '../../../views/user-management/models/tenant.model'
 import { UserManagementService } from '../../../views/user-management/userManagement.service';
 import { AuthService } from '../../guards/auth.service';
 import { UserInitResponse } from '../../models/Init-response.model';
-import { ToastService } from '../toast/toastService';
-import { ModalService } from '../modal/modalService';
+import { ToastService } from '../../../../../../kubee-ui/src/lib/components/toast/toastService';
 import { IntegrationsComponent } from "../integrations/integrations.component";
-
+import { ModalService } from 'kubee-ui';
 
 export interface DocumentRecord {
   label: string;

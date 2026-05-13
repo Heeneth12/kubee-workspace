@@ -1,18 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { DrawerService } from '../../../layouts/components/drawer/drawerService';
-import { LoaderService } from '../../../layouts/components/loader/loaderService';
-import { ModalService } from '../../../layouts/components/modal/modalService';
-import { ToastService } from '../../../layouts/components/toast/toastService';
+import { DrawerService, LoaderService, ModalService, ToastService } from 'kubee-ui';
 import { PurchaseService } from '../purchase.service';
 import { PaginationConfig, TableAction, TableActionConfig, TableColumn } from '../../../layouts/components/standard-table/standard-table.model';
-import { DatePickerConfig, DateRangeEmit } from '../../../layouts/UI/date-picker/date-picker.component';
+import { DatePickerConfig, DateRangeEmit } from '../../../../../../kubee-ui/src/lib/components/date-picker/date-picker.component';
 import { PurchaseRequestFilterModel, PurchaseRequestModel } from '../models/prq.model';
 import { PRQ_ACTIONS, PRQ_COLUMN, PRQ_DATE_CONFIG, PRQ_FILTER_OPTIONS } from '../purchasesConfig';
 import { StandardTableComponent } from '../../../layouts/components/standard-table/standard-table.component';
 import { Search, ShoppingBag, LucideAngularModule } from 'lucide-angular';
-import { ConfirmationModalService } from '../../../layouts/UI/confirmation-modal/confirmation-modal.service';
+import { ConfirmationModalService } from '../../../../../../kubee-ui/src/lib/components/confirmation-modal/confirmation-modal.service';
 
 @Component({
   selector: 'app-purchase-request',

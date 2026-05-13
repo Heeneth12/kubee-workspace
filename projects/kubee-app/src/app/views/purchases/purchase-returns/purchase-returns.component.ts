@@ -1,18 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { LoaderService } from '../../../layouts/components/loader/loaderService';
-import { ModalService } from '../../../layouts/components/modal/modalService';
+import { ConfirmationModalService, DatePickerConfig, DateRangeEmit, DrawerService, LoaderService, ModalService, ToastService } from 'kubee-ui';
 import { HeaderAction, PaginationConfig, TableAction, TableActionConfig, TableColumn } from '../../../layouts/components/standard-table/standard-table.model';
-import { ToastService } from '../../../layouts/components/toast/toastService';
 import { PurchaseService } from '../purchase.service';
 import { PurchaseReturnFilterModel, PurchaseReturnModel, ReturnStatus } from '../models/pr.model';
 import { StandardTableComponent } from "../../../layouts/components/standard-table/standard-table.component";
-import { DatePickerConfig, DateRangeEmit } from '../../../layouts/UI/date-picker/date-picker.component';
 import { FilePlusCorner } from 'lucide-angular';
-import { PR_ACTIONS, PR_COLUMN, PR_DATE_CONFIG, PR_FILTER_OPTIONS} from '../purchasesConfig';
+import { PR_ACTIONS, PR_COLUMN, PR_DATE_CONFIG, PR_FILTER_OPTIONS } from '../purchasesConfig';
 import { FilterOption } from '../../../layouts/UI/filter-dropdown/filter-dropdown.component';
-import { ConfirmationModalService } from '../../../layouts/UI/confirmation-modal/confirmation-modal.service';
 
 @Component({
   selector: 'app-purchase-returns',

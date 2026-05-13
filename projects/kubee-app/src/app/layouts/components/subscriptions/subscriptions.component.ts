@@ -9,8 +9,8 @@ import {
 import { SubscriptionsService } from './subscriptions.service';
 import { SubscriptionModel, SubscriptionPlanModel } from './subscriptions.model';
 import { AuthService } from '../../guards/auth.service';
-import { ToastService } from '../toast/toastService';
-import { ModalService } from '../modal/modalService';
+import { ModalService, ToastService } from 'kubee-ui';
+
 
 @Component({
   selector: 'app-subscriptions',

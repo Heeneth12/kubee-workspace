@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; // Crucial for ngModel
-import { ToastService } from '../../../layouts/components/toast/toastService';
+import { ToastService } from '../../../../../../kubee-ui/src/lib/components/toast/toastService';
 import { UserManagementService } from '../userManagement.service';
 import { ApplicationModel, ModuleModel, PrivilegeModel } from '../models/application.model';
 

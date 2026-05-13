@@ -4,10 +4,10 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators'; // Import operators
 import { UserInitResponse } from '../models/Init-response.model';
-import { BannerLoaderService } from '../components/banner-loader/banner-loader.service';
-import { DrawerService } from '../components/drawer/drawerService';
+import { DrawerService } from 'kubee-ui';
 import { NgxPermissionsService } from 'ngx-permissions';
-import { ForgotPasswordModel, ResendOtpModel, ResetPasswordModel } from '../../../app/views/auth/auth.model';
+import { ForgotPasswordModel, ResendOtpModel, ResetPasswordModel } from '../../views/auth/auth.model';
+import { BannerLoaderService } from '../components/banner-loader/banner-loader.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,10 +17,10 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<UserInitResponse | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private commonService: CommonService, private router: Router, private dannerLoaderSvc: BannerLoaderService, private drawerSvc: DrawerService, private permissionsService: NgxPermissionsService) { }
+  constructor(private commonService: CommonService, private router: Router, private bannerLoaderSvc: BannerLoaderService, private drawerSvc: DrawerService, private permissionsService: NgxPermissionsService) { }
 
   login(payload: any, success: (res: any) => void, error: (err: any) => void) {
-    this.dannerLoaderSvc.show();
+    this.bannerLoaderSvc.show();
     this.commonService.signIn(payload,
       (res: any) => {
         localStorage.setItem('access_token', res.data.accessToken);
@@ -30,19 +30,19 @@ export class AuthService {
           next: (userInitData) => {
             // Navigate to root - RedirectGuard will handle user type-based routing
             this.router.navigate(['/']).then(() => {
-              this.dannerLoaderSvc.hide();
+              this.bannerLoaderSvc.hide();
               success(res);
             });
           },
           error: (err) => {
-            this.dannerLoaderSvc.hide();
+            this.bannerLoaderSvc.hide();
             this.logout();
             error(err);
           }
         });
       },
       (err: any) => {
-        this.dannerLoaderSvc.hide();
+        this.bannerLoaderSvc.hide();
         error(err)
       }
     );
@@ -154,19 +154,19 @@ export class AuthService {
 
   // Refactored to be cleaner for RxJS pipes
   validateToken(): Observable<boolean> {
-    this.dannerLoaderSvc.show();
+    this.bannerLoaderSvc.show();
     return new Observable<boolean>((observer) => {
       this.commonService.validateToken(
         (res: any) => {
           observer.next(true);
           observer.complete();
-          this.dannerLoaderSvc.hide();
+          this.bannerLoaderSvc.hide();
         },
         (err: any) => {
           this.logout(); // Auto logout on invalid token
           observer.next(false);
           observer.complete();
-          this.dannerLoaderSvc.hide();
+          this.bannerLoaderSvc.hide();
         }
       );
     });

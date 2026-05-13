@@ -1,11 +1,9 @@
 import { Component, OnInit, signal, computed, Input } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Search, ArrowLeft, Save, AlertCircle, CheckCircle2 } from 'lucide-angular';
-import { DrawerService } from '../../../../layouts/components/drawer/drawerService';
-import { LoaderService } from '../../../../layouts/components/loader/loaderService';
-import { ToastService } from '../../../../layouts/components/toast/toastService';
+import { DrawerService, LoaderService, ToastService } from 'kubee-ui';
 import { InvoiceService } from '../../invoices/invoice.service';
 import { SalesReturnService } from '../sales-return.service';
 import { SalesReturnRequestModal } from '../sales-return.modal';

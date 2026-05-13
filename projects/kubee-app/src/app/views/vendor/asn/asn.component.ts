@@ -1,13 +1,10 @@
 import { Component, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ArrowRight, Download, ShareIcon, X, PenIcon, ClipboardList } from 'lucide-angular';
-import { DrawerService } from '../../../layouts/components/drawer/drawerService';
-import { LoaderService } from '../../../layouts/components/loader/loaderService';
-import { ModalService } from '../../../layouts/components/modal/modalService';
+import { DrawerService, LoaderService, ModalService, ToastService } from 'kubee-ui';
 import { TableColumn, TableActionConfig, PaginationConfig, TableAction } from '../../../layouts/components/standard-table/standard-table.model';
-import { ToastService } from '../../../layouts/components/toast/toastService';
 import { ButtonConfig, ButtonGroupComponent } from '../../../layouts/UI/button-group/button-group.component';
-import { DatePickerConfig, DateRangeEmit } from '../../../layouts/UI/date-picker/date-picker.component';
+import { DatePickerConfig, DateRangeEmit } from '../../../../../../kubee-ui/src/lib/components/date-picker/date-picker.component';
 import { GoodsReceiptFormComponent } from '../../purchases/goods-receipt/goods-receipt-form/goods-receipt-form.component';
 import { PurchaseOrderFilter, PurchaseOrderModel } from '../../purchases/models/po.model';
 import { PurchaseService } from '../../purchases/purchase.service';
@@ -183,7 +180,7 @@ export class AsnComponent {
       this.viewPoDetails(event.row.id);
     }
     if (event.type === 'custom' && event.key === 'send_asn') {
-      this.updatePoStatus(event.row.id , "ASN_CONFIRMED");
+      this.updatePoStatus(event.row.id, "ASN_CONFIRMED");
     }
   }
 

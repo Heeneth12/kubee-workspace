@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ArrowRight, CloudCog, CloudDownloadIcon, UserPenIcon, UserRoundCog } from 'lucide-angular';
-import { DrawerService } from '../../layouts/components/drawer/drawerService';
-import { ToastService } from '../../layouts/components/toast/toastService';
 import { UserManagementService } from './userManagement.service';
 import { StandardTableComponent } from "../../layouts/components/standard-table/standard-table.component";
 import { HeaderAction, PaginationConfig, TableAction, TableActionConfig, TableColumn } from '../../layouts/components/standard-table/standard-table.model';
@@ -14,6 +12,7 @@ import { TenantModel } from './models/tenant.model';
 import { CreateUserRequest } from './models/user.interfaces';
 import { USER_ACTIONS, USER_COLUMNS, USER_FILTER_OPTIONS } from './user-managementConfig';
 import { FilterOption } from '../../layouts/UI/filter-dropdown/filter-dropdown.component';
+import { DrawerService, ToastService } from 'kubee-ui';
 
 interface ApplicationUI extends ApplicationModel {
   isExpanded?: boolean;       // Is the accordion open?

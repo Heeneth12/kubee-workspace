@@ -38,9 +38,8 @@ import {
 import { AuthService } from '../../guards/auth.service';
 import { TutorialService } from '../../service/common/tutorial.service';
 import { PromoModalComponent } from "../promo-modal/promo-modal.component";
-import { ModalService } from '../modal/modalService';
+import { ModalService } from 'kubee-ui';
 import { NotificationsComponent } from '../notifications/notifications.component';
-import { DrawerService } from '../drawer/drawerService';
 import { SearchModalComponent } from '../search-modal/search-modal.component';
 import { DropdownMenuItem } from '../../UI/custom-dropdown/custom-dropdown.component';
 

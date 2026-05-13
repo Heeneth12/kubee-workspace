@@ -9,10 +9,8 @@ import {
 } from 'lucide-angular';
 import { DeliveryModel, DeliveryStatusUpdateRequest, ShipmentStatus } from '../delivery.model';
 import { DeliveryService } from '../delivery.service';
-import { ToastService } from '../../../../layouts/components/toast/toastService';
-import { ConfirmationModalService } from '../../../../layouts/UI/confirmation-modal/confirmation-modal.service';
+import { ConfirmationModalService, ModalService, ToastService } from 'kubee-ui';
 import { FileManagerService } from '../../../file-manager/file-manager.service';
-import { ModalService } from '../../../../layouts/components/modal/modalService';
 
 @Component({
   selector: 'app-delivery-details',

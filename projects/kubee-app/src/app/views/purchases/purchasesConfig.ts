@@ -1,6 +1,6 @@
 import { ArrowRight, ListRestart, ListCollapse, PenLineIcon, XCircle, Undo2 } from "lucide-angular";
 import { TableActionConfig, TableColumn } from "../../layouts/components/standard-table/standard-table.model";
-import { DatePickerConfig } from "../../layouts/UI/date-picker/date-picker.component";
+import { DatePickerConfig } from "../../../../../kubee-ui/src/lib/components/date-picker/date-picker.component";
 import { FilterOption } from "../../layouts/UI/filter-dropdown/filter-dropdown.component";
 
 //PRQ

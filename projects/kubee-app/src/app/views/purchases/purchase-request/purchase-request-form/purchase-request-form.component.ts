@@ -3,8 +3,8 @@ import { FormGroup, FormBuilder, Validators, FormArray, FormsModule, ReactiveFor
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Search, ShoppingBag, XIcon, Check, ChevronRight, SaveIcon, Eye, Mail, FileText, Settings, LucideAngularModule } from 'lucide-angular';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
-import { LoaderService } from '../../../../layouts/components/loader/loaderService';
-import { ToastService } from '../../../../layouts/components/toast/toastService';
+import { LoaderService } from '../../../../../../../kubee-ui/src/lib/components/loader/loaderService';
+import { ToastService } from '../../../../../../../kubee-ui/src/lib/components/toast/toastService';
 import { ContactService } from '../../../contacts/contacts.service';
 import { ItemService } from '../../../items/item.service';
 import { ItemModel, ItemSearchFilter } from '../../../items/models/Item.model';
@@ -201,7 +201,7 @@ export class PurchaseRequestFormComponent {
     this.loaderSvc.show();
     this.purchaseService.getPrqById(id, (res: any) => {
       const data = res.data;
-      if(data.status === 'CONVERTED' || data.status === 'ACCEPTED'){
+      if (data.status === 'CONVERTED' || data.status === 'ACCEPTED') {
         this.router.navigate(['purchases/prq']);
         this.toastService.show('Cannot edit PRQ with status ' + data.status, 'warning');
         return;

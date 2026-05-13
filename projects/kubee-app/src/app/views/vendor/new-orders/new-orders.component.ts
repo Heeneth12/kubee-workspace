@@ -2,18 +2,14 @@ import { Component, TemplateRef, ViewChild } from '@angular/core';
 import { StandardTableComponent } from "../../../layouts/components/standard-table/standard-table.component";
 import { NEW_ORDERS_COLUMN, NEW_ORDERS_ACTIONS, NEW_ORDERS_DATE_CONFIG, NEW_ORDERS_FILTER_CONFIG } from '../vendorConfig';
 import { TableColumn, TableActionConfig, PaginationConfig, TableAction, HeaderAction } from '../../../layouts/components/standard-table/standard-table.model';
-import { DatePickerConfig, DateRangeEmit } from '../../../layouts/UI/date-picker/date-picker.component';
+import { DatePickerConfig, DateRangeEmit } from '../../../../../../kubee-ui/src/lib/components/date-picker/date-picker.component';
 import { PurchaseRequestFilterModel, PurchaseRequestModel } from '../../purchases/models/prq.model';
 import { VendorService } from '../vendor.service';
 import { Router } from '@angular/router';
-import { DrawerService } from '../../../layouts/components/drawer/drawerService';
-import { LoaderService } from '../../../layouts/components/loader/loaderService';
-import { ModalService } from '../../../layouts/components/modal/modalService';
-import { ToastService } from '../../../layouts/components/toast/toastService';
+import { ConfirmationModalService, DrawerService, LoaderService, ModalService, ToastService } from 'kubee-ui';
 import { LucideAngularModule, PackagePlusIcon, Search, ShoppingBag } from 'lucide-angular';
 import { CommonModule } from '@angular/common';
 import { FilterOption } from '../../../layouts/UI/filter-dropdown/filter-dropdown.component';
-import { ConfirmationModalService } from '../../../layouts/UI/confirmation-modal/confirmation-modal.service';
 
 @Component({
   selector: 'app-new-orders',

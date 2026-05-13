@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ToastService } from '../../../layouts/components/toast/toastService';
+import { ToastService } from '../../../../../../kubee-ui/src/lib/components/toast/toastService';
 import { RoleModel, ApplicationModel, ModuleModel } from '../models/application.model';
 import { PrivilegeAssignRequest } from '../models/user.interfaces';
 import { AddressType, UserAddressModel } from '../models/user.model';
@@ -26,7 +26,7 @@ export class UserFormComponent implements OnInit {
   // Data Sources
   roles: RoleModel[] = []; // Actual roles from database
   applications: ApplicationModel[] = [];
-  
+
   // Default ADMIN role for vendors
   private defaultAdminRole: RoleModel = {
     id: -1,
@@ -101,7 +101,7 @@ export class UserFormComponent implements OnInit {
     // Load user types first
     this.userService.getUserTypes((resTypes: any) => {
       this.userTypes = resTypes.data;
-      
+
       // Set default user type if creating new user
       if (!this.isEditing && this.userTypes.length > 0) {
         this.userForm.patchValue({ userType: this.userTypes[0] });
@@ -388,12 +388,12 @@ export class UserFormComponent implements OnInit {
 
   isRoleDisabled(role: RoleModel): boolean {
     const userType = this.userForm.get('userType')?.value;
-    
+
     // If only one role is available, disable it (keep it selected)
     if (this.displayedRoles.length === 1) {
       return true;
     }
-    
+
     if (userType === 'VENDOR') {
       // Only allow ADMIN role for vendors
       return role.roleKey !== 'ADMIN' && role.roleName.toUpperCase() !== 'ADMIN';

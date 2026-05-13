@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Mail, MapPin, Phone, Building, FileText, ShoppingCart, CreditCard, StickyNote, ArrowUpRight, ArrowDownLeft, Clock, Home, Users, MapPinCheckIcon, ChevronDown, UserSquare, Pencil, User, Fingerprint, Calendar, Hash, Plus, Star, LucideAngularModule, PlusIcon } from 'lucide-angular';
 import { ContactModel } from '../../../views/contacts/contacts.model';
 import { ContactService } from '../../../views/contacts/contacts.service';
-import { ToastService } from '../toast/toastService';
+import { ToastService } from '../../../../../../kubee-ui/src/lib/components/toast/toastService';
 import { CommonModule } from '@angular/common';
 import { PaymentService } from '../../../views/payments/payment.service';
 

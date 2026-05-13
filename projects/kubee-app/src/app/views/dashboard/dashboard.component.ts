@@ -3,8 +3,8 @@ import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angula
 import { Observable } from 'rxjs';
 import { AuthService } from '../../layouts/guards/auth.service';
 import { UserInitResponse } from '../../layouts/models/Init-response.model';
-import { ToastService } from '../../layouts/components/toast/toastService';
-import { ConfirmationModalService } from '../../layouts/UI/confirmation-modal/confirmation-modal.service';
+import { ToastService } from '../../../../../kubee-ui/src/lib/components/toast/toastService';
+import { ConfirmationModalService } from '../../../../../kubee-ui/src/lib/components/confirmation-modal/confirmation-modal.service';
 import {
   LucideAngularModule,
   Eye, Users, MousePointerClick, ShoppingCart, TrendingUp,

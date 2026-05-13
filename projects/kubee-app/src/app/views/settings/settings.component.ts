@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ToastService } from '../../layouts/components/toast/toastService';
+import { ToastService } from 'kubee-ui';
 import { AuthService } from '../../layouts/guards/auth.service';
 import { UserManagementService } from '../user-management/userManagement.service';
 import { UserInitResponse } from '../../layouts/models/Init-response.model';

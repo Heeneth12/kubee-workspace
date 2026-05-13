@@ -5,8 +5,7 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { StandardTableComponent } from '../../../layouts/components/standard-table/standard-table.component';
 import { PaginationConfig, TableAction, TableColumn } from '../../../layouts/components/standard-table/standard-table.model';
-import { ToastService } from '../../../layouts/components/toast/toastService';
-import { DatePickerConfig, DateRangeEmit } from '../../../layouts/UI/date-picker/date-picker.component';
+import { DatePickerConfig, DateRangeEmit } from '../../../../../../kubee-ui/src/lib/components/date-picker/date-picker.component';
 import {
     ADVANCE_ACTIONS,
     ADVANCE_COLUMNS,
@@ -15,7 +14,7 @@ import {
 } from '../paymentConfig';
 import { AdvanceModal, AdvanceRefundItem } from '../payment.modal';
 import { PaymentService } from '../payment.service';
-import { DrawerService } from '../../../layouts/components/drawer/drawerService';
+import { DrawerService, ToastService } from 'kubee-ui';
 import { LucideAngularModule, CreditCard, FileText } from 'lucide-angular';
 
 type PanelMode = 'none' | 'create' | 'utilize' | 'refund' | 'detail';
@@ -174,11 +173,11 @@ export class AdvancePaymentComponent implements OnInit {
 
         this.paymentService.getAdvance(
             advance.id,
-            (res: any) => { 
-                this.selectedAdvance = res.data; 
+            (res: any) => {
+                this.selectedAdvance = res.data;
                 this.isAdvanceDetailsLoading = false;
             },
-            () => { 
+            () => {
                 this.isAdvanceDetailsLoading = false;
                 this.toastSvc.show('Failed to load advance details', 'error');
             }

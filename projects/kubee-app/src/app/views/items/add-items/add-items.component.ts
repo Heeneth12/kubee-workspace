@@ -4,7 +4,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 import { ItemService } from '../item.service';
 import { ItemModel } from '../models/Item.model';
-import { ToastService } from '../../../layouts/components/toast/toastService';
+import { ToastService } from '../../../../../../kubee-ui/src/lib/components/toast/toastService';
 import { BookOpenIcon, InfoIcon, LucideAngularModule, Save, UploadCloudIcon } from "lucide-angular";
 
 @Component({

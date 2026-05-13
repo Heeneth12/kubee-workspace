@@ -3,14 +3,13 @@ import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { StandardTableComponent } from '../../layouts/components/standard-table/standard-table.component';
 import { PaginationConfig, TableColumn, TableAction, HeaderAction, TableActionConfig } from '../../layouts/components/standard-table/standard-table.model';
-import { ToastService } from '../../layouts/components/toast/toastService';
+import { DrawerService, ToastService } from 'kubee-ui';
 import { ItemStockSearchModel, StockDashboardModel, StockFilterModel, StockModel, BatchDetailModel } from './models/stock.model';
 import { StockService } from './stock.service';
 import { StatCardConfig, StatGroupComponent } from "../../layouts/UI/stat-group/stat-group.component";
-import { AlertCircle, CloudDownloadIcon, List, Package, TrendingUp, Zap, LucideAngularModule, Calendar, Search, Building2 } from 'lucide-angular';
+import { AlertCircle, CloudDownloadIcon, List, Package, TrendingUp, Zap, LucideAngularModule, Calendar, Search } from 'lucide-angular';
 import { STOCK_COLUMNS } from '../../layouts/config/tableConfig';
 import { BulkUploadComponent } from '../../layouts/components/bulk-upload/bulk-upload.component';
-import { DrawerService } from '../../layouts/components/drawer/drawerService';
 
 @Component({
   selector: 'app-stock',

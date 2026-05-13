@@ -4,7 +4,7 @@ import { EmployeeModel, EmployeeRole } from '../employee.model';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ToastService } from '../../../layouts/components/toast/toastService';
+import { ToastService } from '../../../../../../kubee-ui/src/lib/components/toast/toastService';
 import { AddressType } from '../../contacts/contacts.model';
 
 @Component({
@@ -15,7 +15,7 @@ import { AddressType } from '../../contacts/contacts.model';
   styleUrl: './employee-form.component.css'
 })
 export class EmployeeFormComponent {
- employeeForm!: FormGroup;
+  employeeForm!: FormGroup;
   isEditMode = false;
   employeeId: number | null = null;
   isLoading = false;

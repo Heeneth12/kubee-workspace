@@ -4,14 +4,11 @@ import { StandardTableComponent } from "../../../layouts/components/standard-tab
 import { PaginationConfig, TableAction, TableActionConfig, TableColumn } from '../../../layouts/components/standard-table/standard-table.model';
 import { PurchaseService } from '../purchase.service';
 import { Router } from '@angular/router';
-import { LoaderService } from '../../../layouts/components/loader/loaderService';
-import { ToastService } from '../../../layouts/components/toast/toastService';
+import { DrawerService, LoaderService, ModalService, ToastService } from 'kubee-ui';
 import { PurchaseOrderFilter, PurchaseOrderModel } from '../models/po.model';
-import { ModalService } from '../../../layouts/components/modal/modalService';
-import { DrawerService } from '../../../layouts/components/drawer/drawerService';
 import { GoodsReceiptFormComponent } from '../goods-receipt/goods-receipt-form/goods-receipt-form.component';
 import { ArrowRight, ClipboardList, Download, PenIcon, ShareIcon, X } from 'lucide-angular';
-import { DatePickerConfig, DateRangeEmit } from '../../../layouts/UI/date-picker/date-picker.component';
+import { DatePickerConfig, DateRangeEmit } from '../../../../../../kubee-ui/src/lib/components/date-picker/date-picker.component';
 import { ButtonConfig, ButtonGroupComponent } from '../../../layouts/UI/button-group/button-group.component';
 import { PO_ACTIONS, PO_COLUMN, PO_DATE_CONFIG, PO_FILTER_OPTIONS } from '../purchasesConfig';
 

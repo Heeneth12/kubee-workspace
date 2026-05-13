@@ -19,11 +19,11 @@ import {
 import { Router } from '@angular/router';
 import { AuthService } from '../../../layouts/guards/auth.service';
 import { CommonService } from '../../../layouts/service/common/common.service';
-import { ToastService } from '../../../layouts/components/toast/toastService';
+import { ToastService } from '../../../../../../kubee-ui/src/lib/components/toast/toastService';
 import { SubscriptionsService } from '../../../layouts/components/subscriptions/subscriptions.service';
 import { SubscriptionPlanModel } from '../../../layouts/components/subscriptions/subscriptions.model';
 import { FeedbackComponent } from '../../../layouts/components/feedback/feedback.component';
-import { ModalService } from '../../../layouts/components/modal/modalService';
+import { ModalService } from 'kubee-ui';
 import { Contact, HeadsetIcon, Info, LucideAngularModule } from 'lucide-angular';
 
 export interface OnboardingResult {

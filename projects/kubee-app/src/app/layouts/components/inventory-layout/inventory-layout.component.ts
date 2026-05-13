@@ -61,11 +61,10 @@ import {
 import { AuthService } from '../../guards/auth.service';
 import { TutorialService } from '../../service/common/tutorial.service';
 import { PromoModalComponent } from "../promo-modal/promo-modal.component";
-import { ModalService } from '../modal/modalService';
 import { NotificationsComponent } from '../notifications/notifications.component';
 import { DropdownMenuItem, CustomDropdownComponent } from '../../UI/custom-dropdown/custom-dropdown.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { DrawerService } from '../drawer/drawerService';
+import { DrawerService, ModalService } from 'kubee-ui';
 import { SearchModalComponent } from '../search-modal/search-modal.component';
 import { AiChatComponent } from '../../../views/ai-chat/ai-chat.component';
 import { FeedbackComponent, FeedbackTab } from '../feedback/feedback.component';

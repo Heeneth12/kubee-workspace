@@ -7,8 +7,8 @@ import {
   ChevronDown, Package, CheckCircle, Zap, Ban, ShieldAlert, RefreshCw,
   Usb
 } from 'lucide-angular';
-import { ModalService } from '../modal/modalService';
-import { ToastService } from '../toast/toastService';
+import { ModalService } from 'kubee-ui';
+import { ToastService } from '../../../../../../kubee-ui/src/lib/components/toast/toastService';
 import { IntegrationsService } from './integrations.service';
 import {
   IntegrationDto, IntegrationRequest, IntegrationType,

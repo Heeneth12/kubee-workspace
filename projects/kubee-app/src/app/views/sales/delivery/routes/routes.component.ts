@@ -1,13 +1,11 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DeliveryService } from '../delivery.service';
-import { DeliveryFilterModel, DeliveryModel, RouteModel, ShipmentStatus } from '../delivery.model';
+import { DeliveryFilterModel, DeliveryModel, RouteModel } from '../delivery.model';
 import { Play, CheckCircle, MapPin, LucideAngularModule, Download, ListCollapse } from 'lucide-angular';
-import { LoaderService } from '../../../../layouts/components/loader/loaderService';
+import { DrawerService, LoaderService, ToastService } from 'kubee-ui';
 import { StandardTableComponent } from '../../../../layouts/components/standard-table/standard-table.component';
 import { PaginationConfig, TableColumn, TableAction, TableActionConfig } from '../../../../layouts/components/standard-table/standard-table.model';
-import { ToastService } from '../../../../layouts/components/toast/toastService';
-import { DrawerService } from '../../../../layouts/components/drawer/drawerService';
 
 @Component({
   selector: 'app-routes',

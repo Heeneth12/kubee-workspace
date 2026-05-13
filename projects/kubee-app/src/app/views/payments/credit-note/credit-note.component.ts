@@ -5,8 +5,7 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { StandardTableComponent } from '../../../layouts/components/standard-table/standard-table.component';
 import { PaginationConfig, TableAction, TableColumn } from '../../../layouts/components/standard-table/standard-table.model';
-import { ToastService } from '../../../layouts/components/toast/toastService';
-import { DatePickerConfig, DateRangeEmit } from '../../../layouts/UI/date-picker/date-picker.component';
+import { DatePickerConfig, DateRangeEmit } from '../../../../../../kubee-ui/src/lib/components/date-picker/date-picker.component';
 import {
     CREDIT_NOTE_ACTIONS,
     CREDIT_NOTE_COLUMNS,
@@ -15,7 +14,7 @@ import {
 } from '../paymentConfig';
 import { CreditNoteModal, CreditNoteRefundItem } from '../payment.modal';
 import { PaymentService } from '../payment.service';
-import { DrawerService } from '../../../layouts/components/drawer/drawerService';
+import { DrawerService, ToastService } from 'kubee-ui';
 import { LucideAngularModule, CreditCard, FileText } from 'lucide-angular';
 import { TemplateRef, ViewChild } from '@angular/core';
 
@@ -160,11 +159,11 @@ export class CreditNoteComponent implements OnInit {
 
         this.paymentService.getCreditNote(
             note.id,
-            (res: any) => { 
-                this.selectedNote = res.data; 
+            (res: any) => {
+                this.selectedNote = res.data;
                 this.isCreditNoteDetailsLoading = false;
             },
-            () => { 
+            () => {
                 this.isCreditNoteDetailsLoading = false;
                 this.toastSvc.show('Failed to load credit note details', 'error');
             }

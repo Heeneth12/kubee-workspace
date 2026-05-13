@@ -1,9 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, signal } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { LoaderService } from '../../../layouts/components/loader/loaderService';
-import { ModalService } from '../../../layouts/components/modal/modalService';
-import { ToastService } from '../../../layouts/components/toast/toastService';
+import { LoaderService, ModalService, ToastService } from 'kubee-ui';
 import { AdvanceModal, InvoicePaymentSummaryModal, RazorpayTransactionModal, RazorpayOrderResponse, RazorpaySuccessResponse } from '../payment.modal';
 import { PaymentService } from '../payment.service';
 import { IntegrationsService } from '../../../layouts/components/integrations/integrations.service';

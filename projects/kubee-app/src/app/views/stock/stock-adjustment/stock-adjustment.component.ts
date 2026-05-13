@@ -4,17 +4,15 @@ import { AdjustmentStatus, StockAdjustmentDetailModel, StockAdjustmentFilter, St
 import { HeaderAction, PaginationConfig, TableAction, TableActionConfig } from '../../../layouts/components/standard-table/standard-table.model';
 import { Router } from '@angular/router';
 import { ArrowRight, CircleX, FilePlusCorner } from 'lucide-angular';
-import { DrawerService } from '../../../layouts/components/drawer/drawerService';
-import { LoaderService } from '../../../layouts/components/loader/loaderService';
-import { ToastService } from '../../../layouts/components/toast/toastService';
+import { DrawerService, LoaderService, ToastService } from 'kubee-ui';
 import { STOCK_ADJUSTMENT_COLUMNS } from '../../../layouts/config/tableConfig';
 import { StandardTableComponent } from "../../../layouts/components/standard-table/standard-table.component";
 import { StockService } from '../stock.service';
-import { DatePickerConfig, DateRangeEmit } from '../../../layouts/UI/date-picker/date-picker.component';
+import { DatePickerConfig, DateRangeEmit } from '../../../../../../kubee-ui/src/lib/components/date-picker/date-picker.component';
 import { FilterOption } from '../../../layouts/UI/filter-dropdown/filter-dropdown.component';
 import { Subject } from 'rxjs/internal/Subject';
 import { debounceTime } from 'rxjs';
-import { ConfirmationModalService } from '../../../layouts/UI/confirmation-modal/confirmation-modal.service';
+import { ConfirmationModalService } from '../../../../../../kubee-ui/src/lib/components/confirmation-modal/confirmation-modal.service';
 
 @Component({
   selector: 'app-stock-adjustment',

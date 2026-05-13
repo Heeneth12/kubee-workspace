@@ -5,7 +5,7 @@ import { AuthService } from '../../guards/auth.service';
 import { UserInitResponse } from '../../models/Init-response.model';
 import { Settings, ShieldCheck, Zap, LucideAngularModule, UserPlusIcon, FolderOpen, ChevronRight, Percent, AppWindow } from 'lucide-angular';
 import { RouterModule, Router } from '@angular/router';
-import { DrawerService } from '../drawer/drawerService';
+import { DrawerService } from 'kubee-ui';
 
 @Component({
   selector: 'app-user',

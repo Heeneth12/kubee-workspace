@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { DatePickerConfig, DateRangeEmit } from '../../layouts/UI/date-picker/date-picker.component';
+import { DatePickerConfig, DateRangeEmit } from '../../../../../kubee-ui/src/lib/components/date-picker/date-picker.component';
 import { FileManagerService } from '../file-manager/file-manager.service';
 
 
@@ -11,9 +11,8 @@ import {
   Download, Trash, Eye, Activity, Database, BarChart2
 } from 'lucide-angular';
 import { FeedbackComponent } from "../../layouts/components/feedback/feedback.component";
-import { ToastService } from '../../layouts/components/toast/toastService';
+import { ModalService, ToastService } from 'kubee-ui';
 import { BannerLoaderService } from '../../layouts/components/banner-loader/banner-loader.service';
-import { ModalService } from '../../layouts/components/modal/modalService';
 import { PromoModalComponent } from '../../layouts/components/promo-modal/promo-modal.component';
 
 // ── Interfaces ────────────────────────────────────────────────

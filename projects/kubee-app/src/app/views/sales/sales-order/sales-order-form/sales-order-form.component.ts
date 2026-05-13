@@ -2,8 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, Input, OnInit, ViewChild, HostListener } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ToastService } from '../../../../layouts/components/toast/toastService';
-import { ItemService } from '../../../items/item.service';
 import { ItemModel } from '../../../items/models/Item.model';
 import { SalesOrderService } from '../sales-order.service';
 import { LucideAngularModule, Search, QrCode, Loader2, AlertTriangle, ShoppingBag, SettingsIcon, FileDown, XIcon, ArrowLeft, Check, Eye, Trash, Save } from 'lucide-angular';
@@ -12,10 +10,9 @@ import { ApprovalConfigModel, ApprovalType } from '../../../approval-console/app
 import { ApprovalConsoleService } from '../../../approval-console/approval-console.service';
 import { UserModel, AddressType, UserType, UserFilterModel } from '../../../user-management/models/user.model';
 import { UserManagementService } from '../../../user-management/userManagement.service';
-import { DrawerService } from '../../../../layouts/components/drawer/drawerService';
 import { SalesOrderFilterModal } from '../sales-order.modal';
-import { ModalService } from '../../../../layouts/components/modal/modalService';
 import { ItemSearchComponent } from '../../../../layouts/components/item-search/item-search.component';
+import { DrawerService, ModalService, ToastService } from 'kubee-ui';
 
 @Component({
   selector: 'app-sales-order-form',

@@ -1,19 +1,15 @@
 import { Component, Input, ViewChild, TemplateRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { ArrowRight } from 'lucide-angular';
-import { DrawerService } from '../../../layouts/components/drawer/drawerService';
-import { LoaderService } from '../../../layouts/components/loader/loaderService';
 import { PaginationConfig, TableColumn, TableAction } from '../../../layouts/components/standard-table/standard-table.model';
-import { ToastService } from '../../../layouts/components/toast/toastService';
 import { SalesOrderService } from '../sales-order/sales-order.service';
 import { SalesReturnService } from './sales-return.service';
 import { SalesReturnFilter, SalesReturnModal } from './sales-return.modal';
 import { StandardTableComponent } from "../../../layouts/components/standard-table/standard-table.component";
 import { SALES_RETURNS_ACTIONS, SALES_RETURNS_COLUMNS, SALES_RETURNS_DATE_CONFIG, SALES_RETURNS_FILTER_OPTIONS } from '../salesConfig';
-import { DateRangeEmit } from '../../../layouts/UI/date-picker/date-picker.component';
 import { CommonModule } from '@angular/common';
-import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { Subject, debounceTime } from 'rxjs';
+import { DateRangeEmit, DrawerService, LoaderService, ToastService } from 'kubee-ui';
 
 @Component({
   selector: 'app-sales-returns',

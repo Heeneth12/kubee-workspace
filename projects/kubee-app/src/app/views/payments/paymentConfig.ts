@@ -1,6 +1,6 @@
 import { ScrollText, FileDown, Eye, CheckCircle, RotateCcw } from "lucide-angular";
 import { TableColumn, TableActionConfig } from "../../layouts/components/standard-table/standard-table.model";
-import { DatePickerConfig } from "../../layouts/UI/date-picker/date-picker.component";
+import { DatePickerConfig } from "../../../../../kubee-ui/src/lib/components/date-picker/date-picker.component";
 import { FilterOption } from "../../layouts/UI/filter-dropdown/filter-dropdown.component";
 
 // PAYMENTS

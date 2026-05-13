@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserManagementService } from '../../userManagement.service';
-import { ToastService } from '../../../../layouts/components/toast/toastService';
+import { ToastService } from '../../../../../../../kubee-ui/src/lib/components/toast/toastService';
 
 export type FormMode = 'create' | 'edit' | 'view';
 
