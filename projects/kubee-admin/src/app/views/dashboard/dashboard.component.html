@@ -1,0 +1,31 @@
+<div class="p-6">
+    <div class="mb-6">
+        <h1 class="text-2xl font-semibold text-ez-heading">Dashboard</h1>
+        <p class="text-sm text-ez-secondary mt-1">Platform overview</p>
+    </div>
+
+    @if (isLoading) {
+    <div class="text-center py-16 text-sm text-ez-secondary">Loading stats...</div>
+    }
+
+    @if (!isLoading) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-ez-white border border-ez-border p-5">
+            <p class="text-xs text-ez-secondary uppercase tracking-wide mb-1">Total Tenants</p>
+            <p class="text-2xl font-semibold text-ez-heading">{{ stats?.totalTenants ?? '—' }}</p>
+        </div>
+        <div class="bg-ez-white border border-ez-border p-5">
+            <p class="text-xs text-ez-secondary uppercase tracking-wide mb-1">Total Users</p>
+            <p class="text-2xl font-semibold text-ez-heading">{{ stats?.totalUsers ?? '—' }}</p>
+        </div>
+        <div class="bg-ez-white border border-ez-border p-5">
+            <p class="text-xs text-ez-secondary uppercase tracking-wide mb-1">Active Subscriptions</p>
+            <p class="text-2xl font-semibold text-ez-heading">{{ stats?.activeSubscriptions ?? '—' }}</p>
+        </div>
+        <div class="bg-ez-white border border-ez-border p-5">
+            <p class="text-xs text-ez-secondary uppercase tracking-wide mb-1">Applications</p>
+            <p class="text-2xl font-semibold text-ez-heading">{{ stats?.totalApplications ?? '—' }}</p>
+        </div>
+    </div>
+    }
+</div>
