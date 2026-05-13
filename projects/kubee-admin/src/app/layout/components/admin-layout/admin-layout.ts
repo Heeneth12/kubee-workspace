@@ -1,0 +1,167 @@
+import { Component, HostListener, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
+import {
+  LucideAngularModule,
+  LayoutDashboard,
+  Building2,
+  Users,
+  AppWindow,
+  ShieldCheck,
+  KeyRound,
+  Database,
+  ScrollText,
+  CreditCard,
+  ChevronDown,
+  ChevronLeft,
+  Menu,
+  Search,
+  SettingsIcon,
+  X,
+  BookOpen,
+  HelpCircle,
+  MessageSquare,
+  LogOut,
+  Zap,
+  Bug,
+} from 'lucide-angular';
+import { CustomDropdownComponent, DropdownMenuItem } from 'kubee-ui';
+import { AuthService } from '../../guards/auth.service';
+
+@Component({
+  selector: 'app-admin-layout',
+  standalone: true,
+  imports: [CommonModule, RouterModule, LucideAngularModule, CustomDropdownComponent],
+  templateUrl: './admin-layout.html',
+  styleUrl: './admin-layout.scss',
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+})
+export class AdminLayout {
+
+  isMobileMenuOpen = false;
+  isSidebarCollapsed = false;
+  openDropdownLabel: string | null = null;
+
+  readonly ChevronDown = ChevronDown;
+  readonly ChevronLeft = ChevronLeft;
+  readonly Menu = Menu;
+  readonly Search = Search;
+  readonly XIcon = X;
+  readonly helpIcon = HelpCircle;
+  readonly Zap = Zap;
+
+  user: UserProfile = { name: '', role: 'KUBEE_OPS', initials: 'KO', email: '' };
+
+  helpCenterItems: DropdownMenuItem[] = [
+    {
+      label: 'Knowledge Base',
+      subLabel: 'Platform documentation',
+      icon: BookOpen,
+      iconBgClass: 'bg-slate-50',
+      colorClass: 'text-slate-600',
+      action: () => {}
+    },
+    {
+      label: 'Contact Support',
+      subLabel: 'Open a support ticket',
+      icon: MessageSquare,
+      iconBgClass: 'bg-slate-50',
+      colorClass: 'text-slate-600',
+      action: () => {}
+    },
+    {
+      label: 'Bug Report',
+      subLabel: 'Report a platform issue',
+      icon: Bug,
+      iconBgClass: 'bg-slate-50',
+      colorClass: 'text-slate-600',
+      action: () => {}
+    }
+  ];
+
+  userMenuItems: DropdownMenuItem[] = [
+    {
+      label: 'Settings',
+      subLabel: 'System preferences',
+      icon: SettingsIcon,
+      iconBgClass: 'bg-slate-50',
+      colorClass: 'text-slate-600',
+      action: () => {}
+    },
+    {
+      label: 'Sign Out',
+      icon: LogOut,
+      iconBgClass: 'bg-rose-50',
+      colorClass: 'text-rose-600',
+      action: () => this.authService.logout()
+    }
+  ];
+
+  allNavItems: NavItem[] = [
+    { label: 'Platform', isHeader: true, icon: null },
+    { label: 'Dashboard', link: '/dashboard', icon: LayoutDashboard },
+    { label: 'Tenants', link: '/tenants', icon: Building2 },
+    { label: 'Subscriptions', link: '/subscriptions', icon: CreditCard },
+    { label: 'Access Control', isHeader: true, icon: null },
+    { label: 'Users', link: '/users', icon: Users },
+    { label: 'Applications', link: '/applications', icon: AppWindow },
+    { label: 'Roles', link: '/roles', icon: ShieldCheck },
+    { label: 'Permissions', link: '/permissions', icon: KeyRound },
+    { label: 'Resources', link: '/resources', icon: Database },
+    { label: 'Monitoring', isHeader: true, icon: null },
+    { label: 'Audit Logs', link: '/audit-logs', icon: ScrollText },
+  ];
+
+  constructor(private authService: AuthService, public router: Router) {}
+
+  ngOnInit() {
+    this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        this.user = {
+          name: user.fullName,
+          role: user.userType,
+          initials: this.getInitials(user.fullName),
+          email: user.email
+        };
+      }
+    });
+  }
+
+  getInitials(name: string): string {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  }
+
+  toggleMenu() { this.isMobileMenuOpen = !this.isMobileMenuOpen; }
+  closeMenu() { this.isMobileMenuOpen = false; }
+
+  isItemActive(item: NavItem): boolean {
+    if (!this.router?.url) return false;
+    if (item.link && this.router.url === item.link) return true;
+    if (item.link && this.router.url.startsWith(item.link) && item.link !== '/') return true;
+    return false;
+  }
+
+  toggleSidebarCollapse() {
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    if (this.isSidebarCollapsed) this.openDropdownLabel = null;
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if (event.key === 'Escape') this.closeMenu();
+  }
+}
+
+export interface NavItem {
+  label: string;
+  icon: any;
+  link?: string;
+  isHeader?: boolean;
+}
+
+export interface UserProfile {
+  name: string;
+  role: string;
+  initials: string;
+  email: string;
+}
