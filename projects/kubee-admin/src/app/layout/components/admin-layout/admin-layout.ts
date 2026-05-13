@@ -1,4 +1,4 @@
-import { Component, HostListener, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, HostListener, CUSTOM_ELEMENTS_SCHEMA, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import {
@@ -26,6 +26,7 @@ import {
   Bug,
 } from 'lucide-angular';
 import { CustomDropdownComponent, DropdownMenuItem } from 'kubee-ui';
+import { Subscription } from 'rxjs';
 import { AuthService } from '../../guards/auth.service';
 
 @Component({
@@ -36,11 +37,11 @@ import { AuthService } from '../../guards/auth.service';
   styleUrl: './admin-layout.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class AdminLayout {
+export class AdminLayout implements OnInit, OnDestroy {
 
   isMobileMenuOpen = false;
   isSidebarCollapsed = false;
-  openDropdownLabel: string | null = null;
+  private userSub = new Subscription();
 
   readonly ChevronDown = ChevronDown;
   readonly ChevronLeft = ChevronLeft;
@@ -115,7 +116,7 @@ export class AdminLayout {
   constructor(private authService: AuthService, public router: Router) {}
 
   ngOnInit() {
-    this.authService.currentUser$.subscribe(user => {
+    this.userSub = this.authService.currentUser$.subscribe(user => {
       if (user) {
         this.user = {
           name: user.fullName,
@@ -126,6 +127,8 @@ export class AdminLayout {
       }
     });
   }
+
+  ngOnDestroy() { this.userSub.unsubscribe(); }
 
   getInitials(name: string): string {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
@@ -143,7 +146,6 @@ export class AdminLayout {
 
   toggleSidebarCollapse() {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
-    if (this.isSidebarCollapsed) this.openDropdownLabel = null;
   }
 
   @HostListener('window:keydown', ['$event'])
