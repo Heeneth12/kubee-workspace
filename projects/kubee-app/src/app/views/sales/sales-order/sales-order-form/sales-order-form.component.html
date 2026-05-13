@@ -1,0 +1,311 @@
+<div class="bg-ez-white font-sans">
+    <form [formGroup]="orderForm" (ngSubmit)="saveOrder()" (keydown.enter)="$event.preventDefault()"
+        class="flex flex-col">
+
+        <div
+            class="bg-white border-b border-ez-border px-8 py-2 flex items-center justify-between sticky top-0 z-30 shrink-0">
+            <div class="flex items-center gap-4">
+                @if(!customerId && !id){
+                <button (click)="back()" title="Go Back" type="button"
+                    class="text-ez-secondary hover:text-ez-heading transition-colors duration-ez outline-none">
+                    <lucide-icon [img]="ArrowLeftIcon" class="w-5 h-5"></lucide-icon>
+                </button>
+                }
+                <h1 class="text-ez-lg font-medium text-ez-heading leading-none">
+                    {{ !isEditMode ? 'Create Sales Order' : 'Update Sales Order' }}
+                </h1>
+            </div>
+
+            <div class="flex items-center gap-3">
+                @if(!isReadonly){
+                <button type="button" class="ez-btn  bg-ez-ash h-9 min-h-0 px-4">
+                    <lucide-icon [img]="DraftIcon" class="w-4 h-4 mr-2"></lucide-icon>
+                    Draft
+                </button>
+                <button type="submit" [disabled]="isLoading" class="ez-btn ez-btn-primary h-9 min-h-0 px-6">
+                    @if(isLoading){
+                    <svg class="w-4 h-4 mr-2 animate-spin" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.3"></circle>
+                        <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+                        </path>
+                    </svg>
+                    } @else {
+                    <lucide-icon [img]="checkIcon" class="w-4 h-4 mr-2"></lucide-icon>
+                    }
+                    {{ isApprovalRequired ? 'Submit for Approval' : 'Save Order' }}
+                </button>
+                }
+            </div>
+        </div>
+
+        @if(isReadonly) {
+        <div class="border-b border-ez-border px-8 py-3 flex items-center gap-3" [ngClass]="{
+                'bg-red-50 border-red-200 text-red-700': orderStatus === 'CANCELLED',
+                'bg-rose-50 border-rose-200 text-rose-700': orderStatus === 'REJECTED',
+                'bg-ez-ash text-ez-secondary': orderStatus === 'DRAFT',
+                'bg-ez-primary-tint border-ez-primary text-ez-primary': orderStatus === 'FULLY_INVOICED',
+                'bg-amber-50 border-amber-200 text-amber-700': orderStatus === 'ACKNOWLEDGED'
+            }">
+            <lucide-icon [img]="WarningIcon" class="w-5 h-5 shrink-0"></lucide-icon>
+            <p class="text-ez-sm">This Sales Order is <strong>{{ orderStatus }}</strong> and cannot be edited.</p>
+        </div>
+        }
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 border-b border-ez-border bg-white">
+
+            <div class="lg:col-span-7 border-r lg:border-r-ez-border" [class.pointer-events-none]="isReadonly"
+                [class.opacity-50]="isReadonly">
+                <app-invoice-header [selectedUser]="selectedUser" [searchType]="'CUSTOMER'" [autoFocus]="true"
+                    [isReadonly]="customerId ? true : false" (userSelected)="onUserSelected($event)"
+                    (userCleared)="onUserCleared()">
+                </app-invoice-header>
+            </div>
+
+            <div class="lg:col-span-5 bg-ez-ash">
+                <div class="grid grid-cols-2 gap-x-6 gap-y-5 p-3">
+
+                    <div class="col-span-2 sm:col-span-1 space-y-1.5">
+                        <label class="ez-label flex items-center gap-2">
+                            Search SO Number
+                            <kbd
+                                class="hidden md:inline-block px-1 py-0.5 text-ez-2xs bg-white border border-ez-border text-ez-muted">F3</kbd>
+                        </label>
+                        <div class="flex">
+                            <input type="text" #soSearch placeholder="Enter SO Number..." [(ngModel)]="orderNumber"
+                                [ngModelOptions]="{standalone: true}"
+                                (keyup.enter)="getSalesOrderByNumber(soSearch.value)"
+                                class="ez-input ez-input--default w-full border-r-0 focus:z-10 bg-white">
+                            <button type="button" (click)="getSalesOrderByNumber(soSearch.value)"
+                                class="px-3 border border-ez-border bg-white text-ez-secondary hover:text-ez-primary hover:border-ez-primary transition-colors duration-ez outline-none focus:z-10">
+                                <lucide-icon [img]="SearchIcon" class="w-4 h-4"></lucide-icon>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-span-2 sm:col-span-1 space-y-1.5">
+                        <label class="ez-label">Order Date</label>
+                        <input type="date" formControlName="orderDate"
+                            class="ez-input ez-input--default w-full bg-white">
+                    </div>
+
+                    <div class="col-span-2 space-y-1.5">
+                        <label class="ez-label">Reference/PO Number</label>
+                        <input type="text" formControlName="referenceNumber"
+                            class="ez-input ez-input--default w-full bg-white" placeholder="Customer Reference #">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div
+            class="px-8 py-4 border-b border-ez-border bg-ez-white flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="relative w-full max-w-2xl group" [class.pointer-events-none]="isReadonly"
+                [class.opacity-50]="isReadonly">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <lucide-icon [img]="SearchIcon" class="w-4 h-4 text-ez-muted"></lucide-icon>
+                </div>
+                <button type="button" (click)="openItemSearch()"
+                    class="w-full flex items-center justify-between pl-10 pr-3 py-2.5 bg-white border border-ez-border text-ez-sm text-ez-muted hover:border-ez-subtle transition-colors duration-ez outline-none focus:border-ez-primary text-left">
+                    <span>Search products by name or SKU...</span>
+                    <kbd
+                        class="hidden md:inline-flex items-center px-1.5 py-0.5 text-ez-2xs font-medium text-ez-muted bg-ez-ash border border-ez-border shrink-0">F2</kbd>
+                </button>
+            </div>
+            <span class="text-ez-xs font-medium text-ez-secondary whitespace-nowrap shrink-0">
+                {{ items.length }} Item{{ items.length !== 1 ? 's' : '' }} Selected
+            </span>
+        </div>
+
+        <div class="bg-white overflow-hidden flex-1">
+            <div class="hidden lg:grid grid-cols-12 gap-4 px-8 py-3 bg-ez-ash border-b border-ez-border items-center">
+                <div class="col-span-3 ez-micro-label text-ez-secondary">Item Details</div>
+                <div class="col-span-1 ez-micro-label text-ez-secondary text-right">MRP</div>
+                <div class="col-span-1 ez-micro-label text-ez-secondary text-right">Unit Price (₹)</div>
+                <div class="col-span-2 ez-micro-label text-ez-secondary text-center">Qty</div>
+                <div class="col-span-2 ez-micro-label text-ez-secondary text-center">Discount</div>
+                <div class="col-span-1 ez-micro-label text-ez-secondary text-center">Tax</div>
+                <div class="col-span-1 ez-micro-label text-ez-secondary text-right">Total (₹)</div>
+                <div class="col-span-1 ez-micro-label text-ez-secondary text-center">Action</div>
+            </div>
+
+            <div formArrayName="items" class="divide-y divide-ez-border pb-20">
+                @for(item of items.controls; track $index){
+                <div [formGroupName]="$index"
+                    class="grid grid-cols-1 lg:grid-cols-12 gap-4 px-8 py-4 items-center hover:bg-ez-ash transition-colors duration-ez group">
+
+                    <div class="col-span-1 lg:col-span-3 flex items-center gap-3 min-w-0">
+                        <img class="w-10 h-10 border border-ez-border object-cover shrink-0 bg-white"
+                            [src]="'https://ui-avatars.com/api/?name=' + item.get('name')?.value + '&background=f4f4f4&color=171a20&bold=true'"
+                            alt="">
+                        <div class="flex flex-col min-w-0">
+                            <p class="text-ez-sm font-medium text-ez-heading truncate"
+                                [title]="item.get('name')?.value">
+                                {{ item.get('name')?.value }}
+                            </p>
+                            <span class="ez-micro-label text-ez-muted mt-1">
+                                HSN: {{ item.get('hsn')?.value || 'N/A' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="col-span-1 lg:col-span-1 lg:flex justify-end hidden">
+                        <input type="number" readonly
+                            class="w-full max-w-[90px] text-right text-ez-sm text-ez-secondary bg-transparent border-none focus:outline-none pointer-events-none">
+                    </div>
+
+                    <div class="col-span-1 lg:col-span-1 flex justify-end">
+                        <input type="number" formControlName="unitPrice" [id]="'unitPriceInput' + $index"
+                            class="w-full max-w-[90px] text-right text-ez-sm font-medium text-ez-heading bg-transparent border border-transparent hover:border-ez-border focus:border-ez-primary focus:bg-white rounded-none px-2 py-1.5 transition-all outline-none placeholder-ez-muted">
+                    </div>
+
+                    <div class="col-span-1 lg:col-span-2 flex justify-center">
+                        <div class="flex items-center border border-ez-border bg-white focus-within:border-ez-primary transition-colors duration-ez"
+                            [class.pointer-events-none]="isReadonly" [class.opacity-50]="isReadonly">
+                            <button type="button" (click)="adjustQuantity($index, -1)"
+                                class="w-8 h-8 flex items-center justify-center text-ez-secondary hover:text-ez-heading hover:bg-ez-ash border-r border-ez-border outline-none transition-colors">−</button>
+                            <input type="number" formControlName="orderedQty"
+                                class="w-12 h-8 text-center text-ez-sm font-medium text-ez-heading bg-transparent border-none focus:outline-none focus:ring-0 p-0 m-0">
+                            <button type="button" (click)="adjustQuantity($index, 1)"
+                                class="w-8 h-8 flex items-center justify-center text-ez-secondary hover:text-ez-heading hover:bg-ez-ash border-l border-ez-border outline-none transition-colors">+</button>
+                        </div>
+                    </div>
+
+                    <div class="col-span-1 lg:col-span-2 flex justify-center">
+                        <div
+                            class="flex items-center border border-ez-border bg-white w-full max-w-[140px] focus-within:border-ez-primary transition-colors duration-ez">
+                            <div class="relative w-1/2 group/input border-r border-ez-border bg-white">
+                                <input type="number" formControlName="discountRate"
+                                    class="w-full h-8 text-right text-ez-xs font-medium text-ez-heading bg-transparent border-none pr-5 pl-2 focus:outline-none focus:ring-0 placeholder-ez-muted"
+                                    placeholder="0">
+                                <span
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 text-ez-2xs text-ez-muted font-medium pointer-events-none">%</span>
+                            </div>
+                            <div class="relative w-1/2 bg-ez-ash group/input">
+                                <span
+                                    class="absolute left-2 top-1/2 -translate-y-1/2 text-ez-2xs text-ez-secondary font-medium pointer-events-none">₹</span>
+                                <input type="number" [value]="getLineDetails($index).discAmt"
+                                    (change)="onDiscountAmountChange($index, $event)"
+                                    class="w-full h-8 text-right text-ez-xs font-medium text-ez-primary bg-transparent border-none pr-2 pl-5 focus:outline-none focus:ring-0 placeholder-ez-muted"
+                                    placeholder="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-span-1 lg:col-span-1 flex justify-center">
+                        <div
+                            class="flex items-center border border-ez-border bg-white w-full max-w-[120px] focus-within:border-ez-primary transition-colors duration-ez">
+                            <div class="relative w-1/2 group/input border-r border-ez-border bg-white">
+                                <input type="number" formControlName="taxRate"
+                                    class="w-full h-8 text-right text-ez-xs font-medium text-ez-heading bg-transparent border-none pr-5 pl-2 focus:outline-none focus:ring-0 placeholder-ez-muted"
+                                    placeholder="0">
+                                <span
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 text-ez-2xs text-ez-muted font-medium pointer-events-none">%</span>
+                            </div>
+                            <div class="relative w-1/2 bg-ez-ash group/input">
+                                <span
+                                    class="absolute left-1.5 top-1/2 -translate-y-1/2 text-ez-2xs text-ez-secondary font-medium pointer-events-none">₹</span>
+                                <input type="number" [value]="getLineDetails($index).taxAmt"
+                                    (change)="onTaxAmountChange($index, $event)"
+                                    class="w-full h-8 text-right text-ez-xs font-medium text-ez-secondary bg-transparent border-none pr-1.5 pl-4 focus:outline-none focus:ring-0 placeholder-ez-muted"
+                                    placeholder="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-span-1 lg:col-span-1 flex justify-end">
+                        <span class="text-ez-base font-medium text-ez-heading">{{ getLineDetails($index).lineTotal |
+                            currency:'INR':'symbol':'1.0-2' }}</span>
+                    </div>
+
+                    <div class="col-span-1 lg:col-span-1 flex justify-center">
+                        @if(!isReadonly) {
+                        <button type="button" (click)="removeItem($index)"
+                            class="p-2 text-ez-muted hover:text-red-500 transition-colors duration-ez outline-none">
+                            <lucide-icon [img]="TrashIcon" class="w-4 h-4"></lucide-icon>
+                        </button>
+                        }
+                    </div>
+                </div>
+                }
+            </div>
+
+            @if(items.length === 0){
+            <div class="flex flex-col items-center justify-center py-20 text-center border-b border-ez-border">
+                <div
+                    class="w-12 h-12 border border-ez-border bg-ez-ash flex items-center justify-center text-ez-muted mb-4">
+                    <lucide-icon [img]="ShoppingBag" class="w-5 h-5 opacity-50"></lucide-icon>
+                </div>
+                <p class="text-ez-base font-medium text-ez-heading mb-1">No items selected</p>
+                <p class="text-ez-sm text-ez-secondary">Search products to build your sales order</p>
+            </div>
+            }
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 bg-white border-t border-ez-border mt-auto">
+
+            <div class="p-8 border-b lg:border-b-0 lg:border-r border-ez-border space-y-6 bg-white">
+                <div class="space-y-2">
+                    <label class="ez-label">Internal Remarks</label>
+                    <textarea formControlName="remarks" rows="5" class="ez-input ez-input--default w-full resize-none"
+                        placeholder="Delivery instructions or internal notes..."></textarea>
+                </div>
+
+                @if(isApprovalRequired){
+                <div class="p-4 border-l-2 border-amber-500 bg-ez-ash flex items-start gap-3">
+                    <lucide-icon [img]="WarningIcon" class="w-5 h-5 text-amber-500 shrink-0"></lucide-icon>
+                    <p class="text-ez-sm text-ez-heading leading-relaxed">
+                        <strong class="font-medium">Approval Triggered:</strong> Total discount exceeds the permitted
+                        threshold. A manager must approve this order.
+                    </p>
+                </div>
+                }
+            </div>
+
+            <div class="p-6 bg-ez-ash flex flex-col justify-end">
+                <div class="space-y-4 mt-2">
+
+                    <div class="flex justify-between items-center text-ez-sm">
+                        <span class="text-ez-secondary">Subtotal (Before Tax)</span>
+                        <span class="font-medium text-ez-heading">{{ itemGrossTotal | currency:'INR' }}</span>
+                    </div>
+
+                    <div class="flex justify-between items-center text-ez-sm">
+                        <span class="text-ez-secondary">Flat Discount (%)</span>
+                        <div class="flex items-center gap-3">
+                            <input type="number" formControlName="flatDiscountRate"
+                                class="w-20 text-right ez-input ez-input--default h-8 min-h-0 py-0 bg-white">
+                            <span class="text-ez-primary font-medium min-w-[80px] text-right">- {{ flatDiscountAmount |
+                                currency:'INR' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center text-ez-sm">
+                        <span class="text-ez-secondary">Shipping / Extra Charges</span>
+                        <div class="flex items-center gap-3">
+                            <input type="number" formControlName="flatTaxRate"
+                                class="w-20 text-right ez-input ez-input--default h-8 min-h-0 py-0 bg-white">
+                            <span class="text-ez-heading font-medium min-w-[80px] text-right">+ {{ flatTaxAmount |
+                                currency:'INR' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-ez-border pt-6 pb-8 flex justify-between items-end">
+                    <div>
+                        <p class="text-ez-lg font-medium text-ez-heading">Grand Total</p>
+                        <p class="text-ez-xs text-ez-secondary mt-1">Total payable amount</p>
+                    </div>
+                    <span class="text-[40px] font-medium text-ez-heading leading-none">{{ grandTotal | currency:'INR'
+                        }}</span>
+                </div>
+
+                <!-- @if(!isReadonly) {
+                <button type="submit" class="ez-btn ez-btn-primary w-full h-12 text-ez-base">
+                    {{ isEditMode ? 'Update Order' : 'Confirm & Create Order' }}
+                </button>
+                } -->
+            </div>
+        </div>
+
+    </form>
+</div>

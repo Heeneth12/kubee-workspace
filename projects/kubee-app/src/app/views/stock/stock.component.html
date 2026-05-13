@@ -1,0 +1,134 @@
+<app-stat-group [stats]="stockDashboardStats"></app-stat-group>
+
+<div class="space-y-6">
+  <div class="flex-1 h-[calc(100vh-200px)] overflow-y-auto">
+    <app-standard-table [title]="'Data Table'" [columns]="columns" [data]="stockList" [pagination]="pagination"
+      [headerActions]="headerActions" (headerAction)="handleHeaderAction($event)" [customActions]="viewDetails"
+      (action)="handleTableAction($event)" (pageChange)="onPageChange($event)" (loadMore)="onLoadMore()"
+      [searchMode]="'server'" (action)="onTableAction($event)" [isLoading]="isLoading">
+    </app-standard-table>
+  </div>
+</div>
+
+
+<ng-template #stockItemDetail>
+  @if(selectedItemDetail){
+  <div class="flex flex-col h-full bg-ez-white font-sans border-l border-ez-border">
+
+    <div class="bg-ez-white px-8 py-6 border-b border-ez-border shrink-0 flex justify-between items-start gap-4">
+      <div class="flex items-center gap-4">
+        <div
+          class="w-12 h-12 border border-ez-border bg-ez-ash flex items-center justify-center text-ez-muted shrink-0">
+          <lucide-icon [img]="packageIcon" [size]="20"></lucide-icon>
+        </div>
+        <div>
+          <h2 class="text-ez-hero font-medium text-ez-heading leading-tight">{{ selectedItemDetail.name }}</h2>
+          <p class="text-ez-sm text-ez-secondary mt-1">Inventory Management / Stock Details</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-4">
+      <div class="space-y-12 max-w-[1000px] mx-auto">
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-ez-border border border-ez-border">
+          <div class="bg-white p-6">
+            <span class="ez-micro-label text-ez-secondary block mb-2">Total Inventory</span>
+            <div class="text-[32px] font-medium text-ez-heading leading-none">
+              {{ calculateTotalStock(selectedItemDetail.batches) }}
+              <span class="text-ez-base text-ez-secondary font-normal">Units</span>
+            </div>
+          </div>
+          <div class="bg-white p-6">
+            <span class="ez-micro-label text-ez-secondary block mb-2">Product Code</span>
+            <div class="text-ez-xl font-medium text-ez-heading leading-none mt-1.5">{{ selectedItemDetail.code }}</div>
+          </div>
+          <div class="bg-white p-6">
+            <span class="ez-micro-label text-ez-secondary block mb-2">SKU Reference</span>
+            <div class="text-ez-xl font-medium text-ez-heading leading-none mt-1.5">{{ selectedItemDetail.sku }}</div>
+          </div>
+        </div>
+
+        <hr class="border-ez-border">
+
+        <div class="space-y-6">
+          <h3 class="text-ez-lg font-medium text-ez-heading">
+            Active Batches ({{ selectedItemDetail.batches.length }})
+          </h3>
+
+          <div class="grid gap-4">
+            @for(batch of selectedItemDetail.batches; track batch.batchNumber){
+            <div
+              class="bg-white border border-ez-border p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 group hover:border-ez-subtle hover:bg-ez-ash transition-[border-color,background-color] duration-ez">
+
+              <div class="flex items-center gap-4">
+                <div [ngClass]="getExpiryStatusColor(batch.expiryDate, 'bg')" class="w-1 h-10 shrink-0"></div>
+                <div>
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="text-ez-base font-medium text-ez-heading">{{ batch.batchNumber }}</span>
+                    <span class="ez-micro-label">Batch</span>
+                  </div>
+                  <div class="flex items-center gap-2 text-ez-xs text-ez-secondary">
+                    <lucide-icon [img]="calendarIcon" [size]="12"></lucide-icon>
+                    <span>Expires: {{ batch.expiryDate | date:'MMM d, y' }}</span>
+                    <span [ngClass]="getExpiryStatusColor(batch.expiryDate, 'text')" class="font-medium">
+                      ({{ getDaysRemainingText(batch.expiryDate) }})
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="flex items-center gap-8 w-full sm:w-auto mt-2 sm:mt-0 pt-4 sm:pt-0 border-t border-ez-border sm:border-0">
+                <div class="text-left sm:text-right flex-1 sm:flex-auto">
+                  <p class="ez-micro-label mb-1">Unit Cost</p>
+                  <p class="text-ez-base font-medium text-ez-heading">{{ batch.buyPrice | currency:'INR' }}</p>
+                </div>
+
+                <div class="flex flex-col items-center min-w-[80px]">
+                  <p class="ez-micro-label mb-2">Available</p>
+                  <div
+                    class="border border-ez-border bg-white group-hover:bg-ez-white px-4 py-1.5 text-ez-base font-medium text-ez-heading min-w-[60px] text-center transition-colors duration-ez">
+                    {{ batch.remainingQty }}
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            }@empty{
+            <div
+              class="flex flex-col items-center justify-center h-full bg-ez-white border-l border-ez-border text-center p-8">
+              <div
+                class="w-12 h-12 border border-ez-border bg-ez-ash flex items-center justify-center mb-4 text-ez-muted">
+                <lucide-icon [img]="searchIcon" class="w-5 h-5 opacity-50"></lucide-icon>
+              </div>
+              <p class="text-ez-base font-medium text-ez-heading mb-1">No Batches Found</p>
+              <p class="text-ez-sm text-ez-secondary">No batches found for this item.</p>
+            </div>
+            }
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="bg-ez-white px-8 py-5 border-t border-ez-border shrink-0 flex items-center justify-between">
+      <div class="text-ez-xs text-ez-muted">
+        Batch availability is updated in real-time.
+      </div>
+      <button (click)="drawerSvc.close()" class="ez-btn ez-btn-secondary">
+        Go Back
+      </button>
+    </div>
+
+  </div>
+  }@else {
+  <div class="flex flex-col items-center justify-center h-full bg-ez-white border-l border-ez-border text-center p-8">
+    <div class="w-12 h-12 border border-ez-border bg-ez-ash flex items-center justify-center mb-4 text-ez-muted">
+      <lucide-icon [img]="searchIcon" class="w-5 h-5 opacity-50"></lucide-icon>
+    </div>
+    <p class="text-ez-base font-medium text-ez-heading mb-1">No Item Selected</p>
+    <p class="text-ez-sm text-ez-secondary">Select an item from the list to view its inventory details.</p>
+  </div>
+  }
+</ng-template>

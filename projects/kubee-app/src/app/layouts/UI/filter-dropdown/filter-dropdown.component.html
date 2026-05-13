@@ -1,0 +1,109 @@
+<div class="relative inline-block text-left font-sans">
+    <button (click)="toggleDropdown()"
+        class="flex items-center gap-2 px-3 py-2 bg-ez-ash border border-ez-border rounded transition-[border-color,background-color,color] duration-ez outline-none"
+        [ngClass]="isOpen() ? 'border-ez-border bg-ez-ash text-ez-heading' : 'border-ez-border bg-white text-ez-secondary hover:border-ez-subtle hover:text-ez-heading'">
+        <div class="relative">
+            <lucide-icon [img]="Filter" class="w-4 h-4"></lucide-icon>
+            @if (totalSelectedCount() > 0) {
+            <span
+                class="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-ez-primary text-ez-2xs font-medium text-white border border-white">
+                {{ totalSelectedCount() }}
+            </span>
+            }
+        </div>
+        <span class="text-ez-sm font-medium">Filters</span>
+    </button>
+
+    @if (isOpen()) {
+    <div class="absolute mt-2 w-[340px] bg-white border border-ez-border z-50 overflow-hidden step-fade shadow-lg">
+
+        <div class="px-4 py-3 flex justify-between items-center border-b border-ez-border">
+            <h3 class="font-medium text-ez-heading text-ez-lg">Filters</h3>
+            <button (click)="clearAll()"
+                class="text-ez-primary text-ez-sm font-medium hover:text-ez-primary-hover transition-colors duration-ez outline-none">
+                Save view
+            </button>
+        </div>
+
+        <div class="p-4 border-b border-ez-border bg-ez-ash">
+            <select class="ez-select w-full">
+                <option>Select a view</option>
+            </select>
+        </div>
+
+        <div class="max-h-[400px] overflow-y-auto">
+            @for (filter of config; track filter.id) {
+            <div class="border-b border-ez-border last:border-0">
+
+                <button (click)="toggleCategory(filter.id)"
+                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-ez-ash transition-[background-color] duration-ez group outline-none">
+                    <span class="font-medium text-ez-heading text-ez-sm">{{ filter.label }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="w-4 h-4 text-ez-muted group-hover:text-ez-heading transition-transform duration-ez"
+                        [class.rotate-180]="isCategoryExpanded(filter.id)" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                @if (isCategoryExpanded(filter.id)) {
+                <div class="bg-white px-4 pb-4 animate-in slide-in-from-top-1 duration-ez">
+
+                    @if (filter.searchable) {
+                    <div class="relative mb-4">
+                        <input type="text" [placeholder]="'Search ' + filter.label.toLowerCase()"
+                            class="ez-input ez-input--default w-full pr-8">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ez-muted" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    }
+
+                    <div class="space-y-3">
+                        @for (opt of filter.options; track opt.value) {
+                        <label class="flex items-start gap-3 group cursor-pointer">
+                            <div class="relative flex items-center mt-0.5">
+                                <input type="checkbox" [checked]="isSelected(filter.id, opt.value)"
+                                    (change)="selectOption(filter.id, opt.value, filter.type)"
+                                    class="peer h-4 w-4 cursor-pointer appearance-none rounded-none border border-ez-border checked:bg-ez-primary checked:border-ez-primary transition-colors duration-ez outline-none focus:border-ez-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="absolute h-3 w-3 text-white opacity-0 peer-checked:opacity-100 left-0.5 pointer-events-none transition-opacity duration-ez"
+                                    viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <span
+                                class="text-ez-sm text-ez-body group-hover:text-ez-heading transition-colors duration-ez">
+                                {{ opt.label }}
+                            </span>
+                        </label>
+                        }
+                    </div>
+
+                    <button
+                        class="mt-4 text-ez-primary text-ez-sm font-medium hover:text-ez-primary-hover transition-colors duration-ez outline-none block">
+                        View all...
+                    </button>
+                </div>
+                }
+            </div>
+            }
+        </div>
+
+        <div class="p-4 bg-white border-t border-ez-border flex gap-3">
+            <button (click)="clearAll()" class="ez-btn ez-btn-secondary flex-1">
+                Clear
+            </button>
+            <button (click)="toggleDropdown()" class="ez-btn ez-btn-primary flex-1">
+                Apply
+            </button>
+        </div>
+
+    </div>
+    }
+</div>

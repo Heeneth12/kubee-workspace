@@ -1,0 +1,184 @@
+import { Component, OnInit, signal, computed, Input } from '@angular/core';
+import { Router } from '@angular/router';
+import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { LucideAngularModule, Search, ArrowLeft, Save, AlertCircle, CheckCircle2 } from 'lucide-angular';
+import { DrawerService } from '../../../../layouts/components/drawer/drawerService';
+import { LoaderService } from '../../../../layouts/components/loader/loaderService';
+import { ToastService } from '../../../../layouts/components/toast/toastService';
+import { InvoiceService } from '../../invoices/invoice.service';
+import { SalesReturnService } from '../sales-return.service';
+import { SalesReturnRequestModal } from '../sales-return.modal';
+import { ContactModel } from '../../../contacts/contacts.model';
+import { ContactService } from '../../../contacts/contacts.service';
+
+@Component({
+  selector: 'app-sales-returnform',
+  standalone: true,
+  imports: [CommonModule, FormsModule, LucideAngularModule],
+  templateUrl: './sales-returnform.component.html',
+  styleUrls: ['./sales-returnform.component.css']
+})
+export class SalesReturnformComponent implements OnInit {
+
+
+  @Input() invoiceId: number | null = null;
+
+  // Icons
+  readonly SearchIcon = Search;
+  readonly ArrowLeft = ArrowLeft;
+  readonly Save = Save;
+  readonly AlertCircle = AlertCircle;
+  readonly CheckCircle2 = CheckCircle2;
+
+  // State
+  searchInvoiceId: string = '';
+  invoiceData: any = null;
+  returnReason: string = '';
+
+  // Contact details
+
+  // Items Signal
+  uiItems = signal<any[]>([]);
+
+  // FIX 1: Computed signal for item count (Solves HTML error)
+  selectedItemCount = computed(() => {
+    return this.uiItems().filter(i => i.isSelected && i.returnQty > 0).length;
+  });
+
+  // Logic to calculate Estimated Refund
+  totalRefundAmount = computed(() => {
+    return this.uiItems().reduce((acc, item) => {
+      if (item.isSelected && item.returnQty > 0) {
+        return acc + (item.unitPrice * item.returnQty);
+      }
+      return acc;
+    }, 0);
+  });
+
+  constructor(
+    private salesReturnService: SalesReturnService,
+    private invoiceService: InvoiceService,
+    private contactService: ContactService,
+    public drawerService: DrawerService,
+    private toastSvc: ToastService,
+    private router: Router,
+    private loaderSvc: LoaderService
+  ) { }
+
+  ngOnInit(): void {
+    if (this.invoiceId) {
+      this.searchInvoiceId = this.invoiceId.toString();
+      this.searchInvoice();
+    }
+  }
+
+  // Fetch Invoice Details
+  searchInvoice() {
+    if (!this.searchInvoiceId) {
+      this.toastSvc.show('Please enter an Invoice ID', 'error');
+      return;
+    }
+
+    // Reset state before new search
+    this.invoiceData = null;
+    this.uiItems.set([]);
+
+    this.loaderSvc.show();
+    this.invoiceService.getInvoiceById(
+      Number(this.searchInvoiceId),
+      (response: any) => {
+        this.loaderSvc.hide();
+        this.invoiceData = response.data;
+        // Map items — account for already-returned quantities
+        this.uiItems.set(this.invoiceData.items.map((item: any) => {
+          const alreadyReturned = item.returnedQuantity || 0;
+          const remainingQty = item.quantity - alreadyReturned;
+          return {
+            ...item,
+            isSelected: false,
+            returnQty: 0,
+            returnedQuantity: alreadyReturned,
+            maxQty: remainingQty,
+            fullyReturned: remainingQty <= 0
+          };
+        }));
+      },
+      (error: any) => {
+        this.loaderSvc.hide();
+        this.invoiceData = null;
+        this.toastSvc.show('Invoice not found or error fetching details', 'error');
+      }
+    );
+  }
+
+  // Toggle Item Selection
+  toggleItem(item: any) {
+    if (item.fullyReturned) return; // Can't select fully returned items
+    // 1. Mutate the item logic
+    item.isSelected = !item.isSelected;
+    if (item.isSelected && item.returnQty === 0) {
+      item.returnQty = 1;
+    } else if (!item.isSelected) {
+      item.returnQty = 0;
+    }
+
+    // FIX 2: Trigger Signal Update
+    // We must spread the array [...v] so Angular knows the reference changed
+    // This forces 'totalRefundAmount' and 'selectedItemCount' to re-calculate
+    this.uiItems.update(v => [...v]);
+  }
+
+  validateQty(item: any) {
+    if (item.returnQty > item.maxQty) {
+      item.returnQty = item.maxQty;
+      this.toastSvc.show(`Maximum return quantity is ${item.maxQty}`, 'warning');
+    }
+    if (item.returnQty < 0) item.returnQty = 0;
+    this.uiItems.update(v => [...v]);
+  }
+
+  createSalesReturn() {
+    const itemsToReturn = this.uiItems()
+      .filter(item => item.isSelected && item.returnQty > 0)
+      .map(item => ({
+        itemId: item.itemId || item.item.id,
+        batchNumber: item.batchNumber,
+        quantity: item.returnQty
+      }));
+
+    if (itemsToReturn.length === 0) {
+      this.toastSvc.show('Please select at least one item to return', 'error');
+      return;
+    }
+
+    if (!this.returnReason) {
+      this.toastSvc.show('Please provide a reason for the return', 'error');
+      return;
+    }
+
+    const payload: SalesReturnRequestModal = {
+      invoiceId: this.invoiceData.id,
+      reason: this.returnReason,
+      items: itemsToReturn
+    };
+
+    this.loaderSvc.show();
+    this.salesReturnService.createSalesReturn(
+      payload,
+      (response: any) => {
+        this.loaderSvc.hide();
+        this.toastSvc.show('Sales Return processed successfully', 'success');
+        this.router.navigate(['/sales/sales-returns/', response.id || response.data?.id]);
+      },
+      (error: any) => {
+        this.loaderSvc.hide();
+        this.toastSvc.show(error.message || 'Error processing Sales Return', 'error');
+      }
+    );
+  }
+
+  cancel() {
+    this.router.navigate(['/sales/sales-returns']);
+  }
+}

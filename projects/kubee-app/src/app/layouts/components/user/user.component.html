@@ -1,0 +1,205 @@
+<div class="flex flex-col h-full bg-slate-50 font-sans text-slate-800 w-full border-r border-gray-200">
+
+    @if (userData$ | async; as user) {
+    <div class="relative bg-white">
+        <div class="absolute inset-0 h-32 bg-slate-900 overflow-hidden">
+            <div class="absolute inset-0 opacity-20"
+                style="background-image: radial-gradient(#4f46e5 1px, transparent 1px); background-size: 20px 20px;">
+            </div>
+        </div>
+
+        <div class="relative pt-12 px-6 pb-4">
+            <div class="flex justify-between items-end mb-4">
+                <div class="relative group cursor-pointer">
+                    <div
+                        class="w-24 h-24 rounded-2xl bg-indigo-600 flex items-center justify-center p-1 shadow-xl ring-4 ring-white">
+                        <span class="text-3xl font-bold text-white tracking-widest">
+                            {{ getInitials(user.fullName) }}
+                        </span>
+                    </div>
+
+                    <div
+                        class="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-sm">
+                        <span class="w-4 h-4 rounded-full border-2 border-white transition-colors duration-300"
+                            [ngClass]="{
+                                    'bg-emerald-500': status === 'online',
+                                    'bg-amber-500': status === 'away',
+                                    'bg-red-500': status === 'dnd'
+                                }">
+                        </span>
+                    </div>
+                </div>
+
+                <button
+                    class="mb-2 px-3 py-1.5 bg-white/90 backdrop-blur border border-gray-200 rounded-lg text-xs font-semibold text-slate-700 shadow-sm hover:bg-gray-50 flex items-center gap-2 transition-all max-w-[140px]">
+                    <span class="w-2 h-2 rounded-full bg-indigo-500 shrink-0"></span>
+                    <span class="truncate">{{ user.tenantName }}</span>
+                </button>
+            </div>
+
+            <div>
+                <h2 class="text-xl font-bold text-slate-900 flex flex-wrap items-center gap-2 capitalize">
+                    {{ user.fullName }}
+                </h2>
+                <p class="text-sm text-gray-500 font-medium truncate">{{ user.email }}</p>
+
+                <div class="flex flex-wrap gap-1 mt-2">
+                    @for (role of user.userRoles; track role) {
+                    <span
+                        class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 uppercase tracking-wide border border-indigo-100">
+                        {{ role }}
+                    </span>
+                    }
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 mt-6">
+                <div class="bg-slate-50 rounded-lg p-2 text-center border border-slate-100">
+                    <div class="text-lg font-bold text-slate-900">{{ user.userApplications.length }}</div>
+                    <div class="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Apps</div>
+                </div>
+                <div class="bg-slate-50 rounded-lg p-2 text-center border border-slate-100">
+                    <div class="text-lg font-bold text-slate-900">{{ user.tenantId }}</div>
+                    <div class="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Tenant ID</div>
+                </div>
+                <div class="bg-slate-50 rounded-lg p-2 text-center border border-slate-100">
+                    <div class="text-lg font-bold" [ngClass]="user.isActive ? 'text-emerald-600' : 'text-red-600'">
+                        {{ user.isActive ? 'Active' : 'Inactive' }}
+                    </div>
+                    <div class="text-[10px] uppercase text-gray-400 font-bold tracking-wider">Status</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto px-4 py-2 space-y-6 bg-white">
+        @if (user.userApplications.length > 0) {
+        <section class="mt-6">
+            <div class="flex items-center gap-2 px-2 mb-2">
+                <div class="h-3 w-1 bg-indigo-500 rounded-full"></div>
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest">
+                    My Applications
+                </h3>
+            </div>
+
+            <div class="space-y-2">
+                @for (app of user.userApplications; track app.id) {
+                <button class="w-full flex items-center gap-4 p-3 rounded-xl border border-gray-100 bg-white 
+                       hover:border-indigo-200 hover:bg-indigo-50/30 hover:shadow-sm 
+                       transition-all duration-200 group text-left">
+
+                    <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-lg 
+                        bg-slate-50 border border-slate-100 group-hover:bg-white 
+                        group-hover:text-indigo-600 transition-colors">
+                        <lucide-icon [name]="AppWindow" class="w-6 h-6 text-slate-500 group-hover:text-indigo-600">
+                        </lucide-icon>
+                    </div>
+
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-slate-800 truncate">
+                            {{ app.appName }}
+                        </p>
+                        <p class="text-xs text-slate-500 truncate">
+                            Tap to open application
+                        </p>
+                    </div>
+                </button>
+                }
+            </div>
+        </section>
+        }
+
+        <section>
+
+            <div class="flex items-center gap-2 px-2 mb-2">
+                <div class="h-3 w-1 bg-indigo-500 rounded-full"></div>
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest">
+                    Navigation
+                </h3>
+            </div>
+
+            <div class="space-y-2">
+                @for (item of navItems; track item.link) {
+                <a (click)="navigateTo(item.link)"
+                    class="group cursor-pointer flex items-center justify-between p-2 rounded-full transition-all duration-200 hover:bg-slate-50 active:scale-[0.98]">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-slate-200 transition-colors"
+                            [ngClass]="item.borderClass">
+                            <lucide-icon [name]="item.icon" class="w-5 h-5 transition-colors"
+                                [ngClass]="item.colorClass">
+                            </lucide-icon>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-slate-700 transition-colors"
+                                [ngClass]="item.colorClass">
+                                {{ item.label }}
+                            </p>
+                            <p class="text-[10px] text-slate-400 font-medium">{{ item.sublabel }}</p>
+                        </div>
+                    </div>
+                    <lucide-icon [name]="ChevronRight"
+                        class="w-4 h-4 text-slate-300 group-hover:text-indigo-400 transform group-hover:translate-x-1 transition-all"></lucide-icon>
+                </a>
+                }
+            </div>
+        </section>
+        <section>
+            <h3 class="px-2 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">System</h3>
+            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div class="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="p-1.5 bg-rose-100 rounded text-rose-600">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                                </path>
+                            </svg>
+                        </div>
+                        <span class="text-sm font-medium text-slate-700">Do Not Disturb</span>
+                    </div>
+                    <button (click)="toggleDND()" [class.bg-rose-500]="isDND" [class.bg-gray-200]="!isDND"
+                        class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2">
+                        <span [class.translate-x-5]="isDND" [class.translate-x-1]="!isDND"
+                            class="inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform shadow-sm"></span>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="p-4 bg-white border-t border-gray-200 mt-auto">
+        <button (click)="onLogout()"
+            class="group w-full flex items-center justify-center px-4 py-3 border rounded-xl text-sm font-medium bg-red-50 border-red-200 text-red-700 transition-all shadow-sm">
+            <span class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-red-500 transition-colors" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                    </path>
+                </svg>
+                Sign Out
+            </span>
+        </button>
+    </div>
+
+    } @else {
+    <div class="animate-pulse flex flex-col h-full bg-white w-full">
+        <div class="h-32 bg-slate-200 w-full"></div>
+        <div class="px-6 -mt-12">
+            <div class="w-24 h-24 bg-slate-300 rounded-2xl border-4 border-white"></div>
+            <div class="h-6 bg-slate-200 w-3/4 mt-4 rounded"></div>
+            <div class="h-4 bg-slate-200 w-1/2 mt-2 rounded"></div>
+            <div class="flex gap-2 mt-4">
+                <div class="h-16 flex-1 bg-slate-100 rounded"></div>
+                <div class="h-16 flex-1 bg-slate-100 rounded"></div>
+                <div class="h-16 flex-1 bg-slate-100 rounded"></div>
+            </div>
+        </div>
+        <div class="p-6 space-y-4">
+            <div class="h-10 bg-slate-100 rounded w-full"></div>
+            <div class="h-10 bg-slate-100 rounded w-full"></div>
+            <div class="h-10 bg-slate-100 rounded w-full"></div>
+        </div>
+    </div>
+    }
+</div>

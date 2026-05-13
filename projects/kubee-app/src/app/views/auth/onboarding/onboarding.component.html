@@ -1,0 +1,675 @@
+<div class="flex w-full h-screen overflow-hidden bg-white ez-onboarding">
+
+    <!-- SIDEBAR -->
+    <aside class="hidden lg:flex w-64 flex-shrink-0 flex-col  px-5 py-4 relative overflow-hidden"
+        style="background: linear-gradient(180deg, #c8d6e5 0%, #dfe6ed 30%, #f0f0f0 70%, #e8e8e8 100%);">
+        <!-- Brand -->
+        <div class="relative z-10 flex justify-start mb-4">
+            <a class="cursor-pointer" href="/">
+                <div class="flex items-center gap-1">
+                    <img src="../../../assets/images/Kubee_logo.png" width="38" alt="Kubee">
+                    <div class="text-left" style="line-height: 1">
+                        <span class="block text-ez-lg font-medium text-ez-carbon leading-tight">Kubee</span>
+                        <span class="block text-ez-2xs text-ez-carbon-80 tracking-widest uppercase">Inventory</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Steps nav -->
+        <nav class="relative z-10 flex-1 flex flex-col">
+            <div *ngFor="let step of steps; let i = index; let last = last"
+                class="relative flex items-start gap-3 py-3">
+
+                <!-- Connector line -->
+                <div *ngIf="!last" class="absolute left-[13px] top-[30px] w-px transition-colors duration-ez"
+                    style="height: calc(100% - 6px)"
+                    [ngClass]="i < currentStep ? 'bg-[#3E6AE1]/40' : 'bg-white/[0.08]'">
+                </div>
+
+                <!-- Dot -->
+                <div class="relative z-10 w-[26px] h-[26px] border-ez-subtle border-2 rounded-full flex-shrink-0 flex items-center justify-center text-ez-2xs font-medium transition-all duration-ez"
+                    [ngClass]="{    
+                        'bg-ez-primary border-2 border-ez-primary text-ez-carbon': i < currentStep,
+                        'bg-transparent border-2 border-ez-primary text-ez-primary': i === currentStep,
+                        'bg-transparent border border-white/15 text-ez-carbon-50': i > currentStep
+                    }">
+                    <svg *ngIf="i < currentStep" width="10" height="10" viewBox="0 0 12 12" fill="none">
+                        <polyline points="2.5,6 5,8.5 9.5,3.5" stroke="white" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    <span *ngIf="i >= currentStep">{{ i + 1 }}</span>
+                </div>
+
+                <!-- Label + desc -->
+                <div class="min-w-0 pt-[3px]">
+                    <p class="text-ez-carbon font-medium leading-tight transition-colors duration-ez" [ngClass]="{
+                        'text-ez-primary': i === currentStep,
+                        'text-ez-carbon-70': i < currentStep,
+                        'text-ez-carbon-80': i > currentStep
+                    }">{{ step.label }}</p>
+                    <p *ngIf="i === currentStep" class="text-ez-xs text-ez-primary mt-0.5 leading-tight">{{
+                        step.desc
+                        }}</p>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Value props -->
+        <div class="relative z-10 mt-4 pt-4 border-t border-white/[0.07]">
+            <p class="text-[10px] font-medium tracking-[0.12em] text-bg-ez-primary-tint mb-2">Free trial
+                includes</p>
+            <div class="space-y-1.5">
+                <div *ngFor="let perk of ['Unlimited products', 'Real-time tracking', 'Up to 5 members', 'No credit card']"
+                    class="flex items-center gap-2 text-ez-xs text-bg-ez-primary-tint">
+                    <span class="text-ez-primary font-medium text-xs">✓</span>{{ perk }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="relative z-10 mt-4 pt-4 border-t border-ez-subtle">
+            <div class="h-[2px] bg-ez-subtle overflow-hidden mb-1.5">
+                <div class="h-full bg-ez-primary transition-all duration-500" [style.width.%]="progressPercent"></div>
+            </div>
+            <p class="text-ez-xs text-bg-ez-primary-tint">Step {{ currentStep + 1 }} of {{ steps.length }}</p>
+        </div>
+    </aside>
+
+    <!-- MAIN PANEL -->
+    <main class="flex-1 flex flex-col overflow-hidden min-w-0 bg-white">
+
+        <!-- Header -->
+        <div class="shrink-0 border-b border-ez-border bg-white sticky top-0 z-20">
+            <div class="px-6 lg:px-10 h-16 flex items-center justify-end gap-3">
+
+                <button (click)="openFeedbackModal('contact')"
+                    class="flex items-center gap-2 px-4 py-2 rounded border border-ez-border hover:border-ez-primary hover:text-ez-primary transition-[border-color,color] duration-ez">
+                    <lucide-icon [img]="icon.Info" class="size-4 text-ez-secondary"></lucide-icon>
+                    <span class="text-ez-base font-medium text-ez-secondary">Need help</span>
+                </button>
+
+                <button (click)="openFeedbackModal('contact')"
+                    class="flex items-center gap-2 px-4 py-2 rounded bg-ez-primary hover:bg-ez-primary-hover transition-[background-color] duration-ez">
+                    <lucide-icon [img]="icon.HeadsetIcon" class="size-4 text-white"></lucide-icon>
+                    <span class="text-ez-base font-medium text-white">Chat with us</span>
+                </button>
+
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-8 lg:px-10 pt-8 pb-4">
+
+
+            <!-- ── STEP 1 — Account Setup ── -->
+            <div *ngIf="currentStep === 0" class="step-fade">
+
+                <div class="mb-6">
+                    <p class="text-ez-xs font-medium text-ez-muted uppercase tracking-[0.1em] mb-2">Step 1 of 3</p>
+                    <h1 class="text-ez-hero font-medium text-ez-heading leading-tight">Set up your workspace</h1>
+                    <p class="text-ez-md text-ez-secondary mt-1.5">Get started in under 2 minutes — no credit card
+                        needed.
+                    </p>
+                </div>
+
+                <!-- Info banner -->
+                <div class="flex items-start gap-3 bg-ez-ash px-4 py-3 mb-6">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"
+                        class="text-ez-primary flex-shrink-0 mt-0.5">
+                        <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.3" />
+                        <path d="M8 5v4M8 10.5v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+                    </svg>
+                    <div>
+                        <p class="text-ez-base font-medium text-ez-heading">14-day free trial — zero commitment</p>
+                        <p class="text-ez-sm text-ez-secondary mt-0.5">Full access to all features. Upgrade or cancel at
+                            any time.</p>
+                    </div>
+                </div>
+
+                <form [formGroup]="accountForm" class="space-y-4" novalidate>
+
+                    <!-- Company + Business type -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="space-y-1.5">
+                            <label class="ez-label">Company name <span class="text-red-500">*</span></label>
+                            <input type="text" formControlName="companyName" placeholder="Acme Logistics Pvt. Ltd."
+                                class="ez-input w-full" [ngClass]="accountForm.get('companyName')?.touched && accountForm.get('companyName')?.invalid
+                                    ? 'ez-input--error' : 'ez-input--default'" />
+                            <p *ngIf="accountForm.get('companyName')?.touched && accountForm.get('companyName')?.invalid"
+                                class="text-ez-xs text-red-500">Required</p>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="ez-label">Business type <span class="text-red-500">*</span></label>
+                            <select formControlName="businessType" class="ez-select w-full">
+                                <option *ngFor="let bt of businessTypes" [value]="bt.value">{{ bt.label }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Full name + Work email -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="space-y-1.5">
+                            <label class="ez-label">Full name <span class="text-red-500">*</span></label>
+                            <input type="text" formControlName="adminFullName" placeholder="John Doe"
+                                class="ez-input w-full" [ngClass]="accountForm.get('adminFullName')?.touched && accountForm.get('adminFullName')?.invalid
+                                    ? 'ez-input--error' : 'ez-input--default'" />
+                            <p *ngIf="accountForm.get('adminFullName')?.touched && accountForm.get('adminFullName')?.invalid"
+                                class="text-ez-xs text-red-500">Required</p>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="ez-label">Work email <span class="text-red-500">*</span></label>
+                            <input type="email" formControlName="adminEmail" placeholder="admin@company.com"
+                                class="ez-input w-full" [ngClass]="accountForm.get('adminEmail')?.touched && accountForm.get('adminEmail')?.invalid
+                                    ? 'ez-input--error' : 'ez-input--default'" />
+                            <p *ngIf="accountForm.get('adminEmail')?.touched && accountForm.get('adminEmail')?.invalid"
+                                class="text-ez-xs text-red-500">Valid email required</p>
+                        </div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="space-y-1.5">
+                        <label class="ez-label">Phone number <span class="text-red-500">*</span></label>
+                        <div class="ez-phone-wrapper flex border overflow-hidden transition-[border-color] duration-ez"
+                            [ngClass]="accountForm.get('adminPhone')?.touched && accountForm.get('adminPhone')?.invalid
+                                ? 'border-red-300 focus-within:border-red-400'
+                                : 'border-ez-border focus-within:border-ez-primary'">
+                            <select formControlName="countryCode"
+                                class="w-24 px-2.5 py-2.5 bg-ez-ash border-r border-ez-border text-ez-sm text-ez-body outline-none appearance-none cursor-pointer">
+                                <option *ngFor="let c of countries" [value]="c.code">{{ c.label }}</option>
+                            </select>
+                            <input type="tel" formControlName="adminPhone" placeholder="98765 43210"
+                                class="flex-1 px-3 py-2.5 text-ez-base text-ez-heading placeholder:text-ez-muted outline-none bg-white" />
+                        </div>
+                        <p *ngIf="accountForm.get('adminPhone')?.touched && accountForm.get('adminPhone')?.invalid"
+                            class="text-ez-xs text-red-500">Enter a valid 10-digit number</p>
+                    </div>
+
+                    <!-- Password + Confirm -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="space-y-1.5">
+                            <label class="ez-label">Password <span class="text-red-500">*</span></label>
+                            <input type="password" formControlName="password" placeholder="Min. 8 characters"
+                                class="ez-input w-full" [ngClass]="accountForm.get('password')?.touched && accountForm.get('password')?.invalid
+                                    ? 'ez-input--error' : 'ez-input--default'" />
+                            <div *ngIf="accountForm.get('password')?.value"
+                                class="h-[2px] bg-ez-border overflow-hidden">
+                                <div class="h-full transition-all duration-300" [ngClass]="{
+                                    'w-1/3 bg-red-400':    (accountForm.get('password')?.value?.length || 0) < 8,
+                                    'w-2/3 bg-amber-400':  (accountForm.get('password')?.value?.length || 0) >= 8 && (accountForm.get('password')?.value?.length || 0) < 12,
+                                    'w-full bg-ez-primary': (accountForm.get('password')?.value?.length || 0) >= 12
+                                }"></div>
+                            </div>
+                            <p *ngIf="accountForm.get('password')?.touched && accountForm.get('password')?.invalid"
+                                class="text-ez-xs text-red-500">Min. 8 characters</p>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="ez-label">Confirm password <span class="text-red-500">*</span></label>
+                            <input type="password" formControlName="confirmPassword" placeholder="Re-enter password"
+                                class="ez-input w-full" [ngClass]="accountForm.get('confirmPassword')?.touched && !passwordsMatch
+                                    ? 'ez-input--error' : 'ez-input--default'" />
+                            <p *ngIf="accountForm.get('confirmPassword')?.touched && !passwordsMatch"
+                                class="text-ez-xs text-red-500">Passwords don't match</p>
+                        </div>
+                    </div>
+
+                    <!-- Address divider -->
+                    <div class="flex items-center gap-3 pt-2">
+                        <span
+                            class="text-ez-xs font-medium text-ez-muted uppercase tracking-[0.1em] whitespace-nowrap">Business
+                            address</span>
+                        <div class="flex-1 h-px bg-ez-border"></div>
+                    </div>
+
+                    <!-- Street -->
+                    <div class="space-y-1.5">
+                        <label class="ez-label">Street address <span class="text-red-500">*</span></label>
+                        <input type="text" formControlName="addressLine1" placeholder="Building / Unit / Street"
+                            class="ez-input w-full" [ngClass]="accountForm.get('addressLine1')?.touched && accountForm.get('addressLine1')?.invalid
+                                ? 'ez-input--error' : 'ez-input--default'" />
+                        <p *ngIf="accountForm.get('addressLine1')?.touched && accountForm.get('addressLine1')?.invalid"
+                            class="text-ez-xs text-red-500">Required</p>
+                    </div>
+
+                    <!-- City + State + PIN -->
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="space-y-1.5">
+                            <label class="ez-label">City <span class="text-red-500">*</span></label>
+                            <input type="text" formControlName="city" placeholder="Mumbai" class="ez-input w-full"
+                                [ngClass]="accountForm.get('city')?.touched && accountForm.get('city')?.invalid
+                                    ? 'ez-input--error' : 'ez-input--default'" />
+                            <p *ngIf="accountForm.get('city')?.touched && accountForm.get('city')?.invalid"
+                                class="text-ez-xs text-red-500">Required</p>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="ez-label">State <span class="text-red-500">*</span></label>
+                            <select formControlName="state" class="ez-select w-full" [ngClass]="accountForm.get('state')?.touched && accountForm.get('state')?.invalid
+                                    ? 'border-red-300 focus:border-red-400' : ''">
+                                <option value="">Select state</option>
+                                <option *ngFor="let s of indianStates" [value]="s">{{ s }}</option>
+                            </select>
+                            <p *ngIf="accountForm.get('state')?.touched && accountForm.get('state')?.invalid"
+                                class="text-ez-xs text-red-500">Required</p>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="ez-label">PIN code <span class="text-red-500">*</span></label>
+                            <input type="text" formControlName="pincode" placeholder="400001" maxlength="6"
+                                class="ez-input w-full" [ngClass]="accountForm.get('pincode')?.touched && accountForm.get('pincode')?.invalid
+                                    ? 'ez-input--error' : 'ez-input--default'" />
+                            <p *ngIf="accountForm.get('pincode')?.touched && accountForm.get('pincode')?.invalid"
+                                class="text-ez-xs text-red-500">6-digit PIN</p>
+                        </div>
+                    </div>
+
+                    <!-- Country + Address 2 -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="space-y-1.5">
+                            <label class="ez-label">Country</label>
+                            <select formControlName="country" class="ez-select w-full">
+                                <option value="India">India</option>
+                                <option value="UAE">UAE</option>
+                                <option value="USA">USA</option>
+                                <option value="Singapore">Singapore</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="ez-label">
+                                Address line 2 <span class="text-ez-xs font-normal text-ez-muted">optional</span>
+                            </label>
+                            <input type="text" formControlName="addressLine2" placeholder="Landmark, Area"
+                                class="ez-input ez-input--default w-full" />
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+
+            <!-- ── STEP 2 — Verify Email ── -->
+            <div *ngIf="currentStep === 1" class="step-fade">
+
+                <div class="mb-6">
+                    <p class="text-ez-xs font-medium text-ez-muted uppercase tracking-[0.1em] mb-2">Step 2 of 3</p>
+                    <h1 class="text-ez-hero font-medium text-ez-heading leading-tight">Verify your email</h1>
+                    <p class="text-ez-md text-ez-secondary mt-1.5">One quick step to keep your account secure.</p>
+                </div>
+
+                <!-- Email banner -->
+                <div class="flex items-start gap-3 bg-ez-ash px-4 py-3 mb-8">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"
+                        class="text-ez-secondary flex-shrink-0 mt-0.5">
+                        <rect x="1" y="3.5" width="14" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2" />
+                        <path d="M1 5.5l7 4.5 7-4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+                    </svg>
+                    <div>
+                        <p class="text-ez-base font-medium text-ez-heading">
+                            Code sent to {{ accountForm.get('adminEmail')?.value || 'your@email.com' }}
+                        </p>
+                        <p class="text-ez-sm text-ez-secondary mt-0.5">
+                            Check your inbox — arrives within seconds. Also check spam.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- OTP block -->
+                <div class="flex flex-col items-center text-center">
+                    <p class="text-ez-base font-medium text-ez-body mb-5">Enter the 6-digit code</p>
+
+                    <div class="flex gap-2.5 mb-5" (paste)="onOtpPaste($event)">
+                        <input *ngFor="let ctrl of otpControls; let i = index" [formControl]="ctrl" [id]="'otp-' + i"
+                            maxlength="1" type="text" inputmode="numeric" autocomplete="one-time-code"
+                            (keyup)="onOtpKeyUp($event, i)" (focus)="onOtpFocus($event)"
+                            class="w-12 h-[52px] text-center text-ez-2xl font-medium text-ez-heading bg-white border border-ez-border outline-none focus:border-ez-primary transition-[border-color] duration-ez" />
+                    </div>
+
+                    <div class="flex flex-wrap items-center justify-center gap-2 text-ez-sm">
+                        <span class="inline-flex items-center gap-1.5 text-ez-secondary">
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" class="flex-shrink-0">
+                                <circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1" />
+                                <path d="M6 3v3.5l2 1.5" stroke="currentColor" stroke-width="1"
+                                    stroke-linecap="round" />
+                            </svg>
+                            Expires in <span class="font-medium text-red-500 ml-0.5">{{ otpExpiry }}</span>
+                        </span>
+                        <span class="text-[#D0D1D2]">·</span>
+                        <span class="text-ez-secondary">
+                            Didn't receive it?
+                            <button type="button" (click)="resendOtp()" [disabled]="resendCooldown > 0"
+                                class="font-medium text-ez-primary underline underline-offset-2 ml-1 disabled:text-ez-muted disabled:no-underline disabled:cursor-not-allowed transition-[color] duration-ez">
+                                {{ resendCooldown > 0 ? 'Resend in ' + resendCooldown + 's' : 'Resend code' }}
+                            </button>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Trust cards -->
+                <div class="grid grid-cols-3 gap-3 mt-10">
+                    <div class="bg-ez-ash p-4">
+                        <div class="w-7 h-7 bg-white flex items-center justify-center mb-3">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" class="text-ez-primary">
+                                <path d="M8 2L3 4v4c0 3 2.5 5 5 6 2.5-1 5-3 5-6V4L8 2z" stroke="currentColor"
+                                    stroke-width="1.3" stroke-linejoin="round" />
+                                <polyline points="5.5,8 7,9.5 10.5,6" stroke="currentColor" stroke-width="1.3"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <p class="text-ez-sm font-medium text-ez-heading mb-1">Secure by default</p>
+                        <p class="text-ez-xs text-ez-secondary leading-relaxed">Your account is protected with
+                            industry-standard encryption.</p>
+                    </div>
+                    <div class="bg-ez-ash p-4">
+                        <div class="w-7 h-7 bg-white flex items-center justify-center mb-3">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" class="text-ez-primary">
+                                <path d="M9 2L4 9h5l-2 5 7-8H9l2-4z" stroke="currentColor" stroke-width="1.3"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <p class="text-ez-sm font-medium text-ez-heading mb-1">Fast delivery</p>
+                        <p class="text-ez-xs text-ez-secondary leading-relaxed">OTP arrives within seconds to your
+                            registered email address.</p>
+                    </div>
+                    <div class="bg-ez-ash p-4">
+                        <div class="w-7 h-7 bg-white flex items-center justify-center mb-3">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" class="text-ez-primary">
+                                <rect x="2.5" y="7" width="11" height="8" rx="1.5" stroke="currentColor"
+                                    stroke-width="1.3" />
+                                <path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.3"
+                                    stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <p class="text-ez-sm font-medium text-ez-heading mb-1">Private & safe</p>
+                        <p class="text-ez-xs text-ez-secondary leading-relaxed">We never share your data. Your details
+                            stay with you always.</p>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- ── STEP 3 — Choose Plan ── -->
+            <div *ngIf="currentStep === 2" class="step-fade">
+
+                <div class="mb-6">
+                    <p class="text-ez-xs font-medium text-ez-muted uppercase tracking-[0.1em] mb-2">Step 3 of 3</p>
+                    <h1 class="text-ez-hero font-medium text-ez-heading leading-tight">Choose your plan</h1>
+                    <p class="text-ez-md text-ez-secondary mt-1.5">Start free, upgrade whenever you're ready. All plans
+                        include onboarding support.</p>
+                </div>
+
+                <!-- Billing toggle -->
+                <div class="inline-flex items-center bg-ez-ash p-1 mb-5 gap-0.5">
+                    <button type="button" (click)="billingCycle = 'monthly'"
+                        class="px-4 py-1.5 text-ez-base font-medium transition-[background-color,color] duration-ez"
+                        [ngClass]="billingCycle === 'monthly'
+                            ? 'bg-white text-ez-heading'
+                            : 'text-ez-secondary hover:text-ez-body'">
+                        Monthly
+                    </button>
+                    <button type="button" (click)="billingCycle = 'annual'"
+                        class="px-4 py-1.5 text-ez-base font-medium transition-[background-color,color] duration-ez flex items-center gap-2"
+                        [ngClass]="billingCycle === 'annual'
+                            ? 'bg-white text-ez-heading'
+                            : 'text-ez-secondary hover:text-ez-body'">
+                        Annual
+                        <span class="text-ez-2xs font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5">Save
+                            20%</span>
+                    </button>
+                </div>
+
+                <!-- Loading -->
+                <div *ngIf="plansLoading"
+                    class="flex items-center justify-center py-16 gap-2 text-ez-muted text-ez-base">
+                    <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.2" />
+                        <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                    </svg>
+                    Loading plans…
+                </div>
+
+                <!-- No plans -->
+                <div *ngIf="!plansLoading && filteredPlans.length === 0"
+                    class="text-center py-12 text-ez-muted text-ez-base">
+                    No {{ billingCycle }} plans available. Try switching the billing cycle.
+                </div>
+
+                <!-- Plan cards -->
+                <div *ngIf="!plansLoading && filteredPlans.length > 0"
+                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+
+                    <div *ngFor="let plan of filteredPlans" (click)="selectedPlan = plan"
+                        class="relative border-2 p-4 cursor-pointer transition-[border-color,background-color] duration-ez"
+                        [ngClass]="selectedPlan?.id === plan.id
+                            ? 'border-ez-primary bg-ez-ash'
+                            : 'border-ez-border hover:border-ez-subtle bg-white'">
+
+                        <!-- Popular badge -->
+                        <div *ngIf="plan.type === 'STANDARD'"
+                            class="absolute -top-px left-1/2 -translate-x-1/2 bg-ez-primary text-white text-ez-2xs font-medium px-3 py-0.5 whitespace-nowrap">
+                            Most popular
+                        </div>
+
+                        <!-- Selected checkmark -->
+                        <div *ngIf="selectedPlan?.id === plan.id"
+                            class="absolute top-3 right-3 w-5 h-5 bg-ez-primary rounded-full flex items-center justify-center">
+                            <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
+                                <polyline points="2.5,6 5,8.5 9.5,3.5" stroke="white" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+
+                        <!-- Type badge -->
+                        <span class="inline-block text-ez-2xs font-medium uppercase tracking-wider px-2.5 py-0.5 mb-3"
+                            [ngClass]="{
+                                'bg-ez-ash text-ez-secondary':         plan.type === 'BASIC',
+                                'bg-ez-primary-tint text-ez-primary':  plan.type === 'STANDARD',
+                                'bg-ez-carbon text-white':             plan.type === 'PREMIUM',
+                                'bg-amber-50 text-amber-700':          plan.type === 'ENTERPRISE'
+                            }">{{ plan.type }}</span>
+
+                        <h3 class="text-ez-md font-medium text-ez-heading mb-1">{{ plan.name }}</h3>
+                        <p class="text-ez-xs text-ez-secondary mb-3 leading-relaxed line-clamp-2">{{ plan.description }}
+                        </p>
+
+                        <!-- Price -->
+                        <div class="mb-3">
+                            <span *ngIf="plan.price === 0" class="text-ez-2xl font-medium text-emerald-600">Free</span>
+                            <span *ngIf="plan.price > 0" class="flex items-baseline gap-1">
+                                <span class="text-ez-2xl font-medium text-ez-heading">₹{{ plan.price }}</span>
+                                <span class="text-ez-xs text-ez-muted">/ {{ plan.durationDays <= 31 ? 'month' : 'year'
+                                        }}</span>
+                                </span>
+                        </div>
+
+                        <!-- Features -->
+                        <div class="border-t border-ez-border pt-3 space-y-1.5">
+                            <div class="flex items-center gap-2 text-ez-xs text-ez-body">
+                                <span class="text-ez-primary text-xs flex-shrink-0">✓</span>
+                                Up to {{ plan.maxUsers }} users
+                            </div>
+                            <div class="flex items-center gap-2 text-ez-xs text-ez-body">
+                                <span class="text-ez-primary text-xs flex-shrink-0">✓</span>
+                                {{ plan.durationDays }}-day access
+                            </div>
+                            <div class="flex items-center gap-2 text-ez-xs text-ez-body">
+                                <span class="text-ez-primary text-xs flex-shrink-0">✓</span>
+                                {{ plan.price === 0 ? 'No card required' : 'Priority support' }}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- SSL strip -->
+                <div class="flex items-center gap-2 text-ez-xs text-ez-muted mb-5">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" class="flex-shrink-0">
+                        <rect x="1.5" y="5.5" width="9" height="6" rx="1" stroke="currentColor" stroke-width="1" />
+                        <path d="M3.5 5.5V3.5a2.5 2.5 0 015 0v2" stroke="currentColor" stroke-width="1"
+                            stroke-linecap="round" />
+                    </svg>
+                    256-bit SSL encrypted · Card details are never stored · Cancel anytime
+                </div>
+
+                <!-- Inline payment -->
+                <div *ngIf="selectedPlan && selectedPlan.price > 0" class="step-fade">
+                    <div class="border-t border-ez-border pt-5">
+
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <span
+                                    class="text-ez-xs font-medium text-ez-muted uppercase tracking-wider">Selected</span>
+                                <span class="bg-ez-ash text-ez-heading text-ez-sm font-medium px-3 py-1">
+                                    {{ selectedPlan.name }} · ₹{{ selectedPlan.price }}
+                                </span>
+                            </div>
+                            <button type="button" (click)="selectedPlan = null"
+                                class="text-ez-sm text-ez-primary underline underline-offset-2 hover:text-ez-primary-hover transition-[color] duration-ez">
+                                Change plan
+                            </button>
+                        </div>
+
+                        <h2 class="text-ez-lg font-medium text-ez-heading mb-4">Payment details</h2>
+
+                        <form [formGroup]="paymentForm" class="space-y-3 max-w-sm" novalidate>
+
+                            <div class="space-y-1.5">
+                                <label class="ez-label">Cardholder name <span class="text-red-500">*</span></label>
+                                <input type="text" formControlName="cardholderName" placeholder="John Doe"
+                                    class="ez-input ez-input--default w-full" />
+                                <p *ngIf="paymentForm.get('cardholderName')?.touched && paymentForm.get('cardholderName')?.invalid"
+                                    class="text-ez-xs text-red-500">Required</p>
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <label class="ez-label">Card number <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <input type="text" formControlName="cardNumber" placeholder="1234 5678 9012 3456"
+                                        maxlength="19" class="ez-input ez-input--default w-full pr-12 font-mono" />
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2">
+                                        <svg width="28" height="18" viewBox="0 0 32 20" fill="none">
+                                            <rect width="32" height="20" rx="3" fill="#1A1F71" />
+                                            <circle cx="13" cy="10" r="6" fill="#EB001B" />
+                                            <circle cx="19" cy="10" r="6" fill="#F79E1B" />
+                                            <path d="M16 5.5a6 6 0 010 9A6 6 0 0116 5.5z" fill="#FF5F00" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p *ngIf="paymentForm.get('cardNumber')?.touched && paymentForm.get('cardNumber')?.invalid"
+                                    class="text-ez-xs text-red-500">Enter a valid 16-digit number</p>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="space-y-1.5">
+                                    <label class="ez-label">Expiry <span class="text-red-500">*</span></label>
+                                    <input type="text" formControlName="expiry" placeholder="MM/YY" maxlength="5"
+                                        class="ez-input ez-input--default w-full font-mono" />
+                                    <p *ngIf="paymentForm.get('expiry')?.touched && paymentForm.get('expiry')?.invalid"
+                                        class="text-ez-xs text-red-500">MM/YY format</p>
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label class="ez-label">CVV <span class="text-red-500">*</span></label>
+                                    <input type="password" formControlName="cvv" placeholder="···" maxlength="4"
+                                        class="ez-input ez-input--default w-full font-mono" />
+                                    <p *ngIf="paymentForm.get('cvv')?.touched && paymentForm.get('cvv')?.invalid"
+                                        class="text-ez-xs text-red-500">3–4 digits</p>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- ── SUCCESS ── -->
+            <div *ngIf="currentStep === steps.length"
+                class="step-fade flex flex-col items-center justify-center text-center py-10 gap-5">
+
+                <div class="w-16 h-16 bg-ez-ash flex items-center justify-center">
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <polyline points="9,16 14,21 23,11" stroke="#3E6AE1" stroke-width="2.4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </div>
+
+                <div>
+                    <h1 class="text-ez-hero font-medium text-ez-heading">You're all set!</h1>
+                    <p class="text-ez-md text-ez-secondary mt-2 max-w-xs mx-auto leading-relaxed">
+                        Your workspace is under review. We'll notify you at
+                        <strong class="text-ez-heading">{{ accountForm.get('adminEmail')?.value }}</strong>
+                        within 24 hours.
+                    </p>
+                </div>
+
+                <!-- Summary -->
+                <div class="w-full max-w-xs bg-ez-ash overflow-hidden">
+                    <div *ngFor="let row of summaryRows"
+                        class="flex items-center justify-between px-4 py-2.5 border-b border-white last:border-0 text-ez-sm">
+                        <span class="text-ez-secondary">{{ row.label }}</span>
+                        <span *ngIf="row.label !== 'Status'"
+                            class="font-medium text-ez-heading max-w-[55%] text-right truncate">{{ row.value }}</span>
+                        <span *ngIf="row.label === 'Status'"
+                            class="bg-ez-primary-tint text-ez-primary text-ez-2xs font-medium px-2.5 py-0.5">
+                            {{ row.value }}
+                        </span>
+                    </div>
+                </div>
+
+                <button type="button" (click)="goToDashboard()" [disabled]="isLoading"
+                    class="inline-flex items-center gap-2 px-10 py-2.5 bg-ez-primary hover:bg-ez-primary-hover disabled:opacity-60 disabled:cursor-not-allowed text-white text-ez-base font-medium rounded transition-[background-color] duration-ez">
+                    <svg *ngIf="isLoading" class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="white" stroke-width="3" opacity="0.3" />
+                        <path d="M4 12a8 8 0 018-8" stroke="white" stroke-width="3" stroke-linecap="round" />
+                    </svg>
+                    {{ isLoading ? loadingText : 'Go to dashboard →' }}
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- FOOTER NAV -->
+        <div *ngIf="currentStep < steps.length"
+            class="flex items-center gap-3 px-8 lg:px-10 py-3 border-t border-ez-border bg-white">
+
+            <button *ngIf="currentStep === 0" type="button" (click)="exitOnboarding()"
+                class="px-4 py-2 text-ez-base font-medium text-ez-secondary border border-ez-border rounded hover:border-ez-subtle hover:text-ez-body transition-[border-color,color] duration-ez">
+                ← Back to login
+            </button>
+            <button *ngIf="currentStep > 0" type="button" (click)="goBack()"
+                class="px-4 py-2 text-ez-base font-medium text-ez-secondary border border-ez-border rounded hover:border-ez-subtle hover:text-ez-body transition-[border-color,color] duration-ez">
+                ← Back
+            </button>
+
+            <!-- Mobile step dots -->
+            <div class="flex items-center gap-1.5 lg:hidden ml-2">
+                <div *ngFor="let step of steps; let i = index" class="h-1.5 rounded-full transition-all duration-ez"
+                    [ngClass]="{
+                        'w-4 bg-ez-primary':       i === currentStep,
+                        'w-1.5 bg-[#3E6AE1]/40':  i < currentStep,
+                        'w-1.5 bg-ez-border':      i > currentStep
+                    }">
+                </div>
+            </div>
+
+            <!-- Next / Submit -->
+            <button type="button" (click)="goNext()" [disabled]="isLoading"
+                class="ml-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-ez-primary hover:bg-ez-primary-hover disabled:opacity-60 disabled:cursor-not-allowed text-white text-ez-base font-medium rounded min-w-[160px] transition-[background-color] duration-ez">
+                <svg *ngIf="isLoading" class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="white" stroke-width="3" opacity="0.3" />
+                    <path d="M4 12a8 8 0 018-8" stroke="white" stroke-width="3" stroke-linecap="round" />
+                </svg>
+                <span *ngIf="!isLoading">
+                    {{ currentStep === 0 ? 'Create account →'
+                    : currentStep === 1 ? 'Verify & continue →'
+                    : (selectedPlan && selectedPlan.price > 0)
+                    ? 'Pay ₹' + selectedPlan.price + ' & activate →'
+                    : 'Activate free plan →' }}
+                </span>
+                <span *ngIf="isLoading">{{ loadingText }}</span>
+            </button>
+
+        </div>
+
+    </main>
+</div>

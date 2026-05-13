@@ -1,0 +1,40 @@
+<div class="w-full flex flex-col h-full bg-ez-white border border-ez-border overflow-hidden">
+    <div class="flex-none border-b border-ez-border bg-ez-white px-2">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar px-2">
+                @for(tab of tabs; track tab.id){
+                <button (click)="selectTab(tab.id)"
+                    class="group relative px-3 py-3.5 text-ez-sm font-medium transition-[color,background-color] duration-ez whitespace-nowrap flex items-center gap-2 outline-none"
+                    [ngClass]="activeTabId === tab.id ? 'text-ez-primary' : 'text-ez-secondary hover:text-ez-heading hover:bg-ez-ash'">
+
+                    <lucide-icon *ngIf="tab.icon" [img]="tab.icon" class="w-4 h-4 transition-colors duration-ez"
+                        [ngClass]="activeTabId === tab.id ? 'text-ez-primary' : 'text-ez-muted group-hover:text-ez-secondary'"></lucide-icon>
+
+                    <span>{{ tab.label }}</span>
+
+                    <span *ngIf="tab.count !== undefined"
+                        class="ml-0.5 px-2 py-0.5 text-ez-2xs font-medium rounded-full transition-[color,background-color] duration-ez"
+                        [ngClass]="activeTabId === tab.id ? 'bg-ez-primary-tint text-ez-primary' : 'bg-ez-ash text-ez-muted'">
+                        {{ tab.count }}
+                    </span>
+
+                    <div class="absolute bottom-0 left-0 right-0 h-[2px] transition-colors duration-ez"
+                        [ngClass]="activeTabId === tab.id ? 'bg-ez-primary' : 'bg-transparent'">
+                    </div>
+                </button>
+                }
+            </div>
+
+            <div class="pr-4 flex items-center">
+                <button
+                    class="flex items-center gap-2 px-3 py-1.5 text-ez-sm font-medium text-ez-secondary hover:text-ez-primary hover:bg-ez-primary-tint rounded transition-[background-color,color] duration-ez outline-none">
+                    <lucide-icon [img]="slidersHorizontal" class="w-4 h-4"></lucide-icon>
+                    <span class="hidden sm:inline">Manage View</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="flex-1 bg-ez-white overflow-auto relative">
+        <ng-content></ng-content>
+    </div>
+</div>

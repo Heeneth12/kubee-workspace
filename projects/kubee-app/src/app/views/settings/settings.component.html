@@ -1,0 +1,33 @@
+<div class="font-sans bg-ez-ash">
+    <div class="sticky top-0">
+        <app-tab-card [tabs]="navigationTabs" [activeTabId]="activeTab()" (activeTabIdChange)="switchTab($event)">
+        </app-tab-card>
+    </div>
+
+    <div [ngSwitch]="activeTab()">
+        <!-- Profile Tab -->
+        <div *ngSwitchCase="'Profile'">
+            <app-profile></app-profile>
+        </div>
+
+        <!-- Business Tab -->
+        <div *ngSwitchCase="'Business'">
+            <app-tenant></app-tenant>
+        </div>
+
+        <!-- Subscriptions Tab -->
+        <div *ngSwitchCase="'Subscriptions'" class="animate-fade-in">
+            <app-subscriptions></app-subscriptions>
+        </div>
+
+        <!-- Default Tab -->
+        <div *ngSwitchDefault class="animate-fade-in flex flex-col items-center justify-center p-20 text-center">
+            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <span class="material-icons text-3xl text-gray-400">code</span>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800">{{ activeTab() }} Settings</h3>
+            <p class="text-sm text-gray-500 mt-2 max-w-sm">This section is currently under development. Additional
+                configurations will be available here soon.</p>
+        </div>
+    </div>
+</div>

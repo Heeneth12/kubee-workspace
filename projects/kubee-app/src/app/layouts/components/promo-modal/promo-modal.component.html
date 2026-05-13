@@ -1,0 +1,43 @@
+<div>
+  <div
+    class="relative bg-ez-white w-full border border-ez-border p-12 flex flex-col items-center text-center step-fade">
+
+    <div class="relative z-10 w-full">
+
+      <div
+        class="mb-6 mx-auto flex items-center justify-center w-12 h-12 bg-ez-ash border border-ez-border rounded text-ez-heading">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.143-7.714L1 12l7.714-2.143L11 3z" />
+        </svg>
+      </div>
+
+      <h2 class="text-ez-hero font-medium text-ez-heading mb-3 leading-tight">
+        Your Catalyst project is ready
+      </h2>
+
+      <p class="text-ez-md text-ez-secondary leading-relaxed mb-10 max-w-xs mx-auto">
+        Let’s take a quick 1-minute tour to help you navigate your new dashboard and services.
+      </p>
+
+      <div class="flex flex-col gap-4 items-center w-full max-w-[240px] mx-auto">
+
+        <button (click)="onAction('tour')" class="ez-btn ez-btn-primary w-full">
+          Start interactive tour
+        </button>
+
+        <button (click)="onClose()"
+          class="text-ez-sm font-medium text-ez-secondary hover:text-ez-heading transition-colors duration-ez outline-none">
+          I'll explore on my own
+        </button>
+      </div>
+    </div>
+
+    <button (click)="onClose()"
+      class="absolute top-6 right-6 text-ez-muted hover:text-ez-heading transition-colors duration-ez outline-none">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
+</div>

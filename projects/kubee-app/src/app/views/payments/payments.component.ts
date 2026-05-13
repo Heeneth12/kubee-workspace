@@ -1,0 +1,266 @@
+import { CommonModule } from '@angular/common';
+import { Component, Input, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { Banknote, Calendar, CreditCard, Mail, Phone, PieChart, ShoppingCart, Users, LucideAngularModule, Send, Share, Download, IndianRupeeIcon, FileText } from 'lucide-angular';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import { DrawerService } from '../../layouts/components/drawer/drawerService';
+import { LoaderService } from '../../layouts/components/loader/loaderService';
+import { ModalService } from '../../layouts/components/modal/modalService';
+import { StandardTableComponent } from '../../layouts/components/standard-table/standard-table.component';
+import { PaginationConfig, TableColumn, TableAction } from '../../layouts/components/standard-table/standard-table.model';
+import { ToastService } from '../../layouts/components/toast/toastService';
+import { DatePickerConfig, DateRangeEmit } from '../../layouts/UI/date-picker/date-picker.component';
+import { StatGroupComponent, StatCardConfig } from '../../layouts/UI/stat-group/stat-group.component';
+import { PaymentFilterModal, PaymentModal, } from './payment.modal';
+import { PaymentService } from './payment.service';
+import { PAYMENTS_COLUMNS, PAYMENTS_FILTER_OPTIONS, PAYMENTS_DATE_CONFIG, PAYMENTS_ACTIONS } from './paymentConfig';
+
+@Component({
+  selector: 'app-payments',
+  standalone: true,
+  imports: [CommonModule, StandardTableComponent, StatGroupComponent, LucideAngularModule],
+  templateUrl: './payments.component.html',
+  styleUrl: './payments.component.css'
+})
+export class PaymentsComponent {
+
+  @Input() statGroup?: boolean = true;
+  @Input() customerId?: number;
+  paymentList: PaymentModal[] = [];
+  paymentDetails: PaymentModal | null = null;
+
+  @ViewChild('paymentDetailsTemplate') paymentDetailsTemplate!: any;
+
+  //icon
+  readonly creditCard = CreditCard;
+  readonly mail = Mail;
+  readonly phone = Phone;
+  readonly calendar = Calendar;
+  readonly users = Users;
+  readonly shoppingCart = ShoppingCart;
+  readonly pieChart = PieChart;
+  readonly banknote = Banknote;
+  readonly send = Send;
+  readonly share = Share;
+  readonly download = Download;
+  readonly indianRupeeIcon = IndianRupeeIcon;
+  readonly fileText = FileText;
+
+
+  pagination: PaginationConfig = { pageSize: 15, currentPage: 1, totalItems: 0 };
+  isLoading = false;
+  isPaymentDetailsLoading = false;
+  selectedItemIds: (string | number)[] = [];
+
+  columns: TableColumn[] = PAYMENTS_COLUMNS;
+  filterOptions = PAYMENTS_FILTER_OPTIONS;
+  dateConfig: DatePickerConfig = PAYMENTS_DATE_CONFIG;
+  payActions = PAYMENTS_ACTIONS;
+  paymentFilter: PaymentFilterModal = new PaymentFilterModal();
+  private tableState$ = new Subject<void>();
+
+
+  constructor(
+    private paymentService: PaymentService,
+    private router: Router,
+    private toastService: ToastService,
+    private loaderSvc: LoaderService,
+    private drawerService: DrawerService,
+    private modalService: ModalService
+  ) {
+  }
+
+  ngOnInit(): void {
+    if (this.customerId) {
+      this.paymentFilter.customerId = this.customerId;
+    }
+    this.setupTablePipeline();
+    this.tableState$.next();
+  }
+
+  private setupTablePipeline() {
+    this.tableState$.pipe(
+      debounceTime(300),
+    ).subscribe(() => {
+      this.getAllPayments();
+    });
+  }
+
+  getAllPayments() {
+    this.isLoading = true;
+    const apiPage = this.pagination.currentPage > 0 ? this.pagination.currentPage - 1 : 0;
+    this.paymentService.getAllPayments(
+      apiPage,
+      this.pagination.pageSize,
+      this.paymentFilter,
+      (response: any) => {
+        this.paymentList = response.data.content;
+        this.pagination = {
+          currentPage: this.pagination.currentPage,
+          totalItems: response.data.totalElements,
+          pageSize: response.data.size
+        };
+        this.isLoading = false;
+      },
+      (error: any) => {
+        this.isLoading = false;
+        this.toastService.show('Failed to load Payments', 'error');
+        console.error('Error fetching payments:', error);
+      }
+    );
+  }
+
+  getPaymentDetailsById(paymentId: string | number) {
+    this.isPaymentDetailsLoading = true;
+    this.paymentService.getPagetPaymentSummaryById(paymentId,
+      (response: any) => {
+        this.paymentDetails = response.data;
+        this.isPaymentDetailsLoading = false;
+      },
+      (error: any) => {
+        this.isPaymentDetailsLoading = false;
+        this.toastService.show("", 'error')
+      }
+    );
+  }
+
+
+  onSelectionChange(selectedIds: (string | number)[]) {
+    this.selectedItemIds = selectedIds;
+    console.log("Current Selection:", this.selectedItemIds);
+  }
+
+
+  handleTableAction(event: TableAction) {
+    if (event.type === 'custom' && event.key === 'payment_details') {
+      this.openPaymentSummaryDrawer(event.row.id);
+
+    }
+    if (event.type === 'custom' && event.key === 'download_receipt') {
+      this.downloadReceiptPdf(event.row.id);
+    }
+  }
+
+  downloadReceiptPdf(paymentId: any) {
+    this.loaderSvc.show();
+    this.paymentService.downloadPaymentPdf(paymentId,
+      (response: any) => {
+        this.loaderSvc.hide();
+        const blob = new Blob([response.body], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        window.open(
+          url,
+          'ReceiptPopup',
+          'width=900,height=800,top=50,left=100,toolbar=no,menubar=no,scrollbars=yes,resizable=yes'
+        );
+      },
+      (error: any) => {
+        this.loaderSvc.hide();
+        this.toastService.show('Failed to download PDF', 'error');
+        console.error('Error downloading PDF:', error);
+      }
+    );
+  }
+
+
+  getPaymentSummary(paymentId: string | number) {
+    this.paymentService.getPaymentById(paymentId,
+      (response: any) => {
+        this.paymentDetails = response.data;
+
+      },
+      (error: any) => {
+        this.toastService.show("", 'error')
+      }
+    );
+  }
+
+  openPaymentSummaryDrawer(paymentId: string | number) {
+    this.getPaymentDetailsById(paymentId);
+    this.drawerService.openTemplate(
+      this.paymentDetailsTemplate,
+      'Payment Details',
+      'lg'
+    )
+  }
+
+  onTableAction(event: TableAction) {
+    const { type, row, key } = event;
+
+    switch (type) {
+      case 'view':
+        console.log("View:", row.id);
+        break;
+      case 'edit':
+        break;
+      case 'delete':
+        console.log("Delete:", row.id);
+        break;
+      case 'toggle':
+        break;
+    }
+  }
+
+  onPageChange(newPage: number) {
+    this.pagination = { ...this.pagination, currentPage: newPage };
+    this.tableState$.next();
+  }
+
+  onLoadMore() {
+  }
+
+  onFilterDate(range: DateRangeEmit) {
+    console.log('Filter table by:', range.from, range.to);
+    this.paymentFilter.fromDate = range.from
+      ? (this.formatDate(range.from) as any)
+      : null;
+
+    this.paymentFilter.toDate = range.to
+      ? (this.formatDate(range.to) as any)
+      : null;
+    this.tableState$.next();
+  }
+
+  onFilterUpdate($event: Record<string, any>) {
+    console.log("Received filter update:", $event);
+    this.paymentFilter.paymentStatus = $event['paymentStatus'] || null;
+    this.paymentFilter.paymentMethod = $event['paymentMethod'] || null;
+    this.tableState$.next();
+  }
+
+  private formatDate(date: Date): string {
+    return date.toISOString().split('T')[0];
+  }
+
+  dashboardStats: StatCardConfig[] = [
+    {
+      key: 'revenue',
+      label: 'Revenue this month',
+      value: '$10,398',
+      color: 'gray',
+      icon: Banknote,
+    },
+    {
+      key: 'profit',
+      label: 'Profit this month',
+      value: '$3,982',
+      icon: PieChart,
+      color: 'gray',
+    },
+    {
+      key: 'orders',
+      label: 'Total Orders',
+      value: '1,248',
+      icon: ShoppingCart,
+      color: 'gray',
+    },
+    {
+      key: 'customers',
+      label: 'New Customers',
+      value: '342',
+      icon: Users,
+      color: 'gray',
+    }
+  ];
+}

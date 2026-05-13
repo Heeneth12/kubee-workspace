@@ -1,59 +1,67 @@
-# KubeeWorkspace
+# Kubee Frontend Workspace
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.5.
+This repository is an Angular Monorepo that houses the entire frontend ecosystem for Kubee. It uses a shared architecture to maintain a strict separation of concerns while keeping our minimalist design system consistent across platforms.
 
-## Development server
+## Architecture
 
-To start a local development server, run:
+The workspace is divided into three core pillars:
 
-```bash
-ng serve
-```
+* **`kubee-app`**: The primary tenant-facing inventory management application.
+* **`kubee-admin`**: The internal command center for global SaaS management and subscription control.
+* **`kubee-ui`**: The shared internal library containing our Tailwind-powered design system, bento-grid components, and global assets (like logos).
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+## Running Locally
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+You can run both applications simultaneously. Open two terminal instances and run the following commands:
 
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+**1. Start the Tenant Inventory App (Port 4200)**
 
 ```bash
-ng generate --help
+ng serve kubee-app --port 4200
+
 ```
 
-## Building
+*Accessible at: `http://localhost:4200*`
 
-To build the project run:
+**2. Start the Admin Dashboard (Port 4201)**
 
 ```bash
-ng build
+ng serve kubee-admin --port 4201
+
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+*Accessible at: `http://localhost:4201*`
 
-## Running unit tests
+---
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Development & Component Creation
+
+All reusable UI elements (buttons, cards, inputs, layout wrappers) must be built inside the shared `kubee-ui` library to ensure design consistency.
+
+**Generate a new shared component:**
 
 ```bash
-ng test
+ng generate component components/your-component-name --project=kubee-ui
+
 ```
 
-## Running end-to-end tests
+**Workflow for Shared Components:**
 
-For end-to-end (e2e) testing, run:
+1. Generate the component using the command above.
+2. Build the component using our shared Tailwind CSS classes.
+3. Export the component in `projects/kubee-ui/src/public-api.ts`.
+4. Import the `KubeeUiModule` into your app to use it.
+
+---
+
+## Production Build
+
+To compile the applications for deployment, run the independent build commands. The output will be stored in the `/dist` directory.
 
 ```bash
-ng e2e
+ng build kubee-app
+ng build kubee-admin
+
 ```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

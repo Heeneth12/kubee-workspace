@@ -1,0 +1,248 @@
+<div class="flex flex-col h-full w-full max-w-5xl mx-auto bg-white border border-ez-border font-sans overflow-hidden">
+
+  <div class="bg-white border-b border-ez-border">
+    <app-tab-card [(activeTabId)]="activeTab" (activeTabIdChange)="tabChanged($event)" [tabs]="tabs"></app-tab-card>
+  </div>
+
+  <div class="flex-1 overflow-y-auto bg-ez-white relative">
+
+    <div *ngIf="errorMessage()" class="absolute top-6 left-1/2 -translate-x-1/2 w-max z-50 step-fade">
+      <div class="bg-white border border-red-300 text-red-500 px-4 py-3 flex items-center gap-3 text-ez-sm font-medium">
+        <lucide-icon [img]="icons.AlertCircle" class="w-4 h-4"></lucide-icon>
+        {{ errorMessage() }}
+        <button (click)="errorMessage.set('')"
+          class="ml-2 text-red-400 hover:text-red-600 transition-colors duration-ez outline-none">
+          <lucide-icon [img]="icons.X" class="w-4 h-4"></lucide-icon>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="activeTab() === 'upload'" class="p-8 lg:p-12 max-w-3xl mx-auto space-y-10 step-fade">
+
+      <section class="flex gap-6">
+        <div
+          class="shrink-0 w-8 h-8 border border-ez-border bg-ez-ash text-ez-heading flex items-center justify-center font-medium text-ez-sm">
+          1
+        </div>
+        <div class="flex-1 pt-1.5">
+          <h3 class="ez-label mb-3">Prepare Data</h3>
+          <div class="bg-white p-6 border border-ez-border flex items-center justify-between">
+            <div>
+              <p class="text-ez-sm font-medium text-ez-heading">Standard Template</p>
+              <p class="text-ez-xs text-ez-secondary mt-1">Required columns: Name, SKU, Price, etc.</p>
+            </div>
+            <button (click)="downloadTemplate()" class="ez-btn ez-btn-primary">
+              <lucide-icon [img]="icons.FileSpreadsheet" class="w-4 h-4"></lucide-icon>
+              Download Template
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="flex gap-6">
+        <div
+          class="shrink-0 w-8 h-8 border border-ez-border bg-ez-ash text-ez-heading flex items-center justify-center font-medium text-ez-sm">
+          2
+        </div>
+        <div class="flex-1 pt-1.5">
+          <h3 class="ez-label mb-3">Upload File</h3>
+
+          <div *ngIf="status() === 'idle' || status() === 'selected' || status() === 'error'"
+            (click)="fileInput.click()" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event)"
+            class="group relative bg-ez-ash border border-dashed p-12 transition-[border-color,background-color] duration-ez cursor-pointer flex flex-col items-center justify-center text-center"
+            [ngClass]="isDragging() ? 'border-ez-primary bg-ez-primary-tint' : 'border-ez-border'">
+
+            <input #fileInput type="file" class="hidden" (change)="handleFile($any($event).target.files[0])"
+              accept=".xlsx,.xls,.csv">
+
+            <ng-container *ngIf="!file()">
+              <div
+                class="w-12 h-12  border border-ez-border flex items-center justify-center mb-4 text-ez-heading group-hover:text-ez-primary transition-colors duration-ez">
+                <lucide-icon [img]="icons.UploadCloud" class="w-5 h-5"></lucide-icon>
+              </div>
+              <p class="text-ez-base font-medium text-ez-heading mb-1">Click to upload or drag and drop</p>
+              <p class="text-ez-xs text-ez-muted">Supports .xlsx, .xls, .csv (Max 10MB)</p>
+            </ng-container>
+
+            <ng-container *ngIf="file()">
+              <div
+                class="w-12 h-12 border border-ez-border bg-white flex items-center justify-center mb-4 text-ez-primary step-fade">
+                <lucide-icon [img]="icons.FileSpreadsheet" class="w-5 h-5"></lucide-icon>
+              </div>
+              <p class="text-ez-base font-medium text-ez-heading mb-1">{{ file()?.name }}</p>
+              <p class="ez-micro-label text-ez-secondary">{{ formatBytes(file()?.size || 0) }}</p>
+
+              <button (click)="$event.stopPropagation(); removeFile()"
+                class="mt-6 text-ez-xs font-medium text-red-500 hover:text-red-700 transition-colors duration-ez flex items-center gap-1.5 outline-none">
+                <lucide-icon [img]="icons.Trash2" class="w-3.5 h-3.5"></lucide-icon> Remove File
+              </button>
+            </ng-container>
+          </div>
+
+          <div *ngIf="status() === 'uploading'" class="bg-white border border-ez-border p-12 text-center">
+            <svg class="w-8 h-8 animate-spin text-ez-primary mx-auto mb-6" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.15" />
+              <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+            </svg>
+            <h4 class="text-ez-base font-medium text-ez-heading mb-1">Processing data...</h4>
+            <p class="text-ez-sm text-ez-secondary">This might take a few moments depending on file size.</p>
+          </div>
+
+          <div *ngIf="status() === 'success'" class="bg-white border border-ez-border step-fade">
+            <div class="p-6 border-b border-ez-border bg-ez-ash flex items-center gap-4">
+              <lucide-icon [img]="icons.CheckCircle2" class="w-5 h-5 text-ez-primary shrink-0"></lucide-icon>
+              <div>
+                <h4 class="text-ez-base font-medium text-ez-heading">Import Completed</h4>
+                <p class="text-ez-sm text-ez-secondary mt-0.5">{{ uploadResult()?.message }}</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 divide-x divide-ez-border border-b border-ez-border">
+              <div class="p-6 text-center">
+                <span class="block text-ez-2xl font-medium text-ez-heading">{{ uploadResult()?.totalProcessed || 0
+                  }}</span>
+                <span class="ez-micro-label mt-2 block">Total Rows</span>
+              </div>
+              <div class="p-6 text-center">
+                <span class="block text-ez-2xl font-medium text-ez-primary">{{ uploadResult()?.successCount || 0
+                  }}</span>
+                <span class="ez-micro-label mt-2 block">Successful</span>
+              </div>
+              <div class="p-6 text-center">
+                <span class="block text-ez-2xl font-medium"
+                  [ngClass]="uploadResult()?.failureCount ? 'text-red-500' : 'text-ez-heading'">{{
+                  uploadResult()?.failureCount || 0 }}</span>
+                <span class="ez-micro-label mt-2 block">Failed</span>
+              </div>
+            </div>
+
+            <div *ngIf="uploadResult()?.errors?.length" class="bg-white">
+              <div class="px-6 py-3 bg-ez-ash border-b border-ez-border flex items-center gap-2">
+                <lucide-icon [img]="icons.AlertTriangle" class="w-4 h-4 text-red-500"></lucide-icon>
+                <span class="text-ez-xs font-medium text-ez-heading">Error Log</span>
+              </div>
+              <div class="max-h-48 overflow-y-auto p-6 space-y-3">
+                <div *ngFor="let err of uploadResult()?.errors" class="flex gap-3 text-ez-sm text-ez-body">
+                  <div class="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0"></div>
+                  {{ err }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </div>
+
+    <div *ngIf="activeTab() === 'download'" class="step-fade">
+      <div class="bg-white border border-ez-border">
+
+        <div class="p-6 border-b border-ez-border bg-ez-ash">
+          <h3 class="text-ez-lg font-medium text-ez-heading flex items-center gap-2">
+            <lucide-icon [img]="icons.Filter" class="w-4 h-4 text-ez-secondary"></lucide-icon>
+            Export Filters
+          </h3>
+          <p class="text-ez-sm text-ez-secondary mt-1">Refine which items to include in your export.</p>
+        </div>
+
+        <div *ngIf="serviceType === 'items'" class="p-6 grid gap-6">
+          <div class="space-y-1.5">
+            <label class="ez-label">Search Query</label>
+            <input [(ngModel)]="filters.searchQuery" placeholder="Search by name, SKU or code..."
+              class="ez-input ez-input--default w-full">
+          </div>
+
+          <div class="grid grid-cols-2 gap-6">
+            <div class="space-y-1.5">
+              <label class="ez-label">Status</label>
+              <select [(ngModel)]="filters.status" class="ez-select w-full">
+                <option value="">All Statuses</option>
+                <option value="true">Active Only</option>
+                <option value="false">Inactive Only</option>
+              </select>
+            </div>
+            <div class="space-y-1.5">
+              <label class="ez-label">Category</label>
+              <select [(ngModel)]="filters.category" class="ez-select w-full">
+                <option value="">All Categories</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Apparel">Apparel</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="serviceType === 'stock-ledger'" class="p-6 grid gap-6">
+          <div class="grid grid-cols-2 gap-6">
+            <div class="space-y-1.5">
+              <label class="ez-label">Reference Type</label>
+              <select [(ngModel)]="stockFilters.referenceTypes" class="ez-select w-full">
+                <option value="">All Types</option>
+                <option value="GRN">GRN</option>
+                <option value="SALE">SALE</option>
+                <option value="PURCHASE_RETURN">PURCHASE_RETURN</option>
+                <option value="ADJUSTMENT">ADJUSTMENT</option>
+                <option value="TRANSFER">TRANSFER</option>
+              </select>
+            </div>
+            <div class="space-y-1.5">
+              <label class="ez-label">Transaction Type</label>
+              <select [(ngModel)]="stockFilters.transactionTypes" class="ez-select w-full">
+                <option value="">All Transactions</option>
+                <option value="IN">IN</option>
+                <option value="OUT">OUT</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-6">
+            <div class="space-y-1.5">
+              <label class="ez-label">From Date</label>
+              <input type="date" [(ngModel)]="stockFilters.fromDate" class="ez-input ez-input--default w-full">
+            </div>
+            <div class="space-y-1.5">
+              <label class="ez-label">To Date</label>
+              <input type="date" [(ngModel)]="stockFilters.toDate" class="ez-input ez-input--default w-full">
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 bg-ez-ash border-t border-ez-border flex items-center justify-between">
+          <button
+            (click)="serviceType === 'stock-ledger' ? stockFilters = {referenceTypes: '', transactionTypes: '', fromDate: '', toDate: ''} : filters = {searchQuery: '', brand: '', category: '', status: ''}"
+            class="text-ez-sm font-medium text-ez-secondary hover:text-ez-heading transition-colors duration-ez outline-none">
+            Reset Filters
+          </button>
+
+          <button (click)="startDownload()" [disabled]="isDownloading()" class="ez-btn ez-btn-primary">
+            <svg *ngIf="isDownloading()" class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.3" />
+              <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+            </svg>
+            <lucide-icon *ngIf="!isDownloading()" [img]="icons.Download" class="w-4 h-4"></lucide-icon>
+            {{ isDownloading() ? 'Generating Excel...' : 'Export to Excel' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="activeTab() === 'upload'"
+    class="p-6 bg-white border-t border-ez-border flex justify-end items-center gap-3 z-10 shrink-0">
+
+    <button (click)="close.emit()" class="ez-btn ez-btn-secondary">
+      Cancel
+    </button>
+
+    <button *ngIf="status() === 'selected'" (click)="startUpload()" class="ez-btn ez-btn-primary">
+      <lucide-icon [img]="icons.UploadCloud" class="w-4 h-4"></lucide-icon>
+      Upload File
+    </button>
+
+    <button *ngIf="status() === 'success'" (click)="reset()" class="ez-btn ez-btn-secondary">
+      <lucide-icon [img]="icons.FileText" class="w-4 h-4"></lucide-icon>
+      Upload Another
+    </button>
+  </div>
+
+</div>

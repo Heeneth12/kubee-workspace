@@ -6,6 +6,11 @@
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
+    "paths": {
+      "kubee-ui": [
+        "./dist/kubee-ui"
+      ]
+    },
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
@@ -21,5 +26,25 @@
     "strictInputAccessModifiers": true,
     "strictTemplates": true
   },
-  "files": []
+  "files": [],
+  "references": [
+    {
+      "path": "./projects/kubee-app/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/kubee-app/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/kubee-admin/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/kubee-admin/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/kubee-ui/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/kubee-ui/tsconfig.spec.json"
+    }
+  ]
 }

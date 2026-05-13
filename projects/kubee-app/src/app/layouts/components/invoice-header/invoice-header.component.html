@@ -1,0 +1,154 @@
+<div class="grid grid-cols-1 md:grid-cols-2 font-sans border border-ez-border bg-white">
+
+    <!-- LEFT: Vendor / Customer (Search or Selected) -->
+    <div class="p-6 md:p-6 border-b md:border-b-0 md:border-r border-ez-border relative group">
+
+        <!-- Label Row -->
+        <div class="flex items-center justify-between mb-4">
+            <span class="ez-micro-label text-ez-secondary">
+                {{ searchType === 'VENDOR' ? 'Vendor / Bill From' : 'Invoice To' }}
+            </span>
+            <button *ngIf="selectedUser && !isReadonly" (click)="clearUser()"
+                class="text-ez-xs font-medium text-ez-primary hover:text-ez-primary-hover transition-colors duration-ez outline-none">
+                Change {{ searchType === 'VENDOR' ? 'Vendor' : 'Customer' }}
+            </button>
+        </div>
+
+        <!-- Selected State -->
+        <div *ngIf="selectedUser" class="flex items-start gap-4">
+            <div
+                class="w-10 h-10 border border-ez-border bg-ez-ash flex items-center justify-center text-ez-heading text-ez-base font-medium shrink-0">
+                {{ selectedUser.fullName.substring(0, 2).toUpperCase() }}
+            </div>
+            <div class="flex-1 min-w-0">
+                <h4 class="text-ez-base font-medium text-ez-heading">{{ selectedUser.fullName }}</h4>
+                <div class="mt-2 space-y-1.5">
+                    <div *ngIf="selectedUser.phone" class="flex items-center gap-2 text-ez-sm text-ez-secondary">
+                        <lucide-icon [img]="Phone" class="w-3.5 h-3.5 text-ez-muted shrink-0"></lucide-icon>
+                        <span>{{ selectedUser.phone }}</span>
+                    </div>
+                    <div *ngIf="selectedUser.email" class="flex items-center gap-2 text-ez-sm text-ez-secondary">
+                        <lucide-icon [img]="Mail" class="w-3.5 h-3.5 text-ez-muted shrink-0"></lucide-icon>
+                        <span class="truncate">{{ selectedUser.email }}</span>
+                    </div>
+                    <div *ngIf="getFormattedAddress()" class="flex items-start gap-2 text-ez-sm text-ez-secondary">
+                        <lucide-icon [img]="MapPin" class="w-3.5 h-3.5 text-ez-muted shrink-0 mt-0.5"></lucide-icon>
+                        <span class="line-clamp-2">{{ getFormattedAddress() }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty / Search State -->
+        <div *ngIf="!selectedUser" class="relative">
+            <div class="relative w-full">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <lucide-icon *ngIf="!isSearching" [img]="Search" class="w-4 h-4 text-ez-muted"></lucide-icon>
+                    <svg *ngIf="isSearching" class="w-4 h-4 text-ez-primary animate-spin" viewBox="0 0 24 24"
+                        fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.2"></circle>
+                        <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+                        </path>
+                    </svg>
+                </div>
+                <input #searchInput type="text" [ngModel]="searchTerm" (ngModelChange)="onSearchInput($event)"
+                    (keydown)="onKeyDown($event)" (blur)="closeDropdown()"
+                    [placeholder]="searchType === 'VENDOR' ? 'Search vendor by name or phone...' : 'Search customer by name or phone...'"
+                    class="ez-input ez-input--default w-full pl-9 bg-white">
+            </div>
+
+            <div class="mt-3 flex items-center gap-2">
+                <span class="ez-micro-label text-ez-muted">OR</span>
+                <button (click)="moveToContactPage()"
+                    class="text-ez-sm font-medium text-ez-primary hover:text-ez-primary-hover transition-colors duration-ez outline-none">
+                    Create New {{ searchType === 'VENDOR' ? 'Vendor' : 'Customer' }}
+                </button>
+            </div>
+
+            <!-- Dropdown Results -->
+            <div *ngIf="showResults && searchResults.length > 0"
+                class="absolute top-[42px] left-0 right-0 z-50 bg-white border border-ez-border shadow-none max-h-[300px] overflow-y-auto">
+                <div *ngFor="let cust of searchResults; let i = index" (mousedown)="selectUser(cust)"
+                    [class.bg-ez-ash]="i === activeIndex"
+                    class="flex items-center gap-4 px-4 py-3 cursor-pointer border-b border-ez-border last:border-0 hover:bg-ez-ash transition-colors duration-ez group/item">
+
+                    <!-- Avatar -->
+                    <div
+                        class="w-8 h-8 border border-ez-border bg-white text-ez-heading flex items-center justify-center text-ez-xs font-medium shrink-0 group-hover/item:border-ez-primary group-hover/item:text-ez-primary transition-colors duration-ez">
+                        {{ cust.fullName.charAt(0) }}
+                    </div>
+
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-0.5">
+                            <span
+                                class="text-ez-sm font-medium text-ez-heading group-hover/item:text-ez-primary transition-colors duration-ez truncate">
+                                {{ cust.fullName }}
+                            </span>
+                            <!-- Role Badge -->
+                            <span
+                                class="px-1.5 py-0.5 border text-ez-2xs font-medium uppercase tracking-[0.1em] shrink-0"
+                                [ngClass]="{
+                                    'text-ez-primary bg-ez-primary-tint border-ez-primary': cust.userType === 'EMPLOYEE',
+                                    'text-amber-600 bg-amber-50 border-amber-200': cust.userType === 'VENDOR',
+                                    'text-ez-heading bg-white border-ez-border': cust.userType === 'CUSTOMER'
+                                }">
+                                {{ cust.userType }}
+                            </span>
+                        </div>
+                        <p class="text-ez-xs text-ez-secondary">{{ cust.phone }}</p>
+                    </div>
+
+                    <lucide-icon [img]="ChevronRight"
+                        class="w-4 h-4 text-ez-muted opacity-0 group-hover/item:opacity-100 group-hover/item:text-ez-primary transition-all duration-ez shrink-0"></lucide-icon>
+                </div>
+            </div>
+
+            <!-- No Results -->
+            <div *ngIf="showResults && !isSearching && searchResults.length === 0 && searchTerm.length >= 2"
+                class="absolute top-[42px] left-0 right-0 z-50 bg-white border border-ez-border p-4 text-center">
+                <p class="text-ez-sm text-ez-secondary">No results found for "<strong
+                        class="text-ez-heading font-medium">{{ searchTerm }}</strong>"</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- RIGHT: Business / Ship To -->
+    <div class="p-6 md:p-6 h-full">
+
+        <!-- Label Row -->
+        <div class="flex items-center justify-between mb-4">
+            <span class="ez-micro-label text-ez-secondary">
+                {{ searchType === 'VENDOR' ? 'Ship To / Our Business' : 'Invoice From' }}
+            </span>
+        </div>
+
+        <!-- Business Info -->
+        <div class="flex items-start gap-4">
+            <div class="w-10 h-10 border border-ez-border bg-white flex items-center justify-center shrink-0">
+                <lucide-icon [img]="Building2" class="w-4 h-4 text-ez-heading"></lucide-icon>
+            </div>
+            <div class="flex-1 min-w-0">
+                @if(userData$ | async; as user) {
+                <h4 class="text-ez-base font-medium text-ez-heading">{{ user.tenantName }}</h4>
+                <div class="mt-2 space-y-1.5">
+                    <div class="flex items-center gap-2 text-ez-sm text-ez-secondary">
+                        <lucide-icon [img]="Phone" class="w-3.5 h-3.5 text-ez-muted shrink-0"></lucide-icon>
+                        <span>{{ tenantDetails?.phone }}</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-ez-sm text-ez-secondary">
+                        <lucide-icon [img]="Mail" class="w-3.5 h-3.5 text-ez-muted shrink-0"></lucide-icon>
+                        <span class="truncate">{{ tenantDetails?.email }}</span>
+                    </div>
+                    <div class="flex items-start gap-2 text-ez-sm text-ez-secondary">
+                        <lucide-icon [img]="MapPin" class="w-3.5 h-3.5 text-ez-muted shrink-0 mt-0.5"></lucide-icon>
+                        <span class="line-clamp-2">123 Market Street, Tech Park, Bangalore, KA - 560001</span>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+
+    </div>
+
+</div>
