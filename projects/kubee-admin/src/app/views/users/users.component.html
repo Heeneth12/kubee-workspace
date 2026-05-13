@@ -1,0 +1,50 @@
+<div class="p-6">
+    <div class="mb-6">
+        <h1 class="text-2xl font-semibold text-ez-heading">Users</h1>
+        <p class="text-sm text-ez-secondary mt-1">Manage all platform users</p>
+    </div>
+    <div class="bg-ez-white border border-ez-border">
+        <div class="p-4 border-b border-ez-border">
+            <input [formControl]="searchControl" type="text"
+                class="w-full max-w-sm px-3 py-2 border border-ez-border rounded text-sm outline-none focus:border-ez-primary"
+                placeholder="Search users...">
+        </div>
+        @if (isLoading) {
+        <div class="p-8 text-center text-sm text-ez-secondary">Loading...</div>
+        }
+        @if (!isLoading && items.length === 0) {
+        <div class="p-8 text-center text-sm text-ez-secondary">No users found.</div>
+        }
+        @if (!isLoading && items.length > 0) {
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-ez-ash border-b border-ez-border">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-ez-secondary uppercase">ID</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-ez-secondary uppercase">Name</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-ez-secondary uppercase">Email</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-ez-secondary uppercase">Type</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-ez-secondary uppercase">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (item of items; track $index) {
+                    <tr class="border-b border-ez-border hover:bg-ez-ash">
+                        <td class="px-4 py-3 text-ez-heading">{{ item.id }}</td>
+                        <td class="px-4 py-3 text-ez-heading">{{ item.fullName || item.name || '—' }}</td>
+                        <td class="px-4 py-3 text-ez-secondary">{{ item.email || '—' }}</td>
+                        <td class="px-4 py-3 text-ez-secondary">{{ item.userType || '—' }}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 rounded text-xs"
+                                [ngClass]="item.isActive ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'">
+                                {{ item.isActive ? 'Active' : 'Inactive' }}
+                            </span>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        }
+    </div>
+</div>
