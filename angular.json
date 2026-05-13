@@ -105,6 +105,11 @@
             "assets": [
               {
                 "glob": "**/*",
+                "input": "projects/kubee-app/src/assets",
+                "output": "/assets/"
+              },
+              {
+                "glob": "**/*",
                 "input": "projects/kubee-admin/public"
               },
               {

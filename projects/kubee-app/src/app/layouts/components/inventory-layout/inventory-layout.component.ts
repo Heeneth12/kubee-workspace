@@ -62,7 +62,7 @@ import { AuthService } from '../../guards/auth.service';
 import { TutorialService } from '../../service/common/tutorial.service';
 import { PromoModalComponent } from "../promo-modal/promo-modal.component";
 import { NotificationsComponent } from '../notifications/notifications.component';
-import { DropdownMenuItem, CustomDropdownComponent } from '../../UI/custom-dropdown/custom-dropdown.component';
+import { DropdownMenuItem, CustomDropdownComponent } from '../../../../../../kubee-ui/src/lib/components/custom-dropdown/custom-dropdown.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { DrawerService, ModalService } from 'kubee-ui';
 import { SearchModalComponent } from '../search-modal/search-modal.component';

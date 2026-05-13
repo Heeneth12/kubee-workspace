@@ -14,3 +14,4 @@ export * from './lib/components/loader/loaderService';
 export * from './lib/components/confirmation-modal/confirmation-modal.component';
 export * from './lib/components/confirmation-modal/confirmation-modal.service';
 export * from './lib/components/date-picker/date-picker.component';
+export * from './lib/components/custom-dropdown/custom-dropdown.component';

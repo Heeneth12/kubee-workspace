@@ -41,7 +41,7 @@ import { PromoModalComponent } from "../promo-modal/promo-modal.component";
 import { ModalService } from 'kubee-ui';
 import { NotificationsComponent } from '../notifications/notifications.component';
 import { SearchModalComponent } from '../search-modal/search-modal.component';
-import { DropdownMenuItem } from '../../UI/custom-dropdown/custom-dropdown.component';
+import { DropdownMenuItem } from '../../../../../../kubee-ui/src/lib/components/custom-dropdown/custom-dropdown.component';
 
 @Component({
   selector: 'app-vendor-layout',

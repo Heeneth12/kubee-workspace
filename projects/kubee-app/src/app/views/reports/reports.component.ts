@@ -6,7 +6,7 @@ import { StatCardConfig, StatGroupComponent } from "../../layouts/UI/stat-group/
 import { SalesOrderService } from '../sales/sales-order/sales-order.service';
 import { ToastService } from '../../../../../kubee-ui/src/lib/components/toast/toastService';
 import { RouterModule } from '@angular/router';
-import { CustomDropdownComponent, DropdownMenuItem } from '../../layouts/UI/custom-dropdown/custom-dropdown.component';
+import { CustomDropdownComponent, DropdownMenuItem } from '../../../../../kubee-ui/src/lib/components/custom-dropdown/custom-dropdown.component';
 import { DatePickerComponent, DatePickerConfig, DateRangeEmit } from '../../../../../kubee-ui/src/lib/components/date-picker/date-picker.component';
 
 interface Tab {

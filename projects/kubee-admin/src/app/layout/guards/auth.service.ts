@@ -19,7 +19,7 @@ export class AuthService {
     private router: Router,
     private bannerLoaderSvc: BannerLoaderService,
     private drawerSvc: DrawerService,
-  ) {}
+  ) { }
 
   login(payload: any, success: (res: any) => void, error: (err: any) => void) {
     this.bannerLoaderSvc.show();
