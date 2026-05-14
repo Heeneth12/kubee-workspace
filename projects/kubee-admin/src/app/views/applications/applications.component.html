@@ -1,48 +1,203 @@
 <div class="p-6">
-    <div class="mb-6">
-        <h1 class="text-2xl font-semibold text-ez-heading">Applications</h1>
-        <p class="text-sm text-ez-secondary mt-1">Manage platform applications</p>
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+        <div>
+            <h1 class="text-2xl font-semibold text-ez-heading">Applications</h1>
+            <p class="text-sm text-ez-secondary mt-1">Manage platform applications</p>
+        </div>
+        <button (click)="openCreateModal()"
+            class="px-4 py-2 bg-ez-primary text-white rounded-lg shadow hover:opacity-90 transition-opacity text-sm font-medium flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Add Application
+        </button>
     </div>
-    <div class="bg-ez-white border border-ez-border">
-        <div class="p-4 border-b border-ez-border">
+
+    <div class="mb-6">
+        <div class="relative max-w-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
             <input [formControl]="searchControl" type="text"
-                class="w-full max-w-sm px-3 py-2 border border-ez-border rounded text-sm outline-none focus:border-ez-primary"
+                class="w-full pl-10 pr-3 py-2 border border-ez-border rounded-lg text-sm outline-none focus:border-ez-primary focus:ring-1 focus:ring-ez-primary transition-all"
                 placeholder="Search applications...">
         </div>
-        @if (isLoading) {
-        <div class="p-8 text-center text-sm text-ez-secondary">Loading...</div>
-        }
-        @if (!isLoading && items.length === 0) {
-        <div class="p-8 text-center text-sm text-ez-secondary">No applications found.</div>
-        }
-        @if (!isLoading && items.length > 0) {
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead class="bg-ez-ash border-b border-ez-border">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-ez-secondary uppercase">ID</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-ez-secondary uppercase">Name</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-ez-secondary uppercase">App Key</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-ez-secondary uppercase">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (item of items; track $index) {
-                    <tr class="border-b border-ez-border hover:bg-ez-ash">
-                        <td class="px-4 py-3 text-ez-heading">{{ item.id }}</td>
-                        <td class="px-4 py-3 text-ez-heading">{{ item.appName || item.name || '—' }}</td>
-                        <td class="px-4 py-3 text-ez-secondary font-mono text-xs">{{ item.appKey || '—' }}</td>
-                        <td class="px-4 py-3">
-                            <span class="px-2 py-1 rounded text-xs"
-                                [ngClass]="item.isActive ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'">
-                                {{ item.isActive ? 'Active' : 'Inactive' }}
-                            </span>
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
+    </div>
+
+    @if (isLoading) {
+    <div class="flex justify-center items-center py-12">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-ez-primary"></div>
+    </div>
+    }
+
+    @if (!isLoading && filteredItems.length === 0) {
+    <div class="bg-ez-white border border-ez-border rounded-xl p-12 text-center shadow-sm">
+        <div class="mx-auto w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-3">
+            <svg class="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-1">No applications found</h3>
+        <p class="text-sm text-gray-500">Get started by creating a new application.</p>
+    </div>
+    }
+
+    @if (!isLoading && filteredItems.length > 0) {
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        @for (item of filteredItems; track item.id) {
+        <div
+            class="bg-ez-white rounded-lg border border-ez-border shadow-sm hover:shadow-md transition-all duration-200 group flex flex-col">
+            <div class="p-5 flex-1">
+                <div class="flex justify-between items-start mb-4 gap-4">
+                    <div class="flex items-start gap-3">
+                        <div
+                            class="w-10 h-10 rounded-lg bg-blue-50 text-ez-primary flex items-center justify-center shrink-0 border border-blue-100">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-semibold text-ez-heading line-clamp-1"
+                                [title]="item.appName || item.name">{{ item.appName || item.name || '—' }}</h3>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span
+                                    class="px-2 py-0.5 rounded bg-ez-ash border border-gray-200 text-xs font-mono text-gray-600 truncate max-w-[120px] block"
+                                    [title]="item.appKey">{{ item.appKey || '—' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0"
+                        [ngClass]="item.isActive ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'">
+                        {{ item.isActive ? 'Active' : 'Inactive' }}
+                    </span>
+                </div>
+
+                <p class="text-sm text-gray-500 mb-2 line-clamp-2 min-h-[2.5rem]">
+                    {{ item.description || 'No description provided.' }}
+                </p>
+            </div>
+
+            <div class="px-5 py-3 border-t border-gray-50 bg-gray-50/50 flex justify-between gap-2 rounded-b-xl">
+
+                <div>
+                    <button (click)="viewRoles(item)" class="text-ez-primary hover:underline">
+                        view roles
+                    </button>
+                </div>
+
+                <div>
+                    <span class="text-xs text-gray-500">total number of active users</span> {{ item.totalActiveUsers }}
+                </div>
+
+                <button (click)="openEditModal(item)"
+                    class="p-1.5 text-gray-500 hover:text-ez-primary hover:bg-blue-50 rounded transition-colors"
+                    title="Edit Application">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                </button>
+                <button (click)="deleteApplication(item.id)"
+                    class="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                    title="Delete Application">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            </div>
         </div>
         }
     </div>
+    }
 </div>
+
+<ng-template #createOrEditModalApp>
+    <div
+        class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh] relative z-10 transform transition-all">
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white">
+            <h2 class="text-lg font-semibold text-gray-900">{{ isEditing ? 'Edit Application' : 'Create Application'
+                }}</h2>
+            <button (click)="closeModal()"
+                class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1.5 rounded-full transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto">
+            <form [formGroup]="appForm" (ngSubmit)="onSubmit()" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Application Name <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" formControlName="appName"
+                        class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-ez-primary focus:border-transparent transition-all shadow-sm"
+                        [ngClass]="{'border-red-300 focus:ring-red-500': appForm.get('appName')?.invalid && appForm.get('appName')?.touched, 'border-gray-300': !(appForm.get('appName')?.invalid && appForm.get('appName')?.touched)}"
+                        placeholder="e.g. Identity Service">
+                    @if (appForm.get('appName')?.invalid && appForm.get('appName')?.touched) {
+                    <p class="text-red-500 text-xs mt-1.5 font-medium">Application name is required</p>
+                    }
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Application Key <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" formControlName="appKey"
+                        class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-ez-primary focus:border-transparent transition-all font-mono text-sm shadow-sm"
+                        [ngClass]="{'border-red-300 focus:ring-red-500': appForm.get('appKey')?.invalid && appForm.get('appKey')?.touched, 'border-gray-300': !(appForm.get('appKey')?.invalid && appForm.get('appKey')?.touched)}"
+                        placeholder="e.g. IDENTITY_SVC">
+                    @if (appForm.get('appKey')?.invalid && appForm.get('appKey')?.touched) {
+                    <p class="text-red-500 text-xs mt-1.5 font-medium">Application key is required</p>
+                    }
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea formControlName="description" rows="3"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-ez-primary focus:border-transparent transition-all shadow-sm resize-none"
+                        placeholder="Brief description of the application..."></textarea>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-100 flex items-start">
+                    <div class="flex items-center h-5">
+                        <input type="checkbox" id="isActive" formControlName="isActive"
+                            class="w-4 h-4 text-ez-primary bg-white border-gray-300 rounded focus:ring-ez-primary focus:ring-2 cursor-pointer">
+                    </div>
+                    <div class="ml-3 text-sm">
+                        <label for="isActive" class="font-medium text-gray-700 cursor-pointer">Active Status</label>
+                        <p class="text-gray-500">Enable this application for immediate use in the system.</p>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 rounded-b-2xl">
+            <button type="button" (click)="closeModal()"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-colors">
+                Cancel
+            </button>
+            <button type="button" (click)="onSubmit()" [disabled]="appForm.invalid || isSubmitting"
+                class="px-6 py-2 text-sm font-medium text-white bg-ez-primary rounded-lg shadow-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ez-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                @if (isSubmitting) {
+                <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                }
+                {{ isEditing ? 'Save Changes' : 'Create Application' }}
+            </button>
+        </div>
+    </div>
+</ng-template>
+
+
+<ng-template #appRolesDrawer>
+    <div class="w-full h-full">
+        <h1>Roles</h1>
+    </div>
+</ng-template>

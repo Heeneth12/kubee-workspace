@@ -12,10 +12,10 @@
         @if (isLoading) {
         <div class="p-8 text-center text-sm text-ez-secondary">Loading...</div>
         }
-        @if (!isLoading && items.length === 0) {
+        @if (!isLoading && users.length === 0) {
         <div class="p-8 text-center text-sm text-ez-secondary">No users found.</div>
         }
-        @if (!isLoading && items.length > 0) {
+        @if (!isLoading && users.length > 0) {
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead class="bg-ez-ash border-b border-ez-border">
@@ -28,16 +28,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for (item of items; track $index) {
+                    @for (user of users; track $index) {
                     <tr class="border-b border-ez-border hover:bg-ez-ash">
-                        <td class="px-4 py-3 text-ez-heading">{{ item.id }}</td>
-                        <td class="px-4 py-3 text-ez-heading">{{ item.fullName || item.name || '—' }}</td>
-                        <td class="px-4 py-3 text-ez-secondary">{{ item.email || '—' }}</td>
-                        <td class="px-4 py-3 text-ez-secondary">{{ item.userType || '—' }}</td>
+                        <td class="px-4 py-3 text-ez-heading">{{ user.id }}</td>
+                        <td class="px-4 py-3 text-ez-heading">{{ user.fullName }}</td>
+                        <td class="px-4 py-3 text-ez-secondary">{{ user.email }}</td>
+                        <td class="px-4 py-3 text-ez-secondary">{{ user.userType }}</td>
                         <td class="px-4 py-3">
                             <span class="px-2 py-1 rounded text-xs"
-                                [ngClass]="item.isActive ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'">
-                                {{ item.isActive ? 'Active' : 'Inactive' }}
+                                [ngClass]="user.isActive ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'">
+                                {{ user.isActive ? 'Active' : 'Inactive' }}
                             </span>
                         </td>
                     </tr>

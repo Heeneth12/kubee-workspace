@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { HttpService } from '../http-svc/http.service';
 import { environment } from '../../../../environments/environment.development';
 
@@ -21,6 +22,11 @@ export class CommonService {
 
   initUser(success: any, error: any) {
     return this.httpService.getHttp(`${CommonService.AUTH_BASE_URL}/user/init`, success, error);
+  }
+
+  /** Prefer this for user init so change detection follows HttpClient (zone / zoneless). */
+  getUserInit(): Observable<unknown> {
+    return this.httpService.getHttpObservable(`${CommonService.AUTH_BASE_URL}/user/init`);
   }
 
   refreshToken(request: any, success: any, error: any) {

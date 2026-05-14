@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { CommonService } from '../service/common/common.service';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators'; // Import operators
+import { map, tap } from 'rxjs/operators';
 import { UserInitResponse } from '../models/Init-response.model';
 import { DrawerService } from 'kubee-ui';
 import { NgxPermissionsService } from 'ngx-permissions';
@@ -49,23 +49,16 @@ export class AuthService {
   }
 
   fetchUserInit(): Observable<UserInitResponse> {
-    return new Observable((observer) => {
-      this.commonService.initUser(
-        (res: any) => {
-          const userData: UserInitResponse = res.data;
-          sessionStorage.setItem('tenantId', userData.tenantId.toString());
-          sessionStorage.setItem('userId', userData.id.toString());
-          sessionStorage.setItem('currentUserUuid', userData.userUuid);
-          this.loadPermissionsIntoStore(userData);
-          this.currentUserSubject.next(userData);
-          observer.next(userData);
-          observer.complete();
-        },
-        (err: any) => {
-          observer.error(err);
-        }
-      );
-    });
+    return this.commonService.getUserInit().pipe(
+      map((res: any) => res.data as UserInitResponse),
+      tap((userData) => {
+        sessionStorage.setItem('tenantId', userData.tenantId.toString());
+        sessionStorage.setItem('userId', userData.id.toString());
+        sessionStorage.setItem('currentUserUuid', userData.userUuid);
+        this.loadPermissionsIntoStore(userData);
+        this.currentUserSubject.next(userData);
+      })
+    );
   }
 
   loginWithGoogle(idToken: string, success: (res: any) => void, error: (err: any) => void) {
