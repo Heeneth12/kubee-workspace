@@ -29,14 +29,27 @@ export class TenantFormComponent implements OnInit {
   ) {
     this.tenantForm = this.fb.group({
       tenantName: ['', Validators.required],
-      tenantCode: [''], 
+      tenantCode: [''],
       adminFullName: ['', Validators.required],
       adminEmail: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required], 
+      password: ['', Validators.required],
       adminPhone: [''],
       appKey: ['', Validators.required],
+      businessType: ['RETAIL', Validators.required],
       isPersonal: [false],
-      isActive: [true] 
+      isActive: [true],
+      address: this.fb.group({
+        addressLine1: ['', Validators.required],
+        addressLine2: [''],
+        route: [''],
+        area: [''],
+        city: ['', Validators.required],
+        state: ['', Validators.required],
+        country: ['', Validators.required],
+        pinCode: ['', Validators.required],
+        type: ['BILLING'],
+        isPrimary: [true]
+      })
     });
   }
 
@@ -46,7 +59,7 @@ export class TenantFormComponent implements OnInit {
       if (id) {
         this.isEditing = true;
         this.tenantId = +id;
-        
+
         // Remove create-specific validation for editing
         this.tenantForm.get('password')?.clearValidators();
         this.tenantForm.get('password')?.updateValueAndValidity();
@@ -56,6 +69,17 @@ export class TenantFormComponent implements OnInit {
         this.tenantForm.get('adminEmail')?.updateValueAndValidity();
         this.tenantForm.get('appKey')?.clearValidators();
         this.tenantForm.get('appKey')?.updateValueAndValidity();
+        this.tenantForm.get('businessType')?.clearValidators();
+        this.tenantForm.get('businessType')?.updateValueAndValidity();
+
+        const addressGroup = this.tenantForm.get('address') as FormGroup;
+        if (addressGroup) {
+          Object.keys(addressGroup.controls).forEach(key => {
+            const control = addressGroup.get(key);
+            control?.clearValidators();
+            control?.updateValueAndValidity();
+          });
+        }
 
         this.loadTenant(this.tenantId);
       }
@@ -64,7 +88,7 @@ export class TenantFormComponent implements OnInit {
 
   loadTenant(id: number) {
     this.isLoading = true;
-    this.tenantsService.getById(id, 
+    this.tenantsService.getById(id,
       (res: any) => {
         const tenant = res.data;
         this.tenantForm.patchValue({
@@ -97,7 +121,7 @@ export class TenantFormComponent implements OnInit {
         tenantCode: formData.tenantCode,
         isActive: formData.isActive
       };
-      
+
       this.tenantsService.update(this.tenantId, updateData,
         (res: any) => {
           this.toast.show('Tenant updated successfully', 'success');
@@ -114,10 +138,15 @@ export class TenantFormComponent implements OnInit {
         tenantName: formData.tenantName,
         adminFullName: formData.adminFullName,
         adminEmail: formData.adminEmail,
+        businessType: formData.businessType,
         password: formData.password,
         adminPhone: formData.adminPhone,
         appKey: formData.appKey,
-        isPersonal: formData.isPersonal
+        isPersonal: formData.isPersonal,
+        address: {
+          ...formData.address,
+          id: 0
+        }
       };
 
       this.commonService.createTenant(registerData,

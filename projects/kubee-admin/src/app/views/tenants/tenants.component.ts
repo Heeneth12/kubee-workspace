@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -15,12 +15,15 @@ import { debounceTime } from 'rxjs/operators';
 })
 export class TenantsComponent implements OnInit {
   
+  @ViewChild('tenantDetails') tenantDetailsTemplate!: TemplateRef<any>;
+
   page = 0;
   size = 10;
   totalItems = 0;
   searchControl = new FormControl('');
   tenants: TenantModel[] = [];
   isLoading = false;
+  selectedTenant: any = null;
 
   constructor(
     private service: TenantsService,
@@ -59,7 +62,8 @@ export class TenantsComponent implements OnInit {
     );
   }
 
-  tenantDetails(){
-    
+  viewTenantDetails(tenant: any) {
+    this.selectedTenant = tenant;
+    this.drawerSvc.openTemplate(this.tenantDetailsTemplate, 'Tenant Details', 'lg');
   }
 }
