@@ -6,23 +6,32 @@ import { environment } from '../../../environments/environment.development';
 export class AuditLogsService {
   private static BASE_URL = environment.authUrl;
   // TODO: fill exact paths from Swagger
-  private static URL = `${AuditLogsService.BASE_URL}/api/v1/admin/audit-logs`;
+  private static URL_USER_REQUESTS = `${AuditLogsService.BASE_URL}/api/v1/userrequests`;
 
-  constructor(private http: HttpService) {}
+  constructor(private http: HttpService) { }
 
-  getAll(success: any, error: any) {
-    return this.http.getHttp(AuditLogsService.URL, success, error);
+  getUserRequests(
+    page?: number,
+    size?: number,
+    success?: any,
+    error?: any
+  ) {
+    return this.http.getHttp(
+      `${AuditLogsService.URL_USER_REQUESTS}?page=${page}&size=${size}`,
+      success,
+      error
+    );
   }
-  getById(id: number, success: any, error: any) {
-    return this.http.getHttp(`${AuditLogsService.URL}/${id}`, success, error);
-  }
-  create(data: any, success: any, error: any) {
-    return this.http.postHttp(AuditLogsService.URL, data, success, error);
-  }
-  update(id: number, data: any, success: any, error: any) {
-    return this.http.putHttp(`${AuditLogsService.URL}/${id}`, data, success, error);
-  }
-  delete(id: number, success: any, error: any) {
-    return this.http.deleteHttp(`${AuditLogsService.URL}/${id}`, success, error);
+
+  getUserRequestById(
+    userReqUuid?: string,
+    success?: any,
+    error?: any
+  ) {
+    return this.http.getHttp(
+      `${AuditLogsService.URL_USER_REQUESTS}/${userReqUuid}`,
+      success,
+      error
+    );
   }
 }
