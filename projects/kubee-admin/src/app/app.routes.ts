@@ -60,10 +60,6 @@ export const routes: Routes = [
         loadChildren: () => import('./views/permissions/permissions.routes').then(m => m.permissionsRoutes)
       },
       {
-        path: 'resources',
-        loadChildren: () => import('./views/resources/resources.routes').then(m => m.resourcesRoutes)
-      },
-      {
         path: 'audit-logs',
         loadChildren: () => import('./views/audit-logs/audit-logs.routes').then(m => m.auditLogsRoutes)
       },
