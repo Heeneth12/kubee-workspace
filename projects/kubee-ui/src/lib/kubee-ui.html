@@ -1,0 +1,133 @@
+<div
+  class="p-8 bg-ez-ash min-h-screen overflow-y-scroll scrollbar-thin scrollbar-track-gray-400 scrollbar-thumb-gray-500 text-ez-body font-sans">
+
+  <div class="max-w-7xl mx-auto space-y-10">
+
+    <!-- Header -->
+    <div>
+      <h1 class="text-ez-hero font-medium text-ez-heading mb-2">Kubee UI Component Library</h1>
+      <p class="text-ez-lg text-ez-secondary">A comprehensive test environment for all shared UI components.</p>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+
+      <!-- Toast Section -->
+      <section class="bg-white p-6 border border-ez-border rounded shadow-sm">
+        <h2 class="text-ez-xl font-medium text-ez-heading mb-4">Toast Notifications</h2>
+        <div class="flex flex-wrap gap-3 mb-6">
+          <button (click)="showToast('success')" class="ez-btn ez-btn-primary">Success</button>
+          <button (click)="showToast('error')"
+            class="ez-btn ez-btn-secondary !border-red-500 !text-red-600 hover:bg-red-50">Error</button>
+          <button (click)="showToast('info')"
+            class="ez-btn ez-btn-secondary !border-blue-500 !text-blue-600 hover:bg-blue-50">Info</button>
+          <button (click)="showToast('warning')"
+            class="ez-btn ez-btn-secondary !border-amber-500 !text-amber-600 hover:bg-amber-50">Warning</button>
+        </div>
+        <div class="bg-ez-carbon text-ez-white p-4 rounded text-ez-sm overflow-x-auto">
+          <pre><code>this.toastService.show('Success!', 'success');</code></pre>
+        </div>
+      </section>
+
+      <!-- Modal Section -->
+      <section class="bg-white p-6 border border-ez-border rounded shadow-sm">
+        <h2 class="text-ez-xl font-medium text-ez-heading mb-4">Modals</h2>
+        <div class="flex flex-wrap gap-3 mb-6">
+          <button (click)="openModal()" class="ez-btn ez-btn-primary">Open Demo Modal</button>
+          <button (click)="openConfirm()"
+            class="ez-btn ez-btn-secondary !border-red-500 !text-red-600 hover:bg-red-50">Confirmation Modal</button>
+        </div>
+        <div class="bg-ez-carbon text-ez-white p-4 rounded text-ez-sm overflow-x-auto">
+          <pre><code>this.modalService.open(&#123;
+  title: 'Demo', 
+  content: 'Content...', 
+  size: 'md'
+&#125;);</code></pre>
+        </div>
+      </section>
+
+      <!-- Drawer Section -->
+      <section class="bg-white p-6 border border-ez-border rounded shadow-sm">
+        <h2 class="text-ez-xl font-medium text-ez-heading mb-4">Drawer</h2>
+        <div class="flex flex-wrap gap-3 mb-6">
+          <button (click)="openDrawer()" class="ez-btn ez-btn-primary">Open Right Drawer</button>
+        </div>
+        <div class="bg-ez-carbon text-ez-white p-4 rounded text-ez-sm overflow-x-auto">
+          <pre><code>this.drawerService.open(&#123;
+  title: 'Demo Drawer',
+  position: 'right'
+&#125;);</code></pre>
+        </div>
+      </section>
+
+      <!-- Loader Section -->
+      <section class="bg-white p-6 border border-ez-border rounded shadow-sm">
+        <h2 class="text-ez-xl font-medium text-ez-heading mb-4">Loader</h2>
+        <div class="flex flex-wrap gap-3 mb-6">
+          <button (click)="showLoader()" class="ez-btn ez-btn-primary">Show Fullscreen Loader</button>
+        </div>
+        <div class="bg-ez-carbon text-ez-white p-4 rounded text-ez-sm overflow-x-auto">
+          <pre><code>this.loaderService.show('Loading...');
+// hide it later
+this.loaderService.hide();</code></pre>
+        </div>
+      </section>
+
+      <!-- Date Picker Section -->
+      <section class="bg-white p-6 border border-ez-border rounded shadow-sm">
+        <h2 class="text-ez-xl font-medium text-ez-heading mb-4">Date Picker</h2>
+        <div class="flex flex-col gap-6 mb-6">
+          <div>
+            <app-date-picker [config]="singleDateConfig" (dateSelect)="onDateSelected($event)"></app-date-picker>
+          </div>
+          <div>
+            <app-date-picker [config]="rangeDateConfig" (dateSelect)="onDateSelected($event)"></app-date-picker>
+          </div>
+        </div>
+        <div class="bg-ez-carbon text-ez-white p-4 rounded text-ez-sm overflow-x-auto">
+          <pre><code>&lt;app-date-picker [config]="singleDateConfig" (dateSelect)="onDateSelected($event)"&gt;
+&lt;/app-date-picker&gt;</code></pre>
+        </div>
+      </section>
+
+      <!-- Custom Dropdown Section -->
+      <section class="bg-white p-6 border border-ez-border rounded shadow-sm">
+        <h2 class="text-ez-xl font-medium text-ez-heading mb-4">Custom Dropdown</h2>
+        <div class="mb-6">
+          <app-custom-dropdown [triggerIcon]="SettingsIcon" menuTitle="Quick Actions" [items]="dropdownItems">
+          </app-custom-dropdown>
+        </div>
+        <div class="bg-ez-carbon text-ez-white p-4 rounded text-ez-sm overflow-x-auto">
+          <pre><code>&lt;app-custom-dropdown 
+              [triggerIcon]="SettingsIcon" 
+              menuTitle="Quick Actions" 
+              [items]="dropdownItems"&gt;
+            &lt;/app-custom-dropdown&gt;</code></pre>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<ng-template #modalContent>
+  <div class="p-6">
+    <h3 class="text-ez-lg font-medium text-ez-heading mb-4">Modal Content</h3>
+    <p class="text-ez-body text-ez-secondary">This is the content of the modal, passed dynamically via @ViewChild and
+      ngTemplateOutlet.</p>
+  </div>
+</ng-template>
+
+<ng-template #drawerContent>
+  <div class="p-6">
+    <h3 class="text-ez-lg font-medium text-ez-heading mb-4">Drawer Content</h3>
+    <p class="text-ez-body text-ez-secondary">This content slides in from the right, perfect for navigation or
+      settings.</p>
+  </div>
+</ng-template>
+
+<ng-template #confirmContent>
+  <div class="p-6">
+    <p class="text-ez-body text-ez-secondary">This is a standard confirmation dialog. Use it for destructive actions.
+    </p>
+  </div>
+</ng-template>
