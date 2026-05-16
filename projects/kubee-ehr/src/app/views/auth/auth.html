@@ -1,0 +1,56 @@
+<div class="min-h-screen bg-ez-ash flex items-center justify-center px-4">
+    <div class="w-full max-w-md">
+
+        <div class="text-center mb-8">
+            <div class="flex items-center justify-center gap-2 mb-4">
+                <img src="/assets/images/Kubee_logo.png" width="40" alt="Kubee">
+                <div class="text-left" style="line-height: 1">
+                    <span class="block text-xl font-semibold text-ez-heading">Kubee</span>
+                    <span class="block text-xs text-ez-secondary tracking-widest uppercase">Ops Portal</span>
+                </div>
+            </div>
+            <h1 class="text-2xl font-semibold text-ez-heading">Welcome back</h1>
+            <p class="text-ez-secondary text-sm mt-1">Sign in to your ops account</p>
+        </div>
+
+        <div class="bg-ez-white border border-ez-border p-8">
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-ez-heading mb-1.5">Email address</label>
+                    <input formControlName="email" type="email" autocomplete="email"
+                        class="w-full px-3 py-2 border rounded text-sm outline-none transition-colors duration-ez"
+                        [ngClass]="email.invalid && email.touched ? 'border-red-400 focus:border-red-500' : 'border-ez-border focus:border-ez-primary'"
+                        placeholder="ops@kubee.com">
+                    @if (email.invalid && email.touched) {
+                    <p class="mt-1 text-xs text-red-500">
+                        {{ email.errors?.['required'] ? 'Email is required' : 'Enter a valid email' }}
+                    </p>
+                    }
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-ez-heading mb-1.5">Password</label>
+                    <input formControlName="password" type="password" autocomplete="current-password"
+                        class="w-full px-3 py-2 border rounded text-sm outline-none transition-colors duration-ez"
+                        [ngClass]="password.invalid && password.touched ? 'border-red-400 focus:border-red-500' : 'border-ez-border focus:border-ez-primary'"
+                        placeholder="••••••••">
+                    @if (password.invalid && password.touched) {
+                    <p class="mt-1 text-xs text-red-500">Password is required (min 6 characters)</p>
+                    }
+                </div>
+
+                @if (errorMessage) {
+                <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700">
+                    {{ errorMessage }}
+                </div>
+                }
+
+                <button type="submit" [disabled]="isLoading"
+                    class="w-full py-2.5 px-4 bg-ez-primary text-white text-sm font-medium rounded transition-opacity duration-ez disabled:opacity-60 hover:opacity-90">
+                    {{ isLoading ? 'Signing in...' : 'Sign in' }}
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
