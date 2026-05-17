@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpService } from '../../layout/service/http-svc/http.service';
+import { HttpService } from 'kubee-ui';
 import { environment } from '../../../environments/environment.development';
 
 @Injectable({ providedIn: 'root' })
@@ -25,12 +25,12 @@ export class SubscriptionsService {
 
   // SUBSCRIPTION PLAN MANAGEMENT
 
-  getAll(success: any, error: any) {
-    return this.http.getHttp(`${SubscriptionsService.URL}/active`, success, error);
+  getAllPlans(page: number = 0, size: number = 10, success: any, error: any) {
+    return this.http.getHttp(`${SubscriptionsService.URL}/plan/all?page=${page}&size=${size}`, success, error);
   }
 
-  getActivePlans(success: any, error: any) {
-    return this.http.getHttp(`${SubscriptionsService.URL}/active`, success, error);
+  getActivePlans(page: number = 0, size: number = 10, success: any, error: any) {
+    return this.http.getHttp(`${SubscriptionsService.URL}/plan/active?page=${page}&size=${size}`, success, error);
   }
 
   getPlanById(id: number, success: any, error: any) {

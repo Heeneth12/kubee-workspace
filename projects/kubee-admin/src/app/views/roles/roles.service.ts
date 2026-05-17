@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpService } from '../../layout/service/http-svc/http.service';
+import { HttpService } from 'kubee-ui';
 import { environment } from '../../../environments/environment.development';
 
 @Injectable({ providedIn: 'root' })
@@ -8,7 +8,7 @@ export class RolesService {
   // TODO: fill exact paths from Swagger
   private static URL = `${RolesService.BASE_URL}/api/v1/admin/roles`;
 
-  constructor(private http: HttpService) {}
+  constructor(private http: HttpService) { }
 
   getAll(success: any, error: any) {
     return this.http.getHttp(RolesService.URL, success, error);

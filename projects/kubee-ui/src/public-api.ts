@@ -21,7 +21,6 @@ export * from './lib/components/custom-dropdown/custom-dropdown.component';
 export * from './lib/config/kubee-config.token';
 export * from './lib/service/http-svc/http.service';
 export * from './lib/service/common/common.service';
-export * from './lib/service/common/tutorial.service';
 
 /**
  *  public common models

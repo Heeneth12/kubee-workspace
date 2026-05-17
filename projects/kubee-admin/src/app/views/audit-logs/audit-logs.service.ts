@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpService } from '../../layout/service/http-svc/http.service';
+import { HttpService } from 'kubee-ui';
 import { environment } from '../../../environments/environment.development';
 
 @Injectable({ providedIn: 'root' })

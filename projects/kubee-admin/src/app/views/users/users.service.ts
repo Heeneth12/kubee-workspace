@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpService } from '../../layout/service/http-svc/http.service';
+import { HttpService } from 'kubee-ui';
 import { environment } from '../../../environments/environment.development';
 
 @Injectable({ providedIn: 'root' })
@@ -8,7 +8,7 @@ export class UsersService {
   private static BASE_URL = environment.authUrl;
   private static URL = `${UsersService.BASE_URL}/api/v1/user`;
 
-  constructor(private http: HttpService) {}
+  constructor(private http: HttpService) { }
 
   createUser(data: any, success: any, error: any) {
     return this.http.postHttp(

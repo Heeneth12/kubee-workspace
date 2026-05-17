@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpService } from '../../layout/service/http-svc/http.service';
+import { HttpService } from 'kubee-ui';
 import { environment } from '../../../environments/environment.development';
 
 @Injectable({ providedIn: 'root' })
@@ -8,7 +8,7 @@ export class TenantsService {
   private static BASE_URL = environment.authUrl;
   private static URL = `${TenantsService.BASE_URL}/api/v1/tenant`;
 
-  constructor(private http: HttpService) {}
+  constructor(private http: HttpService) { }
 
   getAllTenants(page: number, size: number, filter: any, success: any, error: any) {
     return this.http.postHttp(
