@@ -15,6 +15,13 @@ export * from './lib/components/confirmation-modal/confirmation-modal.service';
 export * from './lib/components/date-picker/date-picker.component';
 export * from './lib/components/custom-dropdown/custom-dropdown.component';
 
+/**
+ *  public config & services
+ */
+export * from './lib/config/kubee-config.token';
+export * from './lib/service/http-svc/http.service';
+export * from './lib/service/common/common.service';
+export * from './lib/service/common/tutorial.service';
 
 /**
  *  public common models
