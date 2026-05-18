@@ -3,12 +3,12 @@ import { CanActivate, ActivatedRouteSnapshot, Router, UrlTree } from '@angular/r
 import { AuthService } from './auth.service';
 import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { UserInitResponse } from '../models/Init-response.model';
+import { UserInitResponse } from 'kubee-ui';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) { }
 
   canActivate(route: ActivatedRouteSnapshot): Observable<boolean | UrlTree> {
     return this.authService.isLoggedIn().pipe(

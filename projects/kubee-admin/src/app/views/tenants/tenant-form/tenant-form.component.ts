@@ -3,8 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TenantsService } from '../tenants.service';
-import { CommonService } from '../../../layout/service/common/common.service';
-import { ToastService } from 'kubee-ui';
+import { CommonService, ToastService } from 'kubee-ui';
 
 @Component({
   selector: 'app-tenant-form',
@@ -149,7 +148,7 @@ export class TenantFormComponent implements OnInit {
         }
       };
 
-      this.commonService.createTenant(registerData,
+      this.commonService.registerTenant(registerData,
         (res: any) => {
           this.toast.show('Tenant created successfully', 'success');
           this.router.navigate(['/tenants']);

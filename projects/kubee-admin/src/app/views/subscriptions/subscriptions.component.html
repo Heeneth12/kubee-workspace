@@ -13,7 +13,7 @@
             Create Plan
         </button>
     </div>
-    
+
     <div class="bg-ez-white border border-ez-border rounded-sm shadow-sm overflow-hidden">
         <div class="p-4 border-b border-ez-border bg-gray-50">
             <div class="relative max-w-sm w-full">
@@ -35,38 +35,48 @@
         </div>
         }
 
-        @if (!isLoading && items.length === 0) {
-        <div class="p-12 text-center text-sm text-ez-secondary">
-            No subscription plans found.
-        </div>
-        }
-
-        @if (!isLoading && items.length > 0) {
+        @if (!isLoading && subscriptionPlans.length > 0) {
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead class="bg-gray-50 border-b border-ez-border">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Duration</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Max Users</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">ID
+                        </th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Name</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            App</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Type</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Duration</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Max
+                            Users</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Status</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
-                    @for (plan of items; track $index) {
+                    @for (plan of subscriptionPlans; track $index) {
                     <tr class="hover:bg-gray-50 transition-colors border-b border-ez-border">
                         <td class="px-6 py-4 whitespace-nowrap text-gray-500 font-mono text-xs">{{ plan.id }}</td>
+
                         <td class="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">
                             {{ plan.name }}
                             <div class="text-xs text-gray-500 font-normal mt-1">{{ plan.description }}</div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">{{ plan.type }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">${{ plan.price }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">{{ plan.durationDays }} days</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">
+                            {{ plan.application.appName}} <br />
+                            <span class="text-xs text-gray-500 font-normal">{{ plan.application.appKey }}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">
+                            {{ plan.type }}<br />
+                            <span class="text-xs text-gray-500 font-normal">{{ plan.price }}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">{{ plan.durationDays }} days
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">{{ plan.maxUsers }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
@@ -75,11 +85,11 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right flex justify-end gap-2">
-                            <button (click)="toggleActive(plan)" title="Toggle Status"
+                            <button (click)="toggleActive(plan.id)" title="Toggle Status"
                                 class="text-gray-500 hover:text-gray-700 font-medium bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors text-xs">
                                 {{ plan.isActive ? 'Disable' : 'Enable' }}
                             </button>
-                            <button (click)="openEditForm(plan)"
+                            <button (click)="openEditForm(plan.id)"
                                 class="text-black hover:text-gray-700 font-medium bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors text-xs">
                                 Edit
                             </button>
@@ -87,6 +97,12 @@
                                 class="text-red-600 hover:text-red-800 font-medium bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors text-xs">
                                 Delete
                             </button>
+                        </td>
+                    </tr>
+                    }@empty {
+                    <tr>
+                        <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">
+                            No subscription plans found.
                         </td>
                     </tr>
                     }
@@ -100,11 +116,12 @@
 <ng-template #planFormTemplate>
     <div class="p-6 h-full flex flex-col">
         <form [formGroup]="planForm" (ngSubmit)="submitForm()" class="flex flex-col h-full">
-            
+
             <div class="flex-1 overflow-y-auto space-y-4 pb-6">
                 <!-- Application ID -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Application ID <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Application ID <span
+                            class="text-red-500">*</span></label>
                     <input type="number" formControlName="applicationId"
                         class="w-full px-3 py-2 border border-ez-border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-ez-primary focus:border-ez-primary text-sm"
                         placeholder="Enter application ID">
@@ -115,7 +132,8 @@
 
                 <!-- Plan Name -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Plan Name <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Plan Name <span
+                            class="text-red-500">*</span></label>
                     <input type="text" formControlName="name"
                         class="w-full px-3 py-2 border border-ez-border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-ez-primary focus:border-ez-primary text-sm"
                         placeholder="e.g. Pro Plan">
@@ -134,7 +152,8 @@
 
                 <!-- Type -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Type <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Type <span
+                            class="text-red-500">*</span></label>
                     <input type="text" formControlName="type"
                         class="w-full px-3 py-2 border border-ez-border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-ez-primary focus:border-ez-primary text-sm"
                         placeholder="e.g. Standard, Premium">
@@ -146,7 +165,8 @@
                 <div class="grid grid-cols-2 gap-4">
                     <!-- Price -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Price <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Price <span
+                                class="text-red-500">*</span></label>
                         <input type="number" formControlName="price"
                             class="w-full px-3 py-2 border border-ez-border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-ez-primary focus:border-ez-primary text-sm"
                             placeholder="0.00">
@@ -154,7 +174,8 @@
 
                     <!-- Duration Days -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Duration (Days) <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Duration (Days) <span
+                                class="text-red-500">*</span></label>
                         <input type="number" formControlName="durationDays"
                             class="w-full px-3 py-2 border border-ez-border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-ez-primary focus:border-ez-primary text-sm"
                             placeholder="30">
@@ -163,7 +184,8 @@
 
                 <!-- Max Users -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Max Users <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Max Users <span
+                            class="text-red-500">*</span></label>
                     <input type="number" formControlName="maxUsers"
                         class="w-full px-3 py-2 border border-ez-border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-ez-primary focus:border-ez-primary text-sm"
                         placeholder="10">

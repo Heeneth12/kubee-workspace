@@ -21,3 +21,21 @@ export class SubscriptionModel {
     isValid!: boolean;
     daysRemaining!: number;
 }
+
+export class SubscriptionSummaryModel {
+    id!: number;
+    name!: string;
+    description!: string;
+    type!: string;
+    price!: number;
+    durationDays!: number;
+    maxUsers!: number;
+    isActive!: boolean;
+    application!: MiniApplicationModel;
+}
+
+export class MiniApplicationModel {
+    id!: number;
+    appName!: string;
+    appKey!: string;
+}

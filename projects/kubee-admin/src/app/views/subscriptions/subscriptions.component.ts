@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { SubscriptionsService } from './subscriptions.service';
 import { DrawerService, ToastService } from 'kubee-ui';
-import { SubscriptionPlanModel } from './subscription.model';
+import { SubscriptionPlanModel, SubscriptionSummaryModel } from './subscription.model';
 
 @Component({
   selector: 'app-subscriptions',
@@ -16,12 +16,19 @@ export class SubscriptionsComponent implements OnInit {
 
   searchControl = new FormControl('');
   items: SubscriptionPlanModel[] = [];
+  subscriptionPlans: SubscriptionSummaryModel[] = [];
   isLoading = false;
 
   planForm!: FormGroup;
   isEditMode = false;
   selectedPlanId: number | null = null;
   isSubmitting = false;
+
+  // pagination
+  page = 0;
+  size = 10;
+  totalPages = 0;
+  totalElements = 0;
 
   constructor(
     private service: SubscriptionsService,
@@ -49,9 +56,16 @@ export class SubscriptionsComponent implements OnInit {
 
   load() {
     this.isLoading = true;
-    this.service.getAll(
-      (res: any) => { this.items = res.data ?? []; this.isLoading = false; },
-      () => { this.isLoading = false; this.toast.show('Failed to load plans', 'error'); }
+    this.service.getAllPlans(
+      this.page,
+      this.size,
+      (res: any) => {
+        this.subscriptionPlans = res.data.content ?? [];
+        this.isLoading = false;
+        this.totalPages = res.data.totalPages;
+        this.totalElements = res.data.totalElements;
+      },
+      (err: any) => { this.isLoading = false; this.toast.show('Failed to load plans', 'error'); }
     );
   }
 
@@ -62,10 +76,13 @@ export class SubscriptionsComponent implements OnInit {
     this.drawerSvc.openTemplate(this.planFormTemplate, 'Create Subscription Plan', 'lg');
   }
 
-  openEditForm(plan: SubscriptionPlanModel) {
+  openEditForm(id: number) {
     this.isEditMode = true;
-    this.selectedPlanId = plan.id;
-    this.planForm.patchValue(plan);
+    this.selectedPlanId = id;
+    this.service.getPlanById(id,
+      (res: any) => { this.planForm.patchValue(res.data); },
+      (err: any) => { this.toast.show('Failed to load plan', 'error'); }
+    );
     this.drawerSvc.openTemplate(this.planFormTemplate, 'Edit Subscription Plan', 'lg');
   }
 
@@ -125,8 +142,8 @@ export class SubscriptionsComponent implements OnInit {
     }
   }
 
-  toggleActive(plan: SubscriptionPlanModel) {
-    this.service.disablePlan(plan.id,
+  toggleActive(id: number) {
+    this.service.disablePlan(id,
       (res: any) => {
         this.toast.show('Plan status toggled', 'success');
         this.load();
@@ -134,15 +151,6 @@ export class SubscriptionsComponent implements OnInit {
       (err: any) => {
         this.toast.show('Failed to toggle status', 'error');
       }
-    );
-  }
-
-  // Legacy/other methods from service implementation requested earlier
-  getActivePlans() {
-    this.isLoading = true;
-    this.service.getActivePlans(
-      (res: any) => { this.items = res.data ?? []; this.isLoading = false; },
-      () => { this.isLoading = false; }
     );
   }
 
