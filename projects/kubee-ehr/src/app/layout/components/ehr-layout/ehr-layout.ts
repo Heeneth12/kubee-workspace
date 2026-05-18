@@ -23,11 +23,12 @@ import {
 import { CustomDropdownComponent, DropdownMenuItem } from 'kubee-ui';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../guards/auth.service';
+import { BranchSelectorComponent } from "../branch-selector/branch-selector.component";
 
 @Component({
   selector: 'app-ehr-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideAngularModule, CustomDropdownComponent],
+  imports: [CommonModule, RouterModule, LucideAngularModule, CustomDropdownComponent, BranchSelectorComponent],
   templateUrl: './ehr-layout.html',
   styleUrl: './ehr-layout.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -55,7 +56,7 @@ export class EhrLayout implements OnInit, OnDestroy {
       icon: BookOpen,
       iconBgClass: 'bg-slate-50',
       colorClass: 'text-slate-600',
-      action: () => {}
+      action: () => { }
     },
     {
       label: 'Contact Support',
@@ -63,7 +64,7 @@ export class EhrLayout implements OnInit, OnDestroy {
       icon: MessageSquare,
       iconBgClass: 'bg-slate-50',
       colorClass: 'text-slate-600',
-      action: () => {}
+      action: () => { }
     },
     {
       label: 'Bug Report',
@@ -71,7 +72,7 @@ export class EhrLayout implements OnInit, OnDestroy {
       icon: Bug,
       iconBgClass: 'bg-slate-50',
       colorClass: 'text-slate-600',
-      action: () => {}
+      action: () => { }
     }
   ];
 
@@ -82,7 +83,7 @@ export class EhrLayout implements OnInit, OnDestroy {
       icon: SettingsIcon,
       iconBgClass: 'bg-slate-50',
       colorClass: 'text-slate-600',
-      action: () => {}
+      action: () => { }
     },
     {
       label: 'Sign Out',
@@ -102,7 +103,7 @@ export class EhrLayout implements OnInit, OnDestroy {
     { label: 'Settings', link: '/settings', icon: SettingsIcon }
   ];
 
-  constructor(private authService: AuthService, public router: Router) {}
+  constructor(private authService: AuthService, public router: Router) { }
 
   ngOnInit() {
     this.userSub = this.authService.currentUser$.subscribe(user => {

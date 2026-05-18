@@ -1,31 +1,179 @@
-<div class="p-6">
-    <div class="mb-6">
-        <h1 class="text-2xl font-semibold text-ez-heading">Dashboard</h1>
-        <p class="text-sm text-ez-secondary mt-1">Platform overview</p>
+<div class="p-8 max-w-8xl mx-auto space-y-8">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="text-ez-hero font-semibold text-ez-heading tracking-tight">Clinic Overview</h1>
+            <p class="text-ez-base text-ez-secondary mt-1">Welcome back. Here's what's happening today.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <button class="ez-btn ez-btn-secondary h-[36px]">
+                <lucide-icon [img]="CalendarIcon" class="w-3.5 h-3.5"></lucide-icon>
+                <span>Book Appointment</span>
+            </button>
+            <button class="ez-btn ez-btn-primary h-[36px]">
+                <lucide-icon [img]="PlusIcon" class="w-3.5 h-3.5"></lucide-icon>
+                <span>Register Patient</span>
+            </button>
+        </div>
     </div>
 
-    @if (isLoading) {
-    <div class="text-center py-16 text-sm text-ez-secondary">Loading stats...</div>
-    }
+    <!-- Key Metrics Row -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-    @if (!isLoading) {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div class="bg-ez-white border border-ez-border p-5">
-            <p class="text-xs text-ez-secondary uppercase tracking-wide mb-1">Total Tenants</p>
-            <p class="text-2xl font-semibold text-ez-heading">{{ stats?.totalTenants ?? '—' }}</p>
+        <!-- Metric 1 -->
+        <div
+            class="bg-ez-white border border-ez-border p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-ez group">
+            <div class="flex items-center justify-between mb-4">
+                <p class="text-ez-sm font-medium text-ez-secondary uppercase tracking-wide">Checked-In</p>
+                <div
+                    class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-100 transition-colors">
+                    <lucide-icon [img]="UserCheckIcon" class="w-4 h-4"></lucide-icon>
+                </div>
+            </div>
+            <div class="flex items-end gap-2">
+                <h2 class="text-3xl font-semibold text-ez-heading">{{ stats.checkedIn }}</h2>
+                <span class="text-ez-sm text-green-600 font-medium mb-1">+12%</span>
+            </div>
         </div>
-        <div class="bg-ez-white border border-ez-border p-5">
-            <p class="text-xs text-ez-secondary uppercase tracking-wide mb-1">Total Users</p>
-            <p class="text-2xl font-semibold text-ez-heading">{{ stats?.totalUsers ?? '—' }}</p>
+
+        <!-- Metric 2 -->
+        <div
+            class="bg-ez-white border border-ez-border p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-ez group">
+            <div class="flex items-center justify-between mb-4">
+                <p class="text-ez-sm font-medium text-ez-secondary uppercase tracking-wide">New Registrations</p>
+                <div
+                    class="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center text-purple-600 group-hover:bg-purple-100 transition-colors">
+                    <lucide-icon [img]="UsersIcon" class="w-4 h-4"></lucide-icon>
+                </div>
+            </div>
+            <div class="flex items-end gap-2">
+                <h2 class="text-3xl font-semibold text-ez-heading">{{ stats.todayRegistrations }}</h2>
+            </div>
         </div>
-        <div class="bg-ez-white border border-ez-border p-5">
-            <p class="text-xs text-ez-secondary uppercase tracking-wide mb-1">Active Subscriptions</p>
-            <p class="text-2xl font-semibold text-ez-heading">{{ stats?.activeSubscriptions ?? '—' }}</p>
+
+        <!-- Metric 3 -->
+        <div
+            class="bg-ez-white border border-ez-border p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-ez group">
+            <div class="flex items-center justify-between mb-4">
+                <p class="text-ez-sm font-medium text-ez-secondary uppercase tracking-wide">Pending Bills</p>
+                <div
+                    class="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center text-orange-600 group-hover:bg-orange-100 transition-colors">
+                    <lucide-icon [img]="ClockIcon" class="w-4 h-4"></lucide-icon>
+                </div>
+            </div>
+            <div class="flex items-end gap-2">
+                <h2 class="text-3xl font-semibold text-ez-heading">{{ stats.pendingBills }}</h2>
+            </div>
         </div>
-        <div class="bg-ez-white border border-ez-border p-5">
-            <p class="text-xs text-ez-secondary uppercase tracking-wide mb-1">Applications</p>
-            <p class="text-2xl font-semibold text-ez-heading">{{ stats?.totalApplications ?? '—' }}</p>
+
+        <!-- Metric 4 -->
+        <div
+            class="bg-ez-white border border-ez-border p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-ez group">
+            <div class="flex items-center justify-between mb-4">
+                <p class="text-ez-sm font-medium text-ez-secondary uppercase tracking-wide">Revenue Today</p>
+                <div
+                    class="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center text-green-600 group-hover:bg-green-100 transition-colors">
+                    <lucide-icon [img]="BanknoteIcon" class="w-4 h-4"></lucide-icon>
+                </div>
+            </div>
+            <div class="flex items-end gap-2">
+                <h2 class="text-3xl font-semibold text-ez-heading">${{ stats.revenueToday }}</h2>
+            </div>
         </div>
+
     </div>
-    }
+
+    <!-- Data Grids Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- Upcoming Appointments -->
+        <div class="bg-ez-white border border-ez-border rounded-lg shadow-sm flex flex-col">
+            <div class="p-6 border-b border-ez-border flex justify-between items-center">
+                <h3 class="text-ez-lg font-semibold text-ez-heading flex items-center gap-2">
+                    <lucide-icon [img]="CalendarIcon" class="w-5 h-5 text-ez-primary"></lucide-icon>
+                    Upcoming Appointments
+                </h3>
+                <button
+                    class="text-ez-sm text-ez-primary font-medium hover:text-ez-primary-hover transition-colors">View
+                    All</button>
+            </div>
+            <div class="p-0 overflow-x-auto flex-1">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr
+                            class="bg-ez-ash text-ez-xs uppercase tracking-wide text-ez-secondary border-b border-ez-border">
+                            <th class="px-6 py-3 font-medium">Patient</th>
+                            <th class="px-6 py-3 font-medium">Time</th>
+                            <th class="px-6 py-3 font-medium">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-ez-sm">
+                        @for (apt of upcomingAppointments; track apt.id) {
+                        <tr class="border-b border-ez-border last:border-0 hover:bg-ez-ash transition-colors">
+                            <td class="px-6 py-4 font-medium text-ez-heading">{{ apt.patient }}</td>
+                            <td class="px-6 py-4 text-ez-body">{{ apt.time }}</td>
+                            <td class="px-6 py-4">
+                                <span class="px-2.5 py-1 rounded-full text-xs font-medium"
+                                    [class.bg-yellow-100]="apt.status === 'Waiting'"
+                                    [class.text-yellow-700]="apt.status === 'Waiting'"
+                                    [class.bg-blue-100]="apt.status === 'In Progress'"
+                                    [class.text-blue-700]="apt.status === 'In Progress'"
+                                    [class.bg-green-100]="apt.status === 'Confirmed'"
+                                    [class.text-green-700]="apt.status === 'Confirmed'">
+                                    {{ apt.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Billing -->
+        <div class="bg-ez-white border border-ez-border rounded-lg shadow-sm flex flex-col">
+            <div class="p-6 border-b border-ez-border flex justify-between items-center">
+                <h3 class="text-ez-lg font-semibold text-ez-heading flex items-center gap-2">
+                    <lucide-icon [img]="ActivityIcon" class="w-5 h-5 text-ez-primary"></lucide-icon>
+                    Recent Billing Activity
+                </h3>
+                <button
+                    class="text-ez-sm text-ez-primary font-medium hover:text-ez-primary-hover transition-colors">View
+                    All</button>
+            </div>
+            <div class="p-0 overflow-x-auto flex-1">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr
+                            class="bg-ez-ash text-ez-xs uppercase tracking-wide text-ez-secondary border-b border-ez-border">
+                            <th class="px-6 py-3 font-medium">Invoice ID</th>
+                            <th class="px-6 py-3 font-medium">Patient</th>
+                            <th class="px-6 py-3 font-medium">Amount</th>
+                            <th class="px-6 py-3 font-medium">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-ez-sm">
+                        @for (bill of recentBills; track bill.id) {
+                        <tr class="border-b border-ez-border last:border-0 hover:bg-ez-ash transition-colors">
+                            <td class="px-6 py-4 font-medium text-ez-secondary">{{ bill.id }}</td>
+                            <td class="px-6 py-4 text-ez-heading">{{ bill.patient }}</td>
+                            <td class="px-6 py-4 font-medium">${{ bill.amount }}</td>
+                            <td class="px-6 py-4">
+                                <span class="flex items-center gap-1.5" [class.text-green-600]="bill.status === 'Paid'"
+                                    [class.text-orange-600]="bill.status === 'Pending'">
+                                    <div class="w-2 h-2 rounded-full" [class.bg-green-500]="bill.status === 'Paid'"
+                                        [class.bg-orange-500]="bill.status === 'Pending'"></div>
+                                    {{ bill.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
 </div>

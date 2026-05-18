@@ -1,12 +1,12 @@
 <div class="flex w-full h-screen bg-ez-white text-ez-body overflow-hidden">
 
     @if (isMobileMenuOpen) {
-    <div (click)="closeMenu()" class="fixed inset-0 bg-ez-carbon/80 z-20 lg:hidden transition-opacity duration-ez"></div>
+    <div (click)="closeMenu()" class="fixed inset-0 bg-ez-carbon/80 z-20 lg:hidden transition-opacity duration-ez">
+    </div>
     }
 
     <aside id="app-sidebar"
-        class="fixed inset-y-0 left-0 z-30 bg-ez-carbon flex flex-col transition-all duration-ez lg:static"
-        [ngClass]="{
+        class="fixed inset-y-0 left-0 z-30 bg-ez-carbon flex flex-col transition-all duration-ez lg:static" [ngClass]="{
             'translate-x-0': isMobileMenuOpen,
             '-translate-x-full lg:translate-x-0': !isMobileMenuOpen,
             'w-64': !isSidebarCollapsed,
@@ -44,11 +44,11 @@
         <nav class="flex-1 mt-4 px-3 space-y-1 overflow-y-auto overflow-x-hidden">
             @for (item of allNavItems; track item.label; let i = $index) {
             @if (item.isHeader) {
-                @if (!isSidebarCollapsed) {
-                <div class="px-3 py-2 ez-micro-label text-white/30">{{ item.label }}</div>
-                } @else {
-                <div class="my-4 border-t border-white/10 w-8 mx-auto"></div>
-                }
+            @if (!isSidebarCollapsed) {
+            <div class="px-3 py-2 ez-micro-label text-white/30">{{ item.label }}</div>
+            } @else {
+            <div class="my-4 border-t border-white/10 w-8 mx-auto"></div>
+            }
             } @else {
             <a [routerLink]="item.link" [id]="'menu-item-' + i"
                 class="group relative flex items-center p-3 text-ez-sm font-medium transition-[background-color,color] duration-ez cursor-pointer outline-none"
@@ -57,8 +57,7 @@
                     'text-white bg-white/5': isItemActive(item),
                     'text-white/60 hover:text-white hover:bg-white/5': !isItemActive(item)
                 }">
-                <lucide-icon [img]="item.icon" class="h-5 w-5 shrink-0 transition-colors duration-ez"
-                    [ngClass]="{
+                <lucide-icon [img]="item.icon" class="h-5 w-5 shrink-0 transition-colors duration-ez" [ngClass]="{
                         'text-white': isItemActive(item),
                         'text-white/40 group-hover:text-white': !isItemActive(item)
                     }">
@@ -67,7 +66,8 @@
                 <span class="ml-3 truncate animate-in fade-in duration-ez">{{ item.label }}</span>
                 }
                 @if (isSidebarCollapsed) {
-                <div class="absolute left-full top-1/2 -translate-y-1/2 ml-4 z-[100] whitespace-nowrap bg-ez-carbon border border-white/10 px-3 py-1.5 text-ez-xs text-white opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-ez">
+                <div
+                    class="absolute left-full top-1/2 -translate-y-1/2 ml-4 z-[100] whitespace-nowrap bg-ez-carbon border border-white/10 px-3 py-1.5 text-ez-xs text-white opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-ez">
                     {{ item.label }}
                 </div>
                 }
@@ -79,7 +79,8 @@
 
     <main class="flex-1 min-w-0 flex flex-col bg-ez-white overflow-hidden transition-all duration-ez">
 
-        <header class="h-16 bg-ez-white border-b border-ez-border flex items-center justify-between px-6 sticky top-0 z-10">
+        <header
+            class="h-16 bg-ez-white border-b border-ez-border flex items-center justify-between px-6 sticky top-0 z-10">
 
             <div class="flex items-center gap-4 flex-1">
                 <button (click)="toggleMenu()"
@@ -87,7 +88,8 @@
                     <lucide-icon [img]="Menu" class="w-6 h-6"></lucide-icon>
                 </button>
 
-                <div class="hidden md:flex bg-ez-ash border border-ez-ash rounded relative w-full max-w-sm focus-within:border-ez-primary transition-[border-color] duration-ez">
+                <div
+                    class="hidden md:flex bg-ez-ash border border-ez-ash rounded relative w-full max-w-sm focus-within:border-ez-primary transition-[border-color] duration-ez">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <lucide-icon [img]="Search" class="w-4 h-4 text-ez-muted"></lucide-icon>
                     </div>
@@ -98,17 +100,20 @@
             </div>
 
             <div class="flex items-center gap-3">
-                <app-custom-dropdown
-                    [triggerIcon]="helpIcon"
+
+                <app-branch-selector [showLabel]="false">
+                </app-branch-selector>
+
+                <app-custom-dropdown [triggerIcon]="helpIcon"
                     [iconClass]="'h-4 w-4 shrink-0 transition-colors duration-ez'"
                     buttonClass="flex items-center justify-center w-8 h-8 bg-ez-white border border-ez-border rounded hover:border-ez-subtle text-ez-secondary hover:text-ez-heading transition-[border-color,color] duration-ez outline-none"
-                    [items]="helpCenterItems"
-                    anchor="bottom end">
+                    [items]="helpCenterItems" anchor="bottom end">
                 </app-custom-dropdown>
 
                 <el-dropdown class="inline-block ml-2 pl-4 border-l border-ez-border">
                     <button class="flex items-center gap-2 outline-none">
-                        <div class="w-8 h-8 rounded-full bg-ez-carbon text-white flex items-center justify-center text-ez-sm font-medium transition-colors duration-ez">
+                        <div
+                            class="w-8 h-8 rounded-full bg-ez-carbon text-white flex items-center justify-center text-ez-sm font-medium transition-colors duration-ez">
                             {{ user.initials }}
                         </div>
                     </button>
@@ -117,11 +122,13 @@
                         class="m-0 mt-2 w-72 rounded-none bg-ez-white border border-ez-border shadow-xl p-0 focus:outline-none transition-opacity duration-ez data-[closed]:opacity-0">
 
                         <div class="p-4 border-b border-ez-border bg-ez-ash flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-ez-carbon text-white flex items-center justify-center font-medium">
+                            <div
+                                class="w-10 h-10 rounded-full bg-ez-carbon text-white flex items-center justify-center font-medium">
                                 {{ user.initials }}
                             </div>
                             <div class="flex flex-col min-w-0">
-                                <span class="text-ez-sm font-medium text-ez-heading truncate capitalize">{{ user.name }}</span>
+                                <span class="text-ez-sm font-medium text-ez-heading truncate capitalize">{{ user.name
+                                    }}</span>
                                 <span class="text-ez-xs text-ez-secondary truncate">{{ user.email }}</span>
                                 <div class="mt-1">
                                     <span class="ez-micro-label">{{ user.role }}</span>
