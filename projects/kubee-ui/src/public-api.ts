@@ -28,4 +28,5 @@ export * from './lib/service/common/common.service';
 export * from './lib/models/tenant.model';
 export * from './lib/models/application.model';
 export * from './lib/models/user.model';
+export * from './lib/models/init-response.model';
 export * from './lib/models/subscription.model';

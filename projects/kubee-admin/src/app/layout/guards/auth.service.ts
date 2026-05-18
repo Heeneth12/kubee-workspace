@@ -1,12 +1,9 @@
 import { Injectable } from '@angular/core';
-import { CommonService } from '../service/common/common.service';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { UserInitResponse } from '../models/Init-response.model';
-import { DrawerService } from 'kubee-ui';
-import { ForgotPasswordModel, ResendOtpModel, ResetPasswordModel } from '../../views/auth/auth.model';
+import { CommonService, DrawerService, UserInitResponse } from 'kubee-ui';
 import { BannerLoaderService } from '../components/banner-loader/banner-loader.service';
+import { ForgotPasswordModel, ResendOtpModel, ResetPasswordModel } from '../../views/auth/auth.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
