@@ -6,9 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "build:ui": "ng build kubee-ui",
-    "build:admin": "node scripts/set-env.js kubee-admin && ng build kubee-ui && ng build kubee-admin --configuration production",
-    "build:app": "node scripts/set-env.js kubee-app && ng build kubee-ui && ng build kubee-app --configuration production",
-    "build:ehr": "node scripts/set-env.js kubee-ehr && ng build kubee-ui && ng build kubee-ehr --configuration production",
+    "build:admin": "node scripts/set-env.js kubee-admin && ng build kubee-ui && ng build kubee-admin --configuration production && cp dist/kubee-admin/browser/index.html dist/kubee-admin/browser/404.html",
+    "build:app": "node scripts/set-env.js kubee-app && ng build kubee-ui && ng build kubee-app --configuration production && cp dist/kubee-app/browser/index.html dist/kubee-app/browser/404.html",
+    "build:ehr": "node scripts/set-env.js kubee-ehr && ng build kubee-ui && ng build kubee-ehr --configuration production && cp dist/kubee-ehr/browser/index.html dist/kubee-ehr/browser/404.html",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
