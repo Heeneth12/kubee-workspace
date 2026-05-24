@@ -30,7 +30,15 @@ const APP_NAME        = process.env['APP_NAME']         || '';
 const APP_KEY         = process.env['APP_KEY']          || '';
 const GOOGLE_CLIENT_ID = process.env['GOOGLE_CLIENT_ID'] || '';
 
-const envFileContent = `export const environment = {
+if (!AUTH_URL || !API_URL) {
+  console.error('[set-env] ERROR: AUTH_URL and API_URL must be set as environment variables.');
+  console.error('          Set them in the Vercel dashboard under Project → Settings → Environment Variables.');
+  process.exit(1);
+}
+
+const envDir = path.join(__dirname, `../projects/${APP}/src/environments`);
+
+const prodContent = `export const environment = {
   production: true,
   authUrl: '${AUTH_URL}',
   devUrl: '${API_URL}',
@@ -40,13 +48,12 @@ const envFileContent = `export const environment = {
 };
 `;
 
-const envFilePath = path.join(
-  __dirname,
-  `../projects/${APP}/src/environments/environment.ts`
-);
+// Write both files so localhost never leaks through regardless of which
+// Angular configuration the builder picks up.
+fs.writeFileSync(path.join(envDir, 'environment.ts'), prodContent);
+fs.writeFileSync(path.join(envDir, 'environment.development.ts'), prodContent);
 
-fs.writeFileSync(envFilePath, envFileContent);
-console.log(`[set-env] Wrote environment.ts for ${APP}`);
+console.log(`[set-env] Wrote environment.ts + environment.development.ts for ${APP}`);
 console.log(`          AUTH_URL  = ${AUTH_URL  || '(not set)'}`);
 console.log(`          API_URL   = ${API_URL   || '(not set)'}`);
 console.log(`          APP_NAME  = ${APP_NAME  || '(not set)'}`);

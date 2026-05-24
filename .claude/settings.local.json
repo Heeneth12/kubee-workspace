@@ -9,7 +9,10 @@
       "Bash(Get-ChildItem *)",
       "Bash(git *)",
       "Bash(npx ng *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(node *)",
+      "Bash(AUTH_URL=https://auth.kubee.in API_URL=https://ops-api.kubee.in APP_NAME=\"Kubee Ops\" APP_KEY=KUBEE_OPS node /Users/venkatheenethsai/Documents/kubee/kubee-workspace/scripts/set-env.js kubee-admin)",
+      "Bash(python3 *)"
     ]
   }
 }
