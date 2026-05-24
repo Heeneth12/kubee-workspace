@@ -1,8 +1,8 @@
 export const environment = {
   production: false,
-  authUrl: 'https://auth.kubee.in',
-  devUrl: 'https://inventory.kubee.in',
-  appName: 'Inventory',
-  appKey: 'EZH_INV_001',
+  authUrl: 'http://localhost:8080',
+  devUrl: 'http://localhost:8085',
+  appName: 'Kubee Ops',
+  appKey: 'KUBEE_OPS',
   googleClientId: '',
 };
