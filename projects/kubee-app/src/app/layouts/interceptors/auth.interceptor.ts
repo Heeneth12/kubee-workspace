@@ -1,7 +1,7 @@
 import { Injectable, Injector } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpErrorResponse, HttpEvent } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError, filter, take, switchMap, catchError } from 'rxjs';
-import { CommonService } from '../service/common/common.service';
+import { CommonService } from 'kubee-ui';
 import { AuthService } from '../guards/auth.service';
 import { environment } from '../../../environments/environment.development';
 

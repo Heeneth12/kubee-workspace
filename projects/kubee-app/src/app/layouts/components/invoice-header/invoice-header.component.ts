@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged, filter, switchMap, tap, finalize, of, catchError, Observable } from 'rxjs';
 import { AuthService } from '../../guards/auth.service';
-import { UserInitResponse } from '../../models/init-response.model';
+import { UserInitResponse } from 'kubee-ui';
 import { User, CheckCircle, Phone, Mail, MapPin, Search, Loader2, Building2, Store, LucideAngularModule, ChevronRight } from 'lucide-angular';
 import { Router } from '@angular/router';
 import { UserFilterModel, UserModel, UserType } from '../../../views/user-management/models/user.model';

@@ -7,7 +7,7 @@ import {
   CheckCircle2, ChevronRight, ChevronLeft, BarChart2, X, Paperclip
 } from 'lucide-angular';
 import { ModalService, ToastService } from 'kubee-ui';
-import { CommonService } from '../../service/common/common.service';
+import { CommonService } from 'kubee-ui';
 import { CreateAppRequestModel, SupportCategory, SupportPriority } from '../../models/user-request.model';
 
 export type FeedbackTab = 'rating' | 'feature' | 'bug' | 'contact' | 'nps';

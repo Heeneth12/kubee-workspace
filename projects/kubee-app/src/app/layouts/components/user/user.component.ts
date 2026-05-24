@@ -2,10 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuthService } from '../../guards/auth.service';
-import { UserInitResponse } from '../../models/init-response.model';
 import { Settings, ShieldCheck, Zap, LucideAngularModule, UserPlusIcon, FolderOpen, ChevronRight, Percent, AppWindow } from 'lucide-angular';
 import { RouterModule, Router } from '@angular/router';
-import { DrawerService } from 'kubee-ui';
+import { DrawerService, UserInitResponse } from 'kubee-ui';
 
 @Component({
   selector: 'app-user',

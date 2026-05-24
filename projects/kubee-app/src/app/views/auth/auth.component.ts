@@ -5,9 +5,8 @@ import { AuthService } from '../../layouts/guards/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
-import { ToastService } from '../../../../../kubee-ui/src/lib/components/toast/toastService';
+import { ToastService, CommonService } from 'kubee-ui';
 import { ForgotPasswordModel, ResendOtpModel, ResetPasswordModel } from './auth.model';
-import { CommonService } from '../../layouts/service/common/common.service';
 import { MarketingRequestDto, SupportCategory, SupportPriority } from '../../layouts/models/user-request.model';
 
 

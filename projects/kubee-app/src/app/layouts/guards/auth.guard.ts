@@ -3,7 +3,7 @@ import { CanActivate, ActivatedRouteSnapshot, Router, UrlTree } from '@angular/r
 import { AuthService } from './auth.service';
 import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { UserInitResponse } from '../models/init-response.model';
+import { UserInitResponse } from 'kubee-ui';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
@@ -72,7 +72,7 @@ export class AuthGuard implements CanActivate {
     }
 
     // Look through all applications assigned to the user
-    return user.userApplications.some(app => {
+    return user.userApplications.some((app: any) => {
       // Check if modulePrivileges exists and has the specific key
       return app.modulePrivileges && Object.prototype.hasOwnProperty.call(app.modulePrivileges, moduleKey);
     });

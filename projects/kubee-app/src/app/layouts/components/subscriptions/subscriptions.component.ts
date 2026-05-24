@@ -6,10 +6,8 @@ import {
   Clock, Users, Zap, Star, ShieldCheck, Plus, Ban, RefreshCw,
   AlertTriangle, Package, X
 } from 'lucide-angular';
-import { SubscriptionsService } from './subscriptions.service';
-import { SubscriptionModel, SubscriptionPlanModel } from './subscriptions.model';
 import { AuthService } from '../../guards/auth.service';
-import { ModalService, ToastService } from 'kubee-ui';
+import { ModalService, ToastService, CommonService, SubscriptionPlanModel, SubscriptionModel } from 'kubee-ui';
 
 
 @Component({
@@ -59,7 +57,7 @@ export class SubscriptionsComponent implements OnInit {
   readonly planTypes = ['BASIC', 'STANDARD', 'PREMIUM', 'ENTERPRISE'];
 
   constructor(
-    private subscriptionsSvc: SubscriptionsService,
+    private commonSvc: CommonService,
     private authSvc: AuthService,
     private toastSvc: ToastService,
     private modalSvc: ModalService,
@@ -96,7 +94,7 @@ export class SubscriptionsComponent implements OnInit {
 
   loadCurrentSubscription() {
     this.isLoading.set(true);
-    this.subscriptionsSvc.getCurrentSubscription(
+    this.commonSvc.getCurrentSubscription(
       this.tenantId(),
       (res: any) => {
         this.currentSubscription.set(res.data);
@@ -111,7 +109,7 @@ export class SubscriptionsComponent implements OnInit {
 
   loadActivePlans() {
     this.isPlansLoading.set(true);
-    this.subscriptionsSvc.getActivePlans(
+    this.commonSvc.getActiveSubscriptionPlans(
       (res: any) => {
         this.activePlans.set(res.data || []);
         this.isPlansLoading.set(false);
@@ -136,7 +134,7 @@ export class SubscriptionsComponent implements OnInit {
     const plan = this.selectedPlan();
     if (!plan) return;
     this.isSubscribing.set(true);
-    this.subscriptionsSvc.subscribeTenant(
+    this.commonSvc.subscribeTenant(
       this.tenantId(),
       plan.id,
       (_res: any) => {
@@ -164,7 +162,7 @@ export class SubscriptionsComponent implements OnInit {
     const sub = this.currentSubscription();
     if (!sub) return;
     this.isCancelling.set(true);
-    this.subscriptionsSvc.cancelSubscription(
+    this.commonSvc.cancelSubscription(
       sub.id,
       (_res: any) => {
         this.isCancelling.set(false);
@@ -188,7 +186,7 @@ export class SubscriptionsComponent implements OnInit {
   onCreatePlan() {
     if (this.createPlanForm.invalid) return;
     this.isCreatingPlan.set(true);
-    this.subscriptionsSvc.createPlan(
+    this.commonSvc.createSubscriptionPlan(
       this.createPlanForm.value,
       (_res: any) => {
         this.isCreatingPlan.set(false);

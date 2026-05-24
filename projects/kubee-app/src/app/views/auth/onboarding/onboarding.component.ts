@@ -18,12 +18,8 @@ import {
 
 import { Router } from '@angular/router';
 import { AuthService } from '../../../layouts/guards/auth.service';
-import { CommonService } from '../../../layouts/service/common/common.service';
-import { ToastService } from '../../../../../../kubee-ui/src/lib/components/toast/toastService';
-import { SubscriptionsService } from '../../../layouts/components/subscriptions/subscriptions.service';
-import { SubscriptionPlanModel } from '../../../layouts/components/subscriptions/subscriptions.model';
+import { CommonService, ToastService, ModalService, SubscriptionPlanModel } from 'kubee-ui';
 import { FeedbackComponent } from '../../../layouts/components/feedback/feedback.component';
-import { ModalService } from 'kubee-ui';
 import { Contact, HeadsetIcon, Info, LucideAngularModule } from 'lucide-angular';
 
 export interface OnboardingResult {
@@ -124,7 +120,6 @@ export class OnboardingComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private modalService: ModalService,
     private router: Router,
-    private subscriptionsService: SubscriptionsService,
   ) { }
 
   ngOnInit() {
@@ -243,7 +238,7 @@ export class OnboardingComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.loadingText = 'Creating your account...';
 
-    this.commonService.createTenant(
+    this.commonService.registerTenant(
       payload,
       (res: any) => {
         this.registeredTenantId = res?.data?.tenantId || res?.tenantId || null;
@@ -359,7 +354,7 @@ export class OnboardingComponent implements OnInit, OnDestroy {
     if (this.selectedPlan.price === 0) {
       this.isLoading = true;
       this.loadingText = 'Activating free plan...';
-      this.subscriptionsService.subscribeTenant(
+      this.commonService.subscribeTenant(
         this.registeredTenantId!,
         this.selectedPlan.id,
         (_res: any) => {
@@ -381,7 +376,7 @@ export class OnboardingComponent implements OnInit, OnDestroy {
       this.loadingText = 'Processing payment...';
 
       setTimeout(() => {
-        this.subscriptionsService.subscribeTenant(
+        this.commonService.subscribeTenant(
           this.registeredTenantId!,
           this.selectedPlan!.id,
           (_res: any) => {
@@ -402,7 +397,7 @@ export class OnboardingComponent implements OnInit, OnDestroy {
   loadActivePlans() {
     this.plansLoading = true;
     this.cdr.markForCheck();
-    this.subscriptionsService.getActivePlans(
+    this.commonService.getActiveSubscriptionPlans(
       (res: any) => {
         this.activePlans = res?.data || [];
         this.plansLoading = false;

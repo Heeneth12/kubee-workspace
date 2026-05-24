@@ -81,7 +81,7 @@
                             @if (tenant.subscription) {
                             <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
                                 [ngClass]="tenant.subscription.status === 'ACTIVE' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-gray-50 text-gray-600 border border-gray-200'">
-                                {{ tenant.subscription.plan?.name || tenant.subscription.status }}
+                                {{ tenant.subscription.plan.name || tenant.subscription.status }}
                             </span>
                             } @else {
                             <span class="text-gray-400 text-xs">—</span>

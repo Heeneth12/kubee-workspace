@@ -2,9 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuthService } from '../../layouts/guards/auth.service';
-import { UserInitResponse } from '../../layouts/models/init-response.model';
-import { ToastService } from '../../../../../kubee-ui/src/lib/components/toast/toastService';
-import { ConfirmationModalService } from '../../../../../kubee-ui/src/lib/components/confirmation-modal/confirmation-modal.service';
+import { UserInitResponse, ConfirmationModalService, ToastService } from 'kubee-ui';
 import {
   LucideAngularModule,
   Eye, Users, MousePointerClick, ShoppingCart, TrendingUp,

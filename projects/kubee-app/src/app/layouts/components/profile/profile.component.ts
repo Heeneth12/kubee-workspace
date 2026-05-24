@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   LucideAngularModule,
-  User, Mail, Shield, Key, Bell, CheckCircle, ShieldAlert,
+  Mail, Shield, Key, Bell, CheckCircle, ShieldAlert,
   Edit, Camera, Lock, Eye, EyeOff, Plus, X, MapPin, Save, Loader,
   Activity,
   AlertCircle,
@@ -25,11 +25,9 @@ import {
   ShieldCheckIcon
 } from 'lucide-angular';
 import { AuthService } from '../../guards/auth.service';
-import { UserInitResponse } from '../../models/init-response.model';
-import { ToastService } from '../../../../../../kubee-ui/src/lib/components/toast/toastService';
+import { UserInitResponse, ToastService, ModalService } from 'kubee-ui';
 import { UserManagementService } from '../../../views/user-management/userManagement.service';
 import { UserAddressModel, UserModel } from '../../../views/user-management/models/user.model';
-import { ModalService } from 'kubee-ui';
 import { FileManagerService } from '../../../views/file-manager/file-manager.service';
 
 export interface NotificationRow {

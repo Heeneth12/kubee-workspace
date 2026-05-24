@@ -13,7 +13,7 @@ import '@tailwindplus/elements';
 
 import { NotificationService } from './notification.service';
 import { NotificationFeedItem } from './notification.model';
-import { UserInitResponse } from '../../models/init-response.model';
+import { UserInitResponse } from 'kubee-ui';
 import { AuthService } from '../../guards/auth.service';
 
 @Component({
