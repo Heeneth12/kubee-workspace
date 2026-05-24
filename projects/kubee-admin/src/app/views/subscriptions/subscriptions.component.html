@@ -85,7 +85,7 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right flex justify-end gap-2">
-                            <button (click)="toggleActive(plan.id)" title="Toggle Status"
+                            <button (click)="toggleStatus(plan.id, !plan.isActive)" title="Toggle Status"
                                 class="text-gray-500 hover:text-gray-700 font-medium bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-md transition-colors text-xs">
                                 {{ plan.isActive ? 'Disable' : 'Enable' }}
                             </button>
@@ -118,15 +118,19 @@
         <form [formGroup]="planForm" (ngSubmit)="submitForm()" class="flex flex-col h-full">
 
             <div class="flex-1 overflow-y-auto space-y-4 pb-6">
-                <!-- Application ID -->
+                <!-- Application -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Application ID <span
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Application <span
                             class="text-red-500">*</span></label>
-                    <input type="number" formControlName="applicationId"
-                        class="w-full px-3 py-2 border border-ez-border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-ez-primary focus:border-ez-primary text-sm"
-                        placeholder="Enter application ID">
+                    <select formControlName="applicationId"
+                        class="w-full px-3 py-2 border border-ez-border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-ez-primary focus:border-ez-primary text-sm">
+                        <option value="">Select Application</option>
+                        @for (app of applicationList; track app.id) {
+                        <option [value]="app.id">{{ app.appName }}</option>
+                        }
+                    </select>
                     @if (planForm.get('applicationId')?.invalid && planForm.get('applicationId')?.touched) {
-                    <p class="mt-1 text-xs text-red-500">Application ID is required</p>
+                    <p class="mt-1 text-xs text-red-500">Application is required</p>
                     }
                 </div>
 
@@ -150,15 +154,19 @@
                         placeholder="Plan description..."></textarea>
                 </div>
 
-                <!-- Type -->
+                <!-- Plan Type -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Type <span
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Plan Type <span
                             class="text-red-500">*</span></label>
-                    <input type="text" formControlName="type"
-                        class="w-full px-3 py-2 border border-ez-border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-ez-primary focus:border-ez-primary text-sm"
-                        placeholder="e.g. Standard, Premium">
+                    <select formControlName="type"
+                        class="w-full px-3 py-2 border border-ez-border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-ez-primary focus:border-ez-primary text-sm">
+                        <option value="">Select Plan Type</option>
+                        @for (pt of planTypeList; track pt) {
+                        <option [value]="pt">{{ pt }}</option>
+                        }
+                    </select>
                     @if (planForm.get('type')?.invalid && planForm.get('type')?.touched) {
-                    <p class="mt-1 text-xs text-red-500">Type is required</p>
+                    <p class="mt-1 text-xs text-red-500">Plan Type is required</p>
                     }
                 </div>
 

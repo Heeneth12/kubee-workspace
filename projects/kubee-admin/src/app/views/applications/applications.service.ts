@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment.development';
 export class ApplicationsService {
   private static APPLICATION_BASE_URL = environment.authUrl + "/api/v1/common/app";
   private static ROLE_BASE_URL = environment.authUrl + "/api/v1/common/role";
+  private static COMMON_BASE_URL = environment.authUrl + "/api/v1/common";
 
   constructor(private http: HttpService) { }
 
@@ -25,6 +26,34 @@ export class ApplicationsService {
 
   deleteApplication(id: number, success: any, error: any) {
     return this.http.deleteHttp(`${ApplicationsService.APPLICATION_BASE_URL}/${id}`, success, error);
+  }
+
+  // module apis
+
+  createModule(appId: number, data: any, success: any, error: any) {
+    return this.http.postHttp(`${ApplicationsService.COMMON_BASE_URL}/apps/${appId}/modules`, data, success, error);
+  }
+
+  updateModule(moduleId: number, data: any, success: any, error: any) {
+    return this.http.putHttp(`${ApplicationsService.COMMON_BASE_URL}/modules/${moduleId}`, data, success, error);
+  }
+
+  deleteModule(moduleId: number, success: any, error: any) {
+    return this.http.deleteHttp(`${ApplicationsService.COMMON_BASE_URL}/modules/${moduleId}`, success, error);
+  }
+
+  // privilege apis
+
+  createPrivilege(moduleId: number, data: any, success: any, error: any) {
+    return this.http.postHttp(`${ApplicationsService.COMMON_BASE_URL}/modules/${moduleId}/privileges`, data, success, error);
+  }
+
+  updatePrivilege(privilegeId: number, data: any, success: any, error: any) {
+    return this.http.putHttp(`${ApplicationsService.COMMON_BASE_URL}/privileges/${privilegeId}`, data, success, error);
+  }
+
+  deletePrivilege(privilegeId: number, success: any, error: any) {
+    return this.http.deleteHttp(`${ApplicationsService.COMMON_BASE_URL}/privileges/${privilegeId}`, success, error);
   }
 
   // role apis

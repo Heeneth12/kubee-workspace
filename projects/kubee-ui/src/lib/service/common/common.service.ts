@@ -262,8 +262,8 @@ export class CommonService {
     return this.httpService.deleteHttp(`${this.SUBSCRIPTION_BASE_URL}/plan/${planId}`, success, error);
   }
 
-  disableSubscriptionPlan(planId: number, success: any, error: any) {
-    return this.httpService.patchHttp(`${this.SUBSCRIPTION_BASE_URL}/plan/${planId}/disable`, null, success, error);
+  updateSubscriptionPlanStatus(planId: number, status: boolean, success: any, error: any) {
+    return this.httpService.patchHttp(`${this.SUBSCRIPTION_BASE_URL}/plan/${planId}?st=${status}`, null, success, error);
   }
 
   getAllSubscriptionPlans(page: number = 0, size: number = 10, isActive: boolean | null = null, success: any, error: any) {

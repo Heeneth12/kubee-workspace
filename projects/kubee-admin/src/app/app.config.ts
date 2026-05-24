@@ -5,7 +5,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './layout/interceptors/auth.interceptor';
 import { routes } from './app.routes';
 import { provideKubeeConfig } from 'kubee-ui';
-import { environment } from '../environments/environment';
+import { environment } from '../environments/environment.development';
 
 export const appConfig: ApplicationConfig = {
   providers: [

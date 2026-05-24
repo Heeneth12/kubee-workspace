@@ -29,6 +29,12 @@ export enum SubscriptionStatus {
     PENDING_PAYMENT = "PENDING_PAYMENT"
 }
 
+export enum PlanType {
+    MONTHLY = "MONTHLY",
+    YEARLY = "YEARLY",
+    LIFETIME = "LIFETIME"
+}
+
 export class MiniSubscriptionModel {
     id?: number;
     applicationId?: number;

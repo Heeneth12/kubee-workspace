@@ -2,10 +2,10 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <div>
             <h1 class="text-2xl font-semibold text-ez-heading">Applications</h1>
-            <p class="text-sm text-ez-secondary mt-1">Manage platform applications</p>
+            <p class="text-sm text-ez-secondary mt-1">Manage platform applications and their modules</p>
         </div>
         <button (click)="openCreateModal()"
-            class="px-4 py-2 bg-ez-primary text-white rounded-lg shadow hover:opacity-90 transition-opacity text-sm font-medium flex items-center gap-2">
+            class="px-4 py-2 bg-ez-primary text-white rounded-sm shadow hover:opacity-90 transition-opacity text-sm font-medium flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -63,13 +63,11 @@
                             </svg>
                         </div>
                         <div>
-                            <h3 class="text-base font-semibold text-ez-heading line-clamp-1"
-                                [title]="item.appName || item.name">{{ item.appName || item.name || '—' }}</h3>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span
-                                    class="px-2 py-0.5 rounded bg-ez-ash border border-gray-200 text-xs font-mono text-gray-600 truncate max-w-[120px] block"
-                                    [title]="item.appKey">{{ item.appKey || '—' }}</span>
-                            </div>
+                            <h3 class="text-base font-semibold text-ez-heading line-clamp-1" [title]="item.appName">
+                                {{ item.appName || '—' }}</h3>
+                            <span
+                                class="px-2 py-0.5 rounded bg-ez-ash border border-gray-200 text-xs font-mono text-gray-600 truncate max-w-[120px] block mt-1"
+                                [title]="item.appKey">{{ item.appKey || '—' }}</span>
                         </div>
                     </div>
                     <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0"
@@ -78,39 +76,49 @@
                     </span>
                 </div>
 
-                <p class="text-sm text-gray-500 mb-2 line-clamp-2 min-h-[2.5rem]">
+                <p class="text-sm text-gray-500 mb-3 line-clamp-2 min-h-[2.5rem]">
                     {{ item.description || 'No description provided.' }}
                 </p>
+
+                <div class="flex items-center gap-3 text-xs text-gray-400">
+                    <span class="flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h7" />
+                        </svg>
+                        {{ (item.modules?.length ?? item.modules?.size ?? 0) }} module(s)
+                    </span>
+                </div>
             </div>
 
-            <div class="px-5 py-3 border-t border-gray-50 bg-gray-50/50 flex justify-between gap-2 rounded-b-xl">
+            <div class="px-5 py-3 border-t border-gray-50 bg-gray-50/50 flex justify-between items-center gap-2 rounded-b-xl">
+                <button (click)="openModulesDrawer(item)"
+                    class="text-xs text-ez-primary font-medium hover:underline flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h7" />
+                    </svg>
+                    Manage Modules
+                </button>
 
-                <div>
-                    <button (click)="viewRoles(item)" class="text-ez-primary hover:underline">
-                        view roles
+                <div class="flex items-center gap-1">
+                    <button (click)="openEditModal(item)"
+                        class="p-1.5 text-gray-500 hover:text-ez-primary hover:bg-blue-50 rounded transition-colors"
+                        title="Edit Application">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                    </button>
+                    <button (click)="deleteApplication(item.id)"
+                        class="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                        title="Delete Application">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
                     </button>
                 </div>
-
-                <div>
-                    <span class="text-xs text-gray-500">total number of active users</span> {{ item.totalActiveUsers }}
-                </div>
-
-                <button (click)="openEditModal(item)"
-                    class="p-1.5 text-gray-500 hover:text-ez-primary hover:bg-blue-50 rounded transition-colors"
-                    title="Edit Application">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                </button>
-                <button (click)="deleteApplication(item.id)"
-                    class="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                    title="Delete Application">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                </button>
             </div>
         </div>
         }
@@ -118,9 +126,10 @@
     }
 </div>
 
+<!-- ─── Create / Edit Application Modal ──────────────────────────────────── -->
 <ng-template #createOrEditModalApp>
     <div
-        class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh] relative z-10 transform transition-all">
+        class="bg-white rounded-2xl shadow-xl w-full overflow-hidden flex flex-col max-h-[90vh] relative z-10 transform transition-all">
         <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white">
             <h2 class="text-lg font-semibold text-gray-900">{{ isEditing ? 'Edit Application' : 'Create Application'
                 }}</h2>
@@ -181,11 +190,11 @@
 
         <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 rounded-b-2xl">
             <button type="button" (click)="closeModal()"
-                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-colors">
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-colors">
                 Cancel
             </button>
             <button type="button" (click)="onSubmit()" [disabled]="appForm.invalid || isSubmitting"
-                class="px-6 py-2 text-sm font-medium text-white bg-ez-primary rounded-lg shadow-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ez-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                class="px-6 py-2 text-sm font-medium text-white bg-ez-primary rounded-lg shadow-sm hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
                 @if (isSubmitting) {
                 <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 }
@@ -195,9 +204,279 @@
     </div>
 </ng-template>
 
+<!-- ─── Modules Drawer ────────────────────────────────────────────────────── -->
+<ng-template #modulesDrawer>
+    <div class="flex flex-col h-full">
+        <!-- Drawer sub-header -->
+        <div class="px-5 py-3 border-b border-gray-100 flex items-center justify-between bg-gray-50/60">
+            <div class="flex items-center gap-2 text-sm text-gray-500">
+                <span class="font-mono text-xs bg-gray-100 border border-gray-200 px-2 py-0.5 rounded">{{
+                    selectedApp?.appKey }}</span>
+                <span>{{ (moduleList().length) }} module(s)</span>
+            </div>
+            <button (click)="openModuleForm()"
+                class="flex items-center gap-1.5 px-3 py-1.5 bg-ez-primary text-white text-xs font-medium rounded-lg hover:opacity-90 transition-opacity">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Add Module
+            </button>
+        </div>
 
-<ng-template #appRolesDrawer>
-    <div class="w-full h-full">
-        <h1>Roles</h1>
+        <!-- Modules list -->
+        <div class="flex-1 overflow-y-auto p-4 space-y-2">
+            @if (moduleList().length === 0) {
+            <div class="flex flex-col items-center justify-center py-16 text-center">
+                <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-3 border">
+                    <svg class="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h7" />
+                    </svg>
+                </div>
+                <p class="text-sm font-medium text-gray-500">No modules yet</p>
+                <p class="text-xs text-gray-400 mt-1">Click "Add Module" to create the first one.</p>
+            </div>
+            }
+
+            @for (module of moduleList(); track module.id) {
+            <div class="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
+                <!-- Module row -->
+                <div class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                    (click)="toggleModule(module.id)">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <svg class="w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200"
+                            [ngClass]="expandedModuleId === module.id ? 'rotate-90' : ''"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="text-sm font-semibold text-ez-heading">{{ module.moduleName }}</span>
+                                <span
+                                    class="text-xs font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">{{
+                                    module.moduleKey }}</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                    [ngClass]="module.isActive ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'">
+                                    {{ module.isActive ? 'Active' : 'Inactive' }}
+                                </span>
+                            </div>
+                            @if (module.description) {
+                            <p class="text-xs text-gray-400 mt-0.5 line-clamp-1">{{ module.description }}</p>
+                            }
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0 ml-2">
+                        <span class="text-xs text-gray-400 mr-1">{{ privilegeList(module).length }} priv.</span>
+                        <button (click)="openModuleForm(module); $event.stopPropagation()"
+                            class="p-1.5 text-gray-400 hover:text-ez-primary hover:bg-blue-50 rounded transition-colors"
+                            title="Edit module">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </button>
+                        <button (click)="deleteModule(module.id); $event.stopPropagation()"
+                            class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                            title="Delete module">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Privileges panel -->
+                @if (expandedModuleId === module.id) {
+                <div class="border-t border-gray-100 bg-gray-50/50 px-4 py-3">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Privileges</span>
+                        <button (click)="openPrivilegeForm(module.id)"
+                            class="flex items-center gap-1 text-xs text-ez-primary font-medium hover:underline">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                            Add Privilege
+                        </button>
+                    </div>
+
+                    @if (privilegeList(module).length === 0) {
+                    <p class="text-xs text-gray-400 text-center py-3">No privileges defined for this module.</p>
+                    }
+
+                    <div class="space-y-1.5">
+                        @for (privilege of privilegeList(module); track privilege.id) {
+                        <div
+                            class="flex items-center justify-between px-3 py-2 bg-white rounded-lg border border-gray-200">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <div class="w-1.5 h-1.5 rounded-full bg-ez-primary shrink-0"></div>
+                                <span class="text-sm font-medium text-gray-700">{{ privilege.privilegeName }}</span>
+                                <span
+                                    class="text-xs font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">{{
+                                    privilege.privilegeKey }}</span>
+                            </div>
+                            <div class="flex items-center gap-1 shrink-0">
+                                <button (click)="openPrivilegeForm(module.id, privilege)"
+                                    class="p-1 text-gray-400 hover:text-ez-primary hover:bg-blue-50 rounded transition-colors"
+                                    title="Edit privilege">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </button>
+                                <button (click)="deletePrivilege(privilege.id)"
+                                    class="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                    title="Delete privilege">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+    </div>
+</ng-template>
+
+<!-- ─── Module Form Modal ─────────────────────────────────────────────────── -->
+<ng-template #moduleFormModal>
+    <div class="bg-white rounded-2xl shadow-xl w-full overflow-hidden flex flex-col max-h-[90vh] relative z-10">
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+            <h2 class="text-lg font-semibold text-gray-900">{{ isEditingModule ? 'Edit Module' : 'Add Module' }}</h2>
+            <button (click)="closeModal()"
+                class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1.5 rounded-full transition-colors">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto">
+            <form [formGroup]="moduleForm" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Module Name <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" formControlName="moduleName"
+                        class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-ez-primary focus:border-transparent transition-all shadow-sm"
+                        [ngClass]="{'border-red-300': moduleForm.get('moduleName')?.invalid && moduleForm.get('moduleName')?.touched, 'border-gray-300': !(moduleForm.get('moduleName')?.invalid && moduleForm.get('moduleName')?.touched)}"
+                        placeholder="e.g. Dashboard">
+                    @if (moduleForm.get('moduleName')?.invalid && moduleForm.get('moduleName')?.touched) {
+                    <p class="text-red-500 text-xs mt-1.5 font-medium">Module name is required</p>
+                    }
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Module Key <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" formControlName="moduleKey"
+                        class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-ez-primary focus:border-transparent transition-all font-mono text-sm shadow-sm"
+                        [ngClass]="{'border-red-300': moduleForm.get('moduleKey')?.invalid && moduleForm.get('moduleKey')?.touched, 'border-gray-300': !(moduleForm.get('moduleKey')?.invalid && moduleForm.get('moduleKey')?.touched)}"
+                        placeholder="e.g. DASHBOARD">
+                    @if (moduleForm.get('moduleKey')?.invalid && moduleForm.get('moduleKey')?.touched) {
+                    <p class="text-red-500 text-xs mt-1.5 font-medium">Module key is required</p>
+                    }
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea formControlName="description" rows="3"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-ez-primary focus:border-transparent transition-all shadow-sm resize-none"
+                        placeholder="Brief description..."></textarea>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-100 flex items-center gap-3">
+                    <input type="checkbox" id="moduleIsActive" formControlName="isActive"
+                        class="w-4 h-4 text-ez-primary bg-white border-gray-300 rounded focus:ring-ez-primary focus:ring-2 cursor-pointer">
+                    <label for="moduleIsActive" class="text-sm font-medium text-gray-700 cursor-pointer">Active</label>
+                </div>
+            </form>
+        </div>
+
+        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 rounded-b-2xl">
+            <button type="button" (click)="closeModal()"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-colors">
+                Cancel
+            </button>
+            <button type="button" (click)="submitModuleForm()" [disabled]="moduleForm.invalid || isSubmittingModule"
+                class="px-6 py-2 text-sm font-medium text-white bg-ez-primary rounded-lg shadow-sm hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                @if (isSubmittingModule) {
+                <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                }
+                {{ isEditingModule ? 'Save Changes' : 'Create Module' }}
+            </button>
+        </div>
+    </div>
+</ng-template>
+
+<!-- ─── Privilege Form Modal ──────────────────────────────────────────────── -->
+<ng-template #privilegeFormModal>
+    <div class="bg-white rounded-2xl shadow-xl w-full overflow-hidden flex flex-col max-h-[90vh] relative z-10">
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+            <h2 class="text-lg font-semibold text-gray-900">{{ isEditingPrivilege ? 'Edit Privilege' : 'Add Privilege'
+                }}</h2>
+            <button (click)="closeModal()"
+                class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1.5 rounded-full transition-colors">
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto">
+            <form [formGroup]="privilegeForm" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Privilege Name <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" formControlName="privilegeName"
+                        class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-ez-primary focus:border-transparent transition-all shadow-sm"
+                        [ngClass]="{'border-red-300': privilegeForm.get('privilegeName')?.invalid && privilegeForm.get('privilegeName')?.touched, 'border-gray-300': !(privilegeForm.get('privilegeName')?.invalid && privilegeForm.get('privilegeName')?.touched)}"
+                        placeholder="e.g. Read Only">
+                    @if (privilegeForm.get('privilegeName')?.invalid && privilegeForm.get('privilegeName')?.touched) {
+                    <p class="text-red-500 text-xs mt-1.5 font-medium">Privilege name is required</p>
+                    }
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Privilege Key <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" formControlName="privilegeKey"
+                        class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-ez-primary focus:border-transparent transition-all font-mono text-sm shadow-sm"
+                        [ngClass]="{'border-red-300': privilegeForm.get('privilegeKey')?.invalid && privilegeForm.get('privilegeKey')?.touched, 'border-gray-300': !(privilegeForm.get('privilegeKey')?.invalid && privilegeForm.get('privilegeKey')?.touched)}"
+                        placeholder="e.g. READ">
+                    @if (privilegeForm.get('privilegeKey')?.invalid && privilegeForm.get('privilegeKey')?.touched) {
+                    <p class="text-red-500 text-xs mt-1.5 font-medium">Privilege key is required</p>
+                    }
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea formControlName="description" rows="3"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-ez-primary focus:border-transparent transition-all shadow-sm resize-none"
+                        placeholder="Brief description..."></textarea>
+                </div>
+            </form>
+        </div>
+
+        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 rounded-b-2xl">
+            <button type="button" (click)="closeModal()"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-colors">
+                Cancel
+            </button>
+            <button type="button" (click)="submitPrivilegeForm()"
+                [disabled]="privilegeForm.invalid || isSubmittingPrivilege"
+                class="px-6 py-2 text-sm font-medium text-white bg-ez-primary rounded-lg shadow-sm hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                @if (isSubmittingPrivilege) {
+                <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                }
+                {{ isEditingPrivilege ? 'Save Changes' : 'Add Privilege' }}
+            </button>
+        </div>
     </div>
 </ng-template>

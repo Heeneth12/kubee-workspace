@@ -5,6 +5,10 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:ui": "ng build kubee-ui",
+    "build:admin": "ng build kubee-ui && ng build kubee-admin",
+    "build:app": "ng build kubee-ui && ng build kubee-app",
+    "build:ehr": "ng build kubee-ui && ng build kubee-ehr",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
