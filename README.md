@@ -12,6 +12,8 @@ The workspace is divided into four core projects:
 3. **`kubee-ehr`**: The Electronic Health Record (EHR) management application tailored for specific clinical workflows.
 4. **`kubee-ui`**: The shared internal library containing our Tailwind-powered design system, standalone UI components (modals, drawers, toasts, etc.), and global assets.
 
+---
+
 ## Running Locally
 
 You can run multiple applications simultaneously. It is recommended to open separate terminal instances for each application.
@@ -36,7 +38,7 @@ ng serve kubee-ehr --port 4202
 
 ---
 
-## 🎨 UI Component Test Environment
+## UI Component Test Environment
 
 The `kubee-ui` library contains a built-in interactive dashboard that acts as a showcase for all shared UI components. This environment allows you to test modals, toasts, drawers, and date pickers while viewing the exact code required to implement them.
 
@@ -46,7 +48,7 @@ The `kubee-ui` library contains a built-in interactive dashboard that acts as a 
 
 ---
 
-## 🛠 Development & Component Creation
+## Development & Component Creation
 
 Because we use a monorepo, it is critical to ensure that shared UI elements are placed in the `kubee-ui` library, while application-specific views (like a dashboard or a settings page) are placed in their respective applications.
 
@@ -70,7 +72,7 @@ ng generate component components/custom-button --project=kubee-ui
 
 ---
 
-## 📦 Building for Production & Libraries
+## Building for Production & Libraries
 
 ### Building the UI Library
 Whenever you make changes to files inside the `kubee-ui` folder, you **must** build the library so that the changes are compiled into the `dist/` directory. The applications read from this `dist/` folder.
@@ -81,10 +83,130 @@ ng build kubee-ui
 *Tip: If an application is throwing a "Cannot find module 'kubee-ui'" error, it means you need to run this build command and restart your `ng serve` process.*
 
 ### Building the Applications
-To compile the applications for production deployment, run their independent build commands. The output will be stored in the `/dist/<app-name>` directory.
+The `package.json` includes scripts that build `kubee-ui` first (required), then the target application. Always use these scripts instead of running `ng build` directly.
 
 ```bash
-ng build kubee-app
-ng build kubee-admin
-ng build kubee-ehr
+npm run build:app    # builds kubee-ui + kubee-app
+npm run build:admin  # builds kubee-ui + kubee-admin
+npm run build:ehr    # builds kubee-ui + kubee-ehr
 ```
+
+Build output is written to `dist/<app-name>/browser/`.
+
+---
+
+## Deploying to Vercel
+
+This monorepo is deployed as **three separate Vercel projects**, each pointing at the same GitHub repository but building a different app. The shared `kubee-ui` library is compiled automatically as part of each app's build script.
+
+| Application | Vercel Project | Domain | Build Script | Output Directory |
+|---|---|---|---|---|
+| `kubee-app` | kubee-app | `app.kubee.in` | `npm run build:app` | `dist/kubee-app/browser` |
+| `kubee-admin` | kubee-admin | `ops.kubee.in` | `npm run build:admin` | `dist/kubee-admin/browser` |
+| `kubee-ehr` | kubee-ehr | *(your domain)* | `npm run build:ehr` | `dist/kubee-ehr/browser` |
+
+### Step 1 — Create a Vercel Project for Each App
+
+Repeat the following steps once for each of the three applications.
+
+1. Go to [vercel.com](https://vercel.com) and click **Add New Project**.
+2. Import this GitHub repository.
+3. On the **Configure Project** screen, set the fields as shown in the table above for each app.
+   - **Framework Preset**: `Other`
+   - **Root Directory**: `.` (leave as the repo root — do not change this)
+   - **Build Command**: see table above
+   - **Output Directory**: see table above
+   - **Install Command**: `npm install`
+4. Click **Deploy**.
+
+> **Root Directory must stay as `.`** — the build needs access to `node_modules`, `angular.json`, and the shared `kubee-ui` source at the workspace root. Do not point it at a subdirectory.
+
+### Step 2 — Add Custom Domains
+
+After each project deploys successfully:
+
+1. Open the project in the Vercel dashboard.
+2. Go to **Settings → Domains**.
+3. Add the domain listed in the table above (e.g. `app.kubee.in`).
+4. Vercel will display the DNS record you need to add.
+
+### Step 3 — Configure DNS
+
+In your domain registrar's DNS settings for `kubee.in`, add the following records:
+
+```
+Type   Name   Value
+CNAME  app    cname.vercel-dns.com
+CNAME  ops    cname.vercel-dns.com
+```
+
+> If your registrar does not support CNAME on the root domain (`@`), use an ALIAS or ANAME record, or follow the A record instructions Vercel shows in the domain settings panel.
+
+DNS propagation typically takes a few minutes but can take up to 48 hours depending on your registrar.
+
+### Step 4 — Verify the Deployment
+
+Once DNS has propagated, visit each domain to confirm the correct application loads:
+
+- `https://app.kubee.in` — should load `kubee-app`
+- `https://ops.kubee.in` — should load `kubee-admin`
+
+---
+
+## Build Configuration Notes
+
+### Why `npm run build:*` instead of `ng build`?
+
+The `kubee-ui` shared library must be compiled before any application that depends on it. The `build:app`, `build:admin`, and `build:ehr` scripts in `package.json` handle this automatically:
+
+```
+npm run build:admin  ==  ng build kubee-ui && ng build kubee-admin --configuration production
+```
+
+Running `ng build kubee-admin` alone will fail with a "Cannot find module 'kubee-ui'" error if the library has not been built first.
+
+### Google Fonts
+
+The Google Fonts stylesheet (`DM Sans`) is loaded at runtime from the CDN via `@import` in `styles.scss`. Angular's production builder has a font-inlining feature that is **disabled** in this project (`"fonts": { "inline": false }` in `angular.json`) to prevent the font CSS from exceeding component style budgets.
+
+### Bundle Size Budgets
+
+The production budgets in `angular.json` are set to:
+
+| Budget type | Warning | Error |
+|---|---|---|
+| Initial bundle | 1 MB | 2 MB |
+| Any component style | 10 kB | 20 kB |
+
+If you see a budget warning, investigate what was added to the initial chunk before shipping. Lazy-load large feature modules to keep the initial bundle small.
+
+### SPA Routing
+
+The `vercel.json` at the repo root configures all three Vercel projects to redirect unknown paths to `index.html`, which is required for Angular's client-side router to work correctly:
+
+```json
+{
+  "rewrites": [{ "source": "/((?!.*\\.).*)", "destination": "/index.html" }]
+}
+```
+
+This file is picked up automatically by all three Vercel projects since they share the same repo root.
+
+---
+
+## Common Issues
+
+**Build fails with "Cannot find module 'kubee-ui'"**
+Run `ng build kubee-ui` first, or use the `npm run build:*` scripts which do this automatically.
+
+**Vercel build fails with font budget error**
+Ensure `angular.json` has `"fonts": { "inline": false }` inside the `optimization` block of each app's production configuration. See the Build Configuration Notes section above.
+
+**Vercel build fails with "output directory not found"**
+Confirm the Output Directory in the Vercel project settings is set to `dist/<app-name>/browser` (note the `/browser` suffix — Angular 17+ writes output there).
+
+**Domain not resolving after adding DNS record**
+Check your DNS record is a `CNAME` pointing to `cname.vercel-dns.com` and that the domain is verified in the Vercel project's domain settings. Use `dig app.kubee.in` to check propagation.
+
+**Local dev server shows stale `kubee-ui` components**
+Stop the dev server, run `ng build kubee-ui`, then restart `ng serve`. The dev server does not watch the `kubee-ui` source for changes automatically.
