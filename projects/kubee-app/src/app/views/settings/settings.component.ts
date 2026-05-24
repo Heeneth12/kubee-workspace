@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ToastService } from 'kubee-ui';
 import { AuthService } from '../../layouts/guards/auth.service';
 import { UserManagementService } from '../user-management/userManagement.service';
-import { UserInitResponse } from '../../layouts/models/Init-response.model';
+import { UserInitResponse } from '../../layouts/models/init-response.model';
 import { TenantModel } from '../user-management/models/tenant.model';
 import { Observable, take } from 'rxjs';
 import { ProfileComponent } from '../../layouts/components/profile/profile.component';

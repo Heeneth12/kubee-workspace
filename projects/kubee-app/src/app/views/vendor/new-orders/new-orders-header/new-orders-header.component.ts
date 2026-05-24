@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { UserFilterModel, UserModel, UserType } from '../../../user-management/models/user.model';
-import { UserInitResponse } from '../../../../layouts/models/Init-response.model';
+import { UserInitResponse } from '../../../../layouts/models/init-response.model';
 import { debounceTime, distinctUntilChanged, filter, finalize, Observable, Subject, switchMap, tap } from 'rxjs';
 import { TenantModel } from '../../../user-management/models/tenant.model';
 import { Router } from '@angular/router';

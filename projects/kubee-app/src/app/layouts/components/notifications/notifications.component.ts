@@ -13,7 +13,7 @@ import '@tailwindplus/elements';
 
 import { NotificationService } from './notification.service';
 import { NotificationFeedItem } from './notification.model';
-import { UserInitResponse } from '../../models/Init-response.model';
+import { UserInitResponse } from '../../models/init-response.model';
 import { AuthService } from '../../guards/auth.service';
 
 @Component({
@@ -35,16 +35,16 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   rawNotifications = signal<NotificationFeedItem[]>([]);
 
   // ── Icons ─────────────────────────────────────────────────────────────────────
-  readonly BellIcon     = Bell;
-  readonly CheckIcon    = Check;
-  readonly TrashIcon    = Trash2;
-  readonly AlertIcon    = AlertTriangle;
-  readonly InfoIcon     = Info;
-  readonly ErrorIcon    = XCircle;
+  readonly BellIcon = Bell;
+  readonly CheckIcon = Check;
+  readonly TrashIcon = Trash2;
+  readonly AlertIcon = AlertTriangle;
+  readonly InfoIcon = Info;
+  readonly ErrorIcon = XCircle;
   readonly WhatsAppIcon = MessageCircle;
-  readonly MailIcon     = Mail;
-  readonly PushIcon     = Smartphone;
-  readonly InAppIcon    = Wifi;
+  readonly MailIcon = Mail;
+  readonly PushIcon = Smartphone;
+  readonly InAppIcon = Wifi;
 
   // ── Derived state ─────────────────────────────────────────────────────────────
 
@@ -101,7 +101,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     if (item.deliveryId != null) {
       this.notificationService.markDeliveryAsRead(
         item.deliveryId,
-        () => {},
+        () => { },
         (err: any) => console.error('markDeliveryAsRead failed', err)
       );
     }
@@ -119,7 +119,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     if (this.currentUserId) {
       this.notificationService.markAllDeliveriesAsRead(
         this.currentUserId,
-        () => {},
+        () => { },
         (err: any) => console.error('markAllDeliveriesAsRead failed', err)
       );
     }
@@ -134,10 +134,10 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   /** Channel icon + colour used in the template badge. */
   channelBadge(item: NotificationFeedItem): { label: string; bg: string; text: string } {
     switch (item.channel) {
-      case 'EMAIL':    return { label: 'Email',    bg: 'bg-purple-50', text: 'text-purple-600' };
-      case 'WHATSAPP': return { label: 'WhatsApp', bg: 'bg-green-50',  text: 'text-green-600'  };
-      case 'PUSH':     return { label: 'Push',     bg: 'bg-orange-50', text: 'text-orange-600' };
-      default:         return { label: 'In-App',   bg: 'bg-blue-50',   text: 'text-blue-600'   };
+      case 'EMAIL': return { label: 'Email', bg: 'bg-purple-50', text: 'text-purple-600' };
+      case 'WHATSAPP': return { label: 'WhatsApp', bg: 'bg-green-50', text: 'text-green-600' };
+      case 'PUSH': return { label: 'Push', bg: 'bg-orange-50', text: 'text-orange-600' };
+      default: return { label: 'In-App', bg: 'bg-blue-50', text: 'text-blue-600' };
     }
   }
 }

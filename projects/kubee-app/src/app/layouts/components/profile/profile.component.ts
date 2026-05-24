@@ -25,7 +25,7 @@ import {
   ShieldCheckIcon
 } from 'lucide-angular';
 import { AuthService } from '../../guards/auth.service';
-import { UserInitResponse } from '../../models/Init-response.model';
+import { UserInitResponse } from '../../models/init-response.model';
 import { ToastService } from '../../../../../../kubee-ui/src/lib/components/toast/toastService';
 import { UserManagementService } from '../../../views/user-management/userManagement.service';
 import { UserAddressModel, UserModel } from '../../../views/user-management/models/user.model';

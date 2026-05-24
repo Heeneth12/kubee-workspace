@@ -10,7 +10,7 @@ import { PurchaseReturnModel } from '../../purchases/models/pr.model';
 import { PurchaseService } from '../../purchases/purchase.service';
 import { StandardTableComponent } from "../../../layouts/components/standard-table/standard-table.component";
 import { PurchaseRequestFilterModel } from '../../purchases/models/prq.model';
-import { UserInitResponse } from '../../../layouts/models/Init-response.model';
+import { UserInitResponse } from '../../../layouts/models/init-response.model';
 import { Observable } from 'rxjs';
 import { AuthService } from '../../../layouts/guards/auth.service';
 import { V_PR_ACTIONS, V_PR_COLUMN, V_PR_DATE_CONFIG, V_PR_FILTER_OPTIONS } from '../vendorConfig';

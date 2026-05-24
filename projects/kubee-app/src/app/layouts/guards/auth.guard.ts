@@ -3,7 +3,7 @@ import { CanActivate, ActivatedRouteSnapshot, Router, UrlTree } from '@angular/r
 import { AuthService } from './auth.service';
 import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { UserInitResponse } from '../models/Init-response.model';
+import { UserInitResponse } from '../models/init-response.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {

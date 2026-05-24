@@ -3,7 +3,7 @@ import { CommonService } from '../service/common/common.service';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-import { UserInitResponse } from '../models/Init-response.model';
+import { UserInitResponse } from '../models/init-response.model';
 import { DrawerService } from 'kubee-ui';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { ForgotPasswordModel, ResendOtpModel, ResetPasswordModel } from '../../views/auth/auth.model';
