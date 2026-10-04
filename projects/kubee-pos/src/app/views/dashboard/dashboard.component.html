@@ -1,0 +1,25 @@
+<div class="p-6">
+  <h1 class="text-ez-2xl font-medium text-ez-heading mb-1">Dashboard</h1>
+  <p class="text-ez-md text-ez-secondary mb-6">Today's sales on this terminal.</p>
+
+  @if (stats$ | async; as stats) {
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div class="ez-surface p-5">
+      <p class="ez-micro-label mb-2">Revenue</p>
+      <p class="text-ez-2xl font-medium text-ez-heading">{{ stats.revenue | currency:'INR' }}</p>
+    </div>
+    <div class="ez-surface p-5">
+      <p class="ez-micro-label mb-2">Orders</p>
+      <p class="text-ez-2xl font-medium text-ez-heading">{{ stats.orders }}</p>
+    </div>
+    <div class="ez-surface p-5">
+      <p class="ez-micro-label mb-2">Avg. ticket</p>
+      <p class="text-ez-2xl font-medium text-ez-heading">{{ stats.avgTicket | currency:'INR' }}</p>
+    </div>
+    <div class="ez-surface p-5">
+      <p class="ez-micro-label mb-2">Items sold</p>
+      <p class="text-ez-2xl font-medium text-ez-heading">{{ stats.itemsSold }}</p>
+    </div>
+  </div>
+  }
+</div>

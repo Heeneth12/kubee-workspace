@@ -1,0 +1,33 @@
+<div class="p-6">
+  <h1 class="text-ez-2xl font-medium text-ez-heading mb-1">Orders</h1>
+  <p class="text-ez-md text-ez-secondary mb-6">Sales completed on this terminal.</p>
+
+  <div class="border border-ez-border overflow-x-auto">
+    <table class="w-full text-ez-base">
+      <thead class="bg-ez-ash text-left">
+        <tr>
+          <th class="px-4 py-3 ez-micro-label">Order #</th>
+          <th class="px-4 py-3 ez-micro-label">Time</th>
+          <th class="px-4 py-3 ez-micro-label">Items</th>
+          <th class="px-4 py-3 ez-micro-label">Payment</th>
+          <th class="px-4 py-3 ez-micro-label text-right">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (order of posService.orders$ | async; track order.orderNumber) {
+        <tr class="border-t border-ez-border">
+          <td class="px-4 py-3 font-medium text-ez-heading">{{ order.orderNumber }}</td>
+          <td class="px-4 py-3 text-ez-secondary">{{ order.createdAt | date:'short' }}</td>
+          <td class="px-4 py-3 text-ez-secondary">{{ order.lines.length }}</td>
+          <td class="px-4 py-3"><span class="ez-micro-label">{{ order.paymentMethod }}</span></td>
+          <td class="px-4 py-3 text-right font-medium text-ez-heading">{{ order.grandTotal | currency:'INR' }}</td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="5" class="px-4 py-10 text-center text-ez-sm text-ez-muted">No orders yet.</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

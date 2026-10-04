@@ -1,0 +1,58 @@
+<div class="min-h-screen flex bg-ez-white">
+  <!-- Brand panel -->
+  <div class="hidden lg:flex lg:w-1/2 bg-ez-carbon flex-col justify-between p-10">
+    <div class="flex items-center gap-2">
+      <img src="/assets/images/Kubee_logo.png" width="36" alt="Kubee">
+      <div style="line-height: 1">
+        <span class="block text-ez-lg font-medium text-white">Kubee</span>
+        <span class="block text-ez-2xs text-white/70 tracking-widest uppercase">POS</span>
+      </div>
+    </div>
+    <div>
+      <h2 class="text-ez-hero font-medium text-white leading-tight mb-3">Fast checkout,<br>every counter.</h2>
+      <p class="text-ez-md text-white/60 max-w-sm">Bill customers, take payments and keep stock in sync with Kubee Inventory.</p>
+    </div>
+    <p class="text-ez-xs text-white/40">&copy; Kubee</p>
+  </div>
+
+  <!-- Form panel -->
+  <div class="flex-1 flex items-center justify-center p-6">
+    <form [formGroup]="authForm" (ngSubmit)="onSubmit()" class="w-full max-w-sm step-fade">
+      <h1 class="text-ez-hero font-medium text-ez-heading leading-tight mb-1">Welcome back</h1>
+      <p class="text-ez-md text-ez-secondary mb-8">Sign in to open your POS terminal.</p>
+
+      <div class="mb-4">
+        <label class="ez-label" for="email">Email</label>
+        <input id="email" type="email" formControlName="email" autocomplete="username" placeholder="you@company.com"
+          class="ez-input w-full" [class.ez-input--error]="hasError('email')">
+        @if (hasError('email')) {
+        <p class="text-ez-xs text-red-500 mt-1">Enter a valid email address.</p>
+        }
+      </div>
+
+      <div class="mb-6">
+        <label class="ez-label" for="password">Password</label>
+        <div class="relative">
+          <input id="password" [type]="showPassword ? 'text' : 'password'" formControlName="password"
+            autocomplete="current-password" placeholder="••••••••" class="ez-input w-full pr-10"
+            [class.ez-input--error]="hasError('password')">
+          <button type="button" (click)="showPassword = !showPassword"
+            class="absolute inset-y-0 right-0 px-3 flex items-center text-ez-muted hover:text-ez-heading">
+            <lucide-icon [img]="showPassword ? icons.eyeOff : icons.eye" class="w-4 h-4"></lucide-icon>
+          </button>
+        </div>
+        @if (hasError('password')) {
+        <p class="text-ez-xs text-red-500 mt-1">Password must be at least 8 characters.</p>
+        }
+      </div>
+
+      @if (errorMessage) {
+      <p class="text-ez-sm text-red-500 mb-4">{{ errorMessage }}</p>
+      }
+
+      <button type="submit" class="ez-btn ez-btn-primary w-full" [disabled]="isLoading">
+        {{ isLoading ? 'Signing in...' : 'Sign in' }}
+      </button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,111 @@
+<div class="flex flex-col lg:flex-row h-full">
+
+  <!-- Catalogue -->
+  <section class="flex-1 min-w-0 flex flex-col p-6 overflow-hidden">
+    <div class="flex flex-col sm:flex-row gap-3 mb-4">
+      <div class="relative flex-1">
+        <lucide-icon [img]="icons.search" class="w-4 h-4 text-ez-muted absolute left-3 top-1/2 -translate-y-1/2"></lucide-icon>
+        <input type="text" [(ngModel)]="searchQuery" (keydown.enter)="onSearchEnter()" autofocus
+          placeholder="Search name, code or scan barcode..." class="ez-input w-full pl-9">
+      </div>
+    </div>
+
+    <div class="flex gap-2 mb-4 overflow-x-auto pb-1">
+      @for (cat of categories; track cat) {
+      <button (click)="selectedCategory = cat"
+        class="px-3 py-1.5 text-ez-sm font-medium whitespace-nowrap border rounded transition-colors duration-ez"
+        [class]="selectedCategory === cat ? 'bg-ez-carbon text-white border-ez-carbon' : 'bg-ez-white text-ez-body border-ez-border hover:border-ez-subtle'">
+        {{ cat }}
+      </button>
+      }
+    </div>
+
+    <div class="flex-1 overflow-y-auto">
+      @if (isLoading) {
+      <p class="text-ez-sm text-ez-muted">Loading items...</p>
+      } @else if (!filteredItems.length) {
+      <div class="flex flex-col items-center justify-center py-16 text-ez-muted">
+        <lucide-icon [img]="icons.package" class="w-8 h-8 mb-2"></lucide-icon>
+        <p class="text-ez-sm">No items found</p>
+      </div>
+      } @else {
+      <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
+        @for (item of filteredItems; track item.id) {
+        <button (click)="addToCart(item)"
+          class="text-left bg-ez-ash border border-transparent hover:border-ez-primary p-4 transition-colors duration-ez outline-none">
+          <span class="ez-micro-label block mb-1 truncate">{{ item.category }}</span>
+          <span class="block text-ez-base font-medium text-ez-heading line-clamp-2 min-h-[2.5em]">{{ item.name }}</span>
+          <span class="block text-ez-lg font-medium text-ez-primary mt-2">{{ item.sellingPrice | currency:'INR' }}</span>
+        </button>
+        }
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- Cart -->
+  <aside class="w-full lg:w-96 shrink-0 border-t lg:border-t-0 lg:border-l border-ez-border flex flex-col bg-ez-white">
+    <div class="h-14 px-5 flex items-center justify-between border-b border-ez-border">
+      <h2 class="text-ez-lg font-medium text-ez-heading">Current sale <span class="text-ez-muted">({{ itemCount }})</span></h2>
+      @if (cart.length) {
+      <button (click)="clearCart()" class="text-ez-sm text-ez-secondary hover:text-red-500">Clear</button>
+      }
+    </div>
+
+    <div class="flex-1 overflow-y-auto">
+      @for (line of cart; track line.item.id) {
+      <div class="px-5 py-3 border-b border-ez-border flex items-center gap-3">
+        <div class="flex-1 min-w-0">
+          <p class="text-ez-base font-medium text-ez-heading truncate">{{ line.item.name }}</p>
+          <p class="text-ez-xs text-ez-muted">{{ line.item.sellingPrice | currency:'INR' }} each</p>
+        </div>
+        <div class="flex items-center border border-ez-border">
+          <button (click)="changeQty(line, -1)" class="p-1.5 text-ez-secondary hover:text-ez-heading">
+            <lucide-icon [img]="icons.minus" class="w-3.5 h-3.5"></lucide-icon>
+          </button>
+          <span class="w-8 text-center text-ez-sm font-medium">{{ line.quantity }}</span>
+          <button (click)="changeQty(line, 1)" class="p-1.5 text-ez-secondary hover:text-ez-heading">
+            <lucide-icon [img]="icons.plus" class="w-3.5 h-3.5"></lucide-icon>
+          </button>
+        </div>
+        <span class="w-20 text-right text-ez-base font-medium text-ez-heading">{{ lineTotal(line) | currency:'INR' }}</span>
+        <button (click)="removeLine(line)" class="text-ez-muted hover:text-red-500">
+          <lucide-icon [img]="icons.trash" class="w-4 h-4"></lucide-icon>
+        </button>
+      </div>
+      } @empty {
+      <p class="px-5 py-10 text-center text-ez-sm text-ez-muted">Tap an item to add it to the sale.</p>
+      }
+    </div>
+
+    <div class="border-t border-ez-border p-5 space-y-2 bg-ez-ash">
+      <div class="flex justify-between text-ez-sm text-ez-secondary">
+        <span>Subtotal</span><span>{{ subTotal | currency:'INR' }}</span>
+      </div>
+      <div class="flex justify-between text-ez-sm text-ez-secondary">
+        <span>Tax</span><span>{{ taxTotal | currency:'INR' }}</span>
+      </div>
+      <div class="flex justify-between items-center text-ez-sm text-ez-secondary">
+        <label for="discount">Discount</label>
+        <input id="discount" type="number" min="0" [(ngModel)]="discount" class="ez-input w-24 text-right py-1">
+      </div>
+      <div class="flex justify-between text-ez-xl font-medium text-ez-heading pt-2 border-t border-ez-border">
+        <span>Total</span><span>{{ grandTotal | currency:'INR' }}</span>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 pt-2">
+        @for (method of paymentMethods; track method) {
+        <button (click)="paymentMethod = method"
+          class="py-2 text-ez-sm font-medium border rounded transition-colors duration-ez"
+          [class]="paymentMethod === method ? 'bg-ez-primary-tint text-ez-primary border-ez-primary' : 'bg-ez-white text-ez-body border-ez-border hover:border-ez-subtle'">
+          {{ method }}
+        </button>
+        }
+      </div>
+
+      <button (click)="checkout()" [disabled]="!cart.length" class="ez-btn ez-btn-primary w-full mt-2">
+        Charge {{ grandTotal | currency:'INR' }}
+      </button>
+    </div>
+  </aside>
+</div>
