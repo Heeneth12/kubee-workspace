@@ -60,6 +60,11 @@ export const routes: Routes = [
                     .then(c => c.BillDetailComponent)
             },
             {
+                path: 'shifts/:uuid',
+                loadComponent: () => import('./views/shifts/shift-detail.component')
+                    .then(c => c.ShiftDetailComponent)
+            },
+            {
                 path: 'reports',
                 loadChildren: () => import('./views/reports/reports.routes')
                     .then(m => m.ReportsRoutes)

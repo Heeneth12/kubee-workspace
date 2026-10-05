@@ -14,24 +14,31 @@ import {
   Menu,
   X,
   LogOut,
+  Wallet,
 } from 'lucide-angular';
 import { AuthService } from '../../guards/auth.service';
+import { ShiftService } from '../../../views/shifts/shift.service';
+import { ShiftView } from '../../../views/shifts/shifts.models';
+import { SHIFT_PROMPT_DISMISSED, ShiftDialogComponent } from '../../../views/shifts/shift-dialog.component';
 
 @Component({
   selector: 'app-pos-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideAngularModule],
+  imports: [CommonModule, RouterModule, LucideAngularModule, ShiftDialogComponent],
   templateUrl: './pos-layout.component.html',
 })
 export class PosLayoutComponent implements OnInit, OnDestroy {
   isMobileMenuOpen = false;
   isSidebarCollapsed = false;
   private userSub = new Subscription();
+  /** undefined = not checked yet, null = no shift open. */
+  shift: ShiftView | null | undefined = undefined;
 
   readonly ChevronLeft = ChevronLeft;
   readonly Menu = Menu;
   readonly XIcon = X;
   readonly LogOut = LogOut;
+  readonly Wallet = Wallet;
 
   user: UserProfile = { name: '', role: '', initials: '', email: '' };
 
@@ -44,7 +51,7 @@ export class PosLayoutComponent implements OnInit, OnDestroy {
     { label: 'Dashboard', link: '/dashboard', icon: LayoutDashboard },
   ];
 
-  constructor(public authService: AuthService, public router: Router) { }
+  constructor(public authService: AuthService, public router: Router, public shiftService: ShiftService) { }
 
   ngOnInit() {
     this.userSub = this.authService.currentUser$.subscribe(user => {
@@ -56,6 +63,15 @@ export class PosLayoutComponent implements OnInit, OnDestroy {
           email: user.email
         };
       }
+    });
+    this.userSub.add(this.shiftService.current$.subscribe(shift => this.shift = shift));
+
+    // Start of the day: no open shift -> ask for the opening cash (once per session; shifts aren't enforced)
+    this.shiftService.refreshCurrent().subscribe({
+      next: shift => {
+        if (shift === null && !sessionStorage.getItem(SHIFT_PROMPT_DISMISSED)) this.shiftService.openDialog();
+      },
+      error: () => { /* badge just stays unknown */ }
     });
   }
 

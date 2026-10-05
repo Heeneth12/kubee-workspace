@@ -3,7 +3,7 @@ import { DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { LucideAngularModule, TrendingUp, Wallet, Package, Landmark, Ban } from 'lucide-angular';
+import { LucideAngularModule, TrendingUp, Wallet, Package, Landmark, Ban, Vault } from 'lucide-angular';
 import { ReportPeriod } from './reports.models';
 import { periodError, readPeriod } from './report-page';
 import { isoDate } from '../orders/order-utils';
@@ -36,7 +36,7 @@ function financialYearStart(): Date {
         <div class="flex flex-col xl:flex-row xl:items-end gap-4 mb-4">
           <div class="flex-1">
             <h1 class="text-ez-2xl font-medium text-ez-heading mb-1">Reports</h1>
-            <p class="text-ez-md text-ez-secondary">Sales, collections, items, GST and cancellations for a period (up to 366 days).</p>
+            <p class="text-ez-md text-ez-secondary">Sales, collections, items, GST, cancellations and cash-drawer shifts for a period (up to 366 days).</p>
           </div>
           <!-- Period: presets + custom range, kept in the URL so a report can be bookmarked -->
           <div class="flex flex-wrap items-center gap-2">
@@ -82,6 +82,7 @@ export class ReportsComponent {
     { label: 'Item-wise', link: 'items', icon: Package },
     { label: 'GST summary', link: 'gst', icon: Landmark },
     { label: 'Cancellations & refunds', link: 'cancellations', icon: Ban },
+    { label: 'Shifts', link: 'shifts', icon: Vault },
   ];
   readonly presets: Preset[] = [
     { id: 'today', label: 'Today', period: () => ({ from: isoDate(), to: isoDate() }) },

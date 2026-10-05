@@ -79,3 +79,28 @@ export interface ReportPeriod {
   from: string;
   to: string;
 }
+
+/** GET /reports/shifts: cash-drawer history, shifts opened in the period (not in reports-api.md yet; from ShiftReport.java). */
+export interface ShiftReportRow {
+  shiftUuid: string;
+  status: 'OPEN' | 'CLOSED';
+  openedAt: string;
+  openedBy: string | null;
+  closedAt: string | null;
+  closedBy: string | null;
+  openingCash: number;
+  cashSales: number;
+  cashIn: number;
+  cashOut: number;
+  expectedCash: number;
+  countedCash: number | null;     // null while open
+  cashDifference: number | null;  // counted − expected
+  closingNotes: string | null;
+}
+export interface ShiftReport {
+  from: string; to: string;
+  shiftCount: number;
+  totalShort: number;             // sum of negative differences, as a positive number
+  totalExcess: number;            // sum of positive differences
+  shifts: ShiftReportRow[];
+}

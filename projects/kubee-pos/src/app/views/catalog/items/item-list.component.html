@@ -2,7 +2,8 @@
   <!-- Toolbar -->
   <div class="flex flex-col xl:flex-row gap-3 mb-4">
     <div class="relative flex-1 min-w-0">
-      <lucide-icon [img]="icons.search" class="w-4 h-4 text-ez-muted absolute left-3 top-1/2 -translate-y-1/2"></lucide-icon>
+      <lucide-icon [img]="icons.search"
+        class="w-4 h-4 text-ez-muted absolute left-3 top-1/2 -translate-y-1/2"></lucide-icon>
       <input type="text" [(ngModel)]="search" (ngModelChange)="onSearchChange($event)"
         placeholder="Search name, item code or barcode..." class="ez-input w-full pl-9">
     </div>
@@ -61,8 +62,8 @@
         <tr class="border-t border-ez-border" [class.opacity-60]="busyUuid === item.uuid">
           <td class="px-4 py-3">
             <button (click)="toggleFavourite(item)" [disabled]="busyUuid === item.uuid"
-              [title]="item.favourite ? 'Remove from quick buttons' : 'Show as quick button'"
-              class="outline-none" [class]="item.favourite ? 'text-amber-500' : 'text-ez-muted hover:text-ez-secondary'">
+              [title]="item.favourite ? 'Remove from quick buttons' : 'Show as quick button'" class="outline-none"
+              [class]="item.favourite ? 'text-amber-500' : 'text-ez-muted hover:text-ez-secondary'">
               <lucide-icon [img]="icons.star" class="w-4 h-4" [class.fill-current]="item.favourite"></lucide-icon>
             </button>
           </td>
@@ -137,11 +138,13 @@
   <div class="flex items-center justify-between mt-4 text-ez-sm text-ez-secondary">
     <span>{{ totalElements }} items</span>
     <div class="flex items-center gap-3">
-      <button (click)="goToPage(page - 1)" [disabled]="page === 0 || isLoading" class="ez-btn ez-btn-secondary !min-h-0 !p-1.5">
+      <button (click)="goToPage(page - 1)" [disabled]="page === 0 || isLoading"
+        class="ez-btn ez-btn-secondary !min-h-0 !p-1.5">
         <lucide-icon [img]="icons.prev" class="w-4 h-4"></lucide-icon>
       </button>
       <span>Page {{ page + 1 }} of {{ totalPages }}</span>
-      <button (click)="goToPage(page + 1)" [disabled]="page >= totalPages - 1 || isLoading" class="ez-btn ez-btn-secondary !min-h-0 !p-1.5">
+      <button (click)="goToPage(page + 1)" [disabled]="page >= totalPages - 1 || isLoading"
+        class="ez-btn ez-btn-secondary !min-h-0 !p-1.5">
         <lucide-icon [img]="icons.next" class="w-4 h-4"></lucide-icon>
       </button>
     </div>

@@ -28,6 +28,11 @@ export const ReportsRoutes: Routes = [
                     .then(c => c.GstReportComponent)
             },
             {
+                path: 'shifts',
+                loadComponent: () => import('./shifts-report.component')
+                    .then(c => c.ShiftsReportComponent)
+            },
+            {
                 path: 'cancellations',
                 loadComponent: () => import('./cancellations-report.component')
                     .then(c => c.CancellationsReportComponent)

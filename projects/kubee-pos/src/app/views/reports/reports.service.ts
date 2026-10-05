@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../catalog/catalog.models';
 import {
   CancellationReport, GstReport, ItemSalesReport, ItemSalesSort, PaymentModeReport, ReportPeriod, SalesSummaryReport,
+  ShiftReport,
 } from './reports.models';
 
 /** Kubee POS reports API (read-only). Every report takes an inclusive from/to period of at most 366 days. */
@@ -28,6 +29,10 @@ export class ReportsService {
   }
   cancellations(period: ReportPeriod): Observable<CancellationReport> {
     return this.get('/cancellations', period);
+  }
+  /** Cash-drawer history: shifts opened in the period, expected vs counted cash. */
+  shifts(period: ReportPeriod): Observable<ShiftReport> {
+    return this.get('/shifts', period);
   }
 
   private get<T>(path: string, query: ReportPeriod & { categoryUuid?: string; sort?: string }): Observable<T> {

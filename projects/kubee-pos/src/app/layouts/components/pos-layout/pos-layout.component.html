@@ -73,6 +73,20 @@
         <lucide-icon [img]="Menu" class="w-6 h-6"></lucide-icon>
       </button>
       <div class="flex-1"></div>
+      <!-- Cash-drawer shift -->
+      @if (shift !== undefined) {
+      <button (click)="shiftService.openDialog()" title="Cash drawer shift"
+        class="mr-4 flex items-center gap-2 px-3 py-1.5 border rounded text-ez-sm font-medium transition-colors duration-ez outline-none"
+        [ngClass]="shift ? 'border-green-200 bg-green-50 text-green-700 hover:border-green-400' : 'border-ez-border text-ez-secondary hover:border-ez-subtle hover:text-ez-heading'">
+        <lucide-icon [img]="Wallet" class="w-4 h-4"></lucide-icon>
+        @if (shift) {
+        <span class="hidden sm:inline">Shift open since {{ shift.openedAt | date:'h:mm a' }}</span>
+        <span class="sm:hidden">Shift</span>
+        } @else {
+        <span>Open shift</span>
+        }
+      </button>
+      }
       <div class="flex items-center gap-3">
         <div class="hidden sm:flex flex-col items-end leading-tight">
           <span class="text-ez-sm font-medium text-ez-heading capitalize">{{ user.name }}</span>
@@ -89,3 +103,5 @@
     </div>
   </main>
 </div>
+
+<app-shift-dialog></app-shift-dialog>

@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 import { CommonService, DrawerService, UserInitResponse } from 'kubee-ui';
 import { NgxPermissionsService } from 'ngx-permissions';
 import { BannerLoaderService } from '../components/banner-loader/banner-loader.service';
+import { ShiftService } from '../../views/shifts/shift.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<UserInitResponse | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private commonService: CommonService, private router: Router, private bannerLoaderSvc: BannerLoaderService, private drawerSvc: DrawerService, private permissionsService: NgxPermissionsService) { }
+  constructor(private commonService: CommonService, private router: Router, private bannerLoaderSvc: BannerLoaderService, private drawerSvc: DrawerService, private permissionsService: NgxPermissionsService, private shiftService: ShiftService) { }
 
   login(payload: any, success: (res: any) => void, error: (err: any) => void) {
     this.bannerLoaderSvc.show();
@@ -90,6 +91,7 @@ export class AuthService {
     localStorage.clear();
     sessionStorage.clear(); // drop the previous user's ids
     this.drawerSvc.close();
+    this.shiftService.reset();
     this.currentUserSubject.next(null);
     this.router.navigate(['/auth/login']);
   }

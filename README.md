@@ -10,7 +10,7 @@ The workspace is divided into five core projects:
 1. **`kubee-app`**: The primary tenant-facing inventory management application.
 2. **`kubee-admin`**: The internal command center for global SaaS management, tenant oversight, and subscription control.
 3. **`kubee-ehr`**: The Electronic Health Record (EHR) management application tailored for specific clinical workflows.
-4. **`kubee-pos`**: The point-of-sale application: billing terminal (orders, payments, hold/recall), orders with refunds, GST bills (issue, print, share, cancel), reports (day sales, payment modes, item-wise, GST summary, cancellations), dashboard and the catalog (items, categories, add-on groups).
+4. **`kubee-pos`**: The point-of-sale application: billing terminal (orders, payments, hold/recall), orders with refunds, GST bills (issue, print, share, cancel), cash-drawer shifts (open, cash in/out, blind count at close), reports (day sales, payment modes, item-wise, GST summary, cancellations, shift history), dashboard and the catalog (items, categories, add-on groups).
 5. **`kubee-ui`**: The shared internal library containing our Tailwind-powered design system, standalone UI components (modals, drawers, toasts, etc.), and global assets.
 
 ---
@@ -62,7 +62,7 @@ The POS screens (terminal, orders, bills, catalog) call the **Kubee POS backend*
 
 API contracts: [`catalog-api.md`](projects/kubee-pos/doc/catalog-api.md),
 [`orders-api.md`](projects/kubee-pos/doc/orders-api.md), [`billing-api.md`](projects/kubee-pos/doc/billing-api.md),
-[`reports-api.md`](projects/kubee-pos/doc/reports-api.md).
+[`reports-api.md`](projects/kubee-pos/doc/reports-api.md), [`shifts-api.md`](projects/kubee-pos/doc/shifts-api.md).
 
 ---
 
