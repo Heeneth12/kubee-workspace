@@ -7,6 +7,9 @@ import {
   LayoutDashboard,
   ShoppingCart,
   ReceiptText,
+  BookOpen,
+  FileText,
+  ChartColumn,
   ChevronLeft,
   Menu,
   X,
@@ -35,6 +38,9 @@ export class PosLayoutComponent implements OnInit, OnDestroy {
   navItems: NavItem[] = [
     { label: 'Terminal', link: '/pos', icon: ShoppingCart },
     { label: 'Orders', link: '/orders', icon: ReceiptText },
+    { label: 'Bills', link: '/bills', icon: FileText },
+    { label: 'Reports', link: '/reports', icon: ChartColumn },
+    { label: 'Catalog', link: '/catalog', icon: BookOpen },
     { label: 'Dashboard', link: '/dashboard', icon: LayoutDashboard },
   ];
 

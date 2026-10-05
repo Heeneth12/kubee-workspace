@@ -1,0 +1,279 @@
+<div class="p-6">
+  @if (order) {
+  <!-- Header -->
+  <div class="flex flex-wrap items-center gap-3 mb-6">
+    <a routerLink="/orders" class="text-ez-secondary hover:text-ez-heading" title="Back to orders">
+      <lucide-icon [img]="icons.back" class="w-5 h-5"></lucide-icon>
+    </a>
+    <h1 class="text-ez-2xl font-medium text-ez-heading">Order #{{ order.orderNumber }}</h1>
+    <span class="px-2 py-0.5 text-ez-xs font-medium" [class]="orderStatusClass(order.status)">{{ label(order.status) }}</span>
+    <span class="text-ez-sm" [class]="paymentStatusClass(order.paymentStatus)">{{ label(order.paymentStatus) }}</span>
+    <span class="text-ez-sm text-ez-muted">{{ order.createdAt | date:'medium' }}</span>
+    <div class="ml-auto flex gap-2">
+      @if (canResume) {
+      <button (click)="resumeInTerminal()" class="ez-btn ez-btn-primary">
+        <lucide-icon [img]="icons.terminal" class="w-4 h-4"></lucide-icon>
+        {{ order.status === 'HELD' ? 'Recall in terminal' : 'Open in terminal' }}
+      </button>
+      }
+      @if (canCancel) {
+      <button (click)="cancelOpen = !cancelOpen" [disabled]="busy" class="ez-btn ez-btn-secondary hover:!text-red-600">
+        <lucide-icon [img]="icons.cancel" class="w-4 h-4"></lucide-icon>
+        Cancel order
+      </button>
+      }
+    </div>
+  </div>
+
+  @if (error) {
+  <div class="border border-red-200 bg-red-50 text-red-700 text-ez-sm px-4 py-3 mb-4">{{ error }}</div>
+  }
+
+  @if (cancelOpen) {
+  <div class="border border-red-200 bg-red-50 p-4 mb-4 flex flex-col sm:flex-row gap-2">
+    <input type="text" [(ngModel)]="cancelReason" placeholder="Reason for cancelling" class="ez-input ez-input--default flex-1">
+    <button (click)="cancelOrder()" [disabled]="busy || !cancelReason.trim()" class="ez-btn bg-red-600 text-white border-red-600">Cancel order</button>
+  </div>
+  }
+
+  @if (order.status === 'CANCELLED') {
+  <p class="text-ez-sm text-red-600 mb-4">
+    Cancelled {{ order.cancelledAt | date:'short' }}{{ order.cancelReason ? ': ' + order.cancelReason : '' }}
+  </p>
+  }
+
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div class="xl:col-span-2 space-y-6">
+
+      <!-- Lines -->
+      <section class="border border-ez-border overflow-x-auto">
+        <table class="w-full text-ez-base">
+          <thead class="bg-ez-ash text-left">
+            <tr>
+              <th class="px-4 py-3 ez-micro-label">Item</th>
+              <th class="px-4 py-3 ez-micro-label text-right">Qty</th>
+              <th class="px-4 py-3 ez-micro-label text-right">Rate</th>
+              <th class="px-4 py-3 ez-micro-label text-right">Discount</th>
+              <th class="px-4 py-3 ez-micro-label text-right">Tax</th>
+              <th class="px-4 py-3 ez-micro-label text-right">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (line of order.lines; track line.uuid) {
+            <tr class="border-t border-ez-border align-top">
+              <td class="px-4 py-3">
+                <p class="font-medium text-ez-heading">{{ line.itemName }}{{ line.variantName ? ' (' + line.variantName + ')' : '' }}</p>
+                @if (line.addons.length) { <p class="text-ez-xs text-ez-secondary">+ {{ addonText(line.addons) }}</p> }
+                @if (line.notes) { <p class="text-ez-xs text-ez-muted italic">{{ line.notes }}</p> }
+              </td>
+              <td class="px-4 py-3 text-right">{{ line.quantity | number:'1.0-3' }} {{ line.unitOfMeasure }}</td>
+              <td class="px-4 py-3 text-right">{{ line.unitPrice + line.addonsUnitPrice | currency:'INR' }}</td>
+              <td class="px-4 py-3 text-right text-ez-secondary">{{ line.discountAmount ? '-' : '' }}{{ line.discountAmount | currency:'INR' }}</td>
+              <td class="px-4 py-3 text-right text-ez-secondary">{{ line.taxAmount | currency:'INR' }} <span class="text-ez-xs">({{ line.taxRate | number:'1.0-3' }}%)</span></td>
+              <td class="px-4 py-3 text-right font-medium text-ez-heading">{{ line.totalAmount | currency:'INR' }}</td>
+            </tr>
+            } @empty {
+            <tr><td colspan="6" class="px-4 py-8 text-center text-ez-sm text-ez-muted">No items</td></tr>
+            }
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Payments -->
+      <section>
+        <h2 class="ez-micro-label mb-3">Payments</h2>
+        <div class="border border-ez-border overflow-x-auto">
+          <table class="w-full text-ez-base">
+            <thead class="bg-ez-ash text-left">
+              <tr>
+                <th class="px-4 py-3 ez-micro-label">Time</th>
+                <th class="px-4 py-3 ez-micro-label">Type</th>
+                <th class="px-4 py-3 ez-micro-label">Method</th>
+                <th class="px-4 py-3 ez-micro-label">Reference</th>
+                <th class="px-4 py-3 ez-micro-label text-right">Amount</th>
+                <th class="px-4 py-3"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of order.payments; track p.uuid) {
+              <tr class="border-t border-ez-border">
+                <td class="px-4 py-3 text-ez-secondary">{{ p.paidAt | date:'short' }}</td>
+                <td class="px-4 py-3">
+                  <span [class]="p.type === 'REFUND' ? 'text-red-600' : 'text-ez-heading'">{{ label(p.type) }}</span>
+                  @if (p.status !== 'SUCCESS') { <span class="text-ez-xs text-ez-muted ml-1">({{ label(p.status) }})</span> }
+                </td>
+                <td class="px-4 py-3 text-ez-secondary">
+                  {{ label(p.method) }}
+                  @if (p.tenderedAmount !== null) {
+                  <div class="text-ez-xs text-ez-muted">Given {{ p.tenderedAmount | currency:'INR' }} · change {{ p.changeAmount | currency:'INR' }}</div>
+                  }
+                </td>
+                <td class="px-4 py-3 text-ez-secondary">{{ p.referenceNo ?? p.notes ?? '-' }}</td>
+                <td class="px-4 py-3 text-right font-medium" [class]="p.type === 'REFUND' ? 'text-red-600' : 'text-ez-heading'">
+                  {{ p.type === 'REFUND' ? '-' : '' }}{{ p.amount | currency:'INR' }}
+                </td>
+                <td class="px-4 py-3 text-right">
+                  @if (p.type === 'PAYMENT' && (p.refundableAmount ?? 0) > 0 && order.status !== 'CANCELLED') {
+                  <button (click)="openRefund(p)" [disabled]="busy" class="text-ez-sm text-ez-primary hover:underline inline-flex items-center gap-1">
+                    <lucide-icon [img]="icons.refund" class="w-3.5 h-3.5"></lucide-icon>
+                    Refund
+                  </button>
+                  }
+                </td>
+              </tr>
+              } @empty {
+              <tr><td colspan="6" class="px-4 py-8 text-center text-ez-sm text-ez-muted">No payments yet</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (refundForm) {
+        <div class="border border-ez-border bg-ez-ash p-4 mt-3 space-y-3">
+          <p class="text-ez-sm text-ez-heading">
+            Refund {{ label(refundForm.payment.method) }} payment of {{ refundForm.payment.amount | currency:'INR' }}
+            <span class="text-ez-muted">(up to {{ refundForm.payment.refundableAmount | currency:'INR' }})</span>
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="ez-label">Amount</label>
+              <input type="number" min="0.01" step="0.01" [max]="refundForm.payment.refundableAmount" [(ngModel)]="refundForm.amount" class="ez-input ez-input--default w-full">
+            </div>
+            <div>
+              <label class="ez-label">Refund by</label>
+              <select [(ngModel)]="refundForm.method" class="ez-select w-full">
+                @for (m of paymentMethods; track m) { <option [value]="m">{{ label(m) }}</option> }
+              </select>
+            </div>
+            <div>
+              <label class="ez-label">Reason</label>
+              <input type="text" [(ngModel)]="refundForm.reason" placeholder="Item returned" class="ez-input ez-input--default w-full">
+            </div>
+          </div>
+          <div class="flex gap-2 justify-end">
+            <button (click)="refundForm = null" class="ez-btn ez-btn-secondary">Close</button>
+            <button (click)="submitRefund()" [disabled]="busy || !refundForm.amount || !refundForm.reason.trim()" class="ez-btn ez-btn-primary">Refund</button>
+          </div>
+        </div>
+        }
+      </section>
+
+      <!-- Bill -->
+      @if (order.status === 'COMPLETED') {
+      <section>
+        <h2 class="ez-micro-label mb-3">GST bill</h2>
+        @if (!billLoaded) {
+        <p class="text-ez-sm text-ez-muted">Loading bill...</p>
+        } @else {
+        @if (canIssueBill) {
+        @if (!issueOpen) {
+        <div class="border border-ez-border p-4 flex items-center gap-3">
+          <lucide-icon [img]="icons.bill" class="w-5 h-5 text-ez-muted"></lucide-icon>
+          <p class="text-ez-sm text-ez-secondary flex-1">{{ bill ? 'The bill was cancelled. Issue a corrected one.' : 'No bill issued for this order yet.' }}</p>
+          <button (click)="openIssue()" class="ez-btn ez-btn-primary">Issue bill</button>
+        </div>
+        } @else {
+        <div class="border border-ez-border p-4 space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="ez-label">Customer name</label>
+              <input type="text" [(ngModel)]="issue.customerName" class="ez-input ez-input--default w-full">
+            </div>
+            <div>
+              <label class="ez-label">Customer phone</label>
+              <input type="tel" [(ngModel)]="issue.customerPhone" class="ez-input ez-input--default w-full">
+            </div>
+            <div>
+              <label class="ez-label">Customer GSTIN <span class="text-ez-muted font-normal">(B2B only)</span></label>
+              <input type="text" [(ngModel)]="issue.customerGstin" maxlength="15" placeholder="29ABCDE1234F1Z5" class="ez-input ez-input--default w-full uppercase">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="ez-label">Place of supply</label>
+                <input type="text" [(ngModel)]="issue.placeOfSupply" maxlength="2" placeholder="29" class="ez-input ez-input--default w-full">
+              </div>
+              <div>
+                <label class="ez-label">Series</label>
+                <input type="text" [(ngModel)]="issue.series" maxlength="4" placeholder="A" class="ez-input ez-input--default w-full uppercase">
+              </div>
+            </div>
+          </div>
+          <p class="text-ez-xs text-ez-muted">Place of supply is a 2-digit state code. Left empty, it comes from the GSTIN, else the shop's state.</p>
+          <div class="flex gap-2 justify-end">
+            <button (click)="issueOpen = false" class="ez-btn ez-btn-secondary">Close</button>
+            <button (click)="issueBill()" [disabled]="busy" class="ez-btn ez-btn-primary">Issue bill</button>
+          </div>
+        </div>
+        }
+        }
+        @if (bill) {
+        <div class="mt-4 max-w-xl">
+          <app-bill-panel [bill]="bill" (billChange)="bill = $event"></app-bill-panel>
+        </div>
+        }
+        }
+      </section>
+      }
+    </div>
+
+    <!-- Side: totals & details -->
+    <div class="space-y-6">
+      <section class="ez-surface p-5 space-y-2 text-ez-sm">
+        <div class="flex justify-between text-ez-secondary"><span>Sub total</span><span>{{ order.subTotal | currency:'INR' }}</span></div>
+        @if (order.discountAmount) {
+        <div class="flex justify-between text-ez-secondary">
+          <span>Discount{{ order.discountType === 'PERCENT' ? ' (' + order.discountValue + '% on bill)' : '' }}</span>
+          <span>-{{ order.discountAmount | currency:'INR' }}</span>
+        </div>
+        }
+        <div class="flex justify-between text-ez-secondary"><span>Taxable</span><span>{{ order.taxableAmount | currency:'INR' }}</span></div>
+        <div class="flex justify-between text-ez-secondary"><span>Tax</span><span>{{ order.taxAmount | currency:'INR' }}</span></div>
+        @if (order.roundOffAmount) {
+        <div class="flex justify-between text-ez-secondary"><span>Round off</span><span>{{ order.roundOffAmount | currency:'INR' }}</span></div>
+        }
+        <div class="flex justify-between text-ez-xl font-medium text-ez-heading pt-2 border-t border-ez-border">
+          <span>Total</span><span>{{ order.grandTotal | currency:'INR' }}</span>
+        </div>
+        <div class="flex justify-between text-ez-secondary"><span>Paid</span><span>{{ order.paidAmount | currency:'INR' }}</span></div>
+        <div class="flex justify-between font-medium" [class]="order.dueAmount ? 'text-amber-700' : 'text-ez-secondary'">
+          <span>Due</span><span>{{ order.dueAmount | currency:'INR' }}</span>
+        </div>
+      </section>
+
+      <section class="border border-ez-border p-5 space-y-3">
+        <h2 class="ez-micro-label">Details</h2>
+        <div>
+          <label class="ez-label">Order type</label>
+          <select [(ngModel)]="details.orderType" [disabled]="order.status === 'CANCELLED'" class="ez-select w-full">
+            @for (t of orderTypes; track t) { <option [value]="t">{{ label(t) }}</option> }
+          </select>
+        </div>
+        <div>
+          <label class="ez-label">Customer name</label>
+          <input type="text" [(ngModel)]="details.customerName" [disabled]="order.status === 'CANCELLED'" class="ez-input ez-input--default w-full">
+        </div>
+        <div>
+          <label class="ez-label">Phone</label>
+          <input type="tel" [(ngModel)]="details.customerPhone" [disabled]="order.status === 'CANCELLED'" class="ez-input ez-input--default w-full">
+        </div>
+        <div>
+          <label class="ez-label">Table</label>
+          <input type="text" [(ngModel)]="details.tableLabel" [disabled]="order.status === 'CANCELLED'" class="ez-input ez-input--default w-full">
+        </div>
+        <div>
+          <label class="ez-label">Notes</label>
+          <textarea [(ngModel)]="details.notes" rows="2" [disabled]="order.status === 'CANCELLED'" class="ez-input ez-input--default w-full resize-y"></textarea>
+        </div>
+        @if (order.status !== 'CANCELLED') {
+        <button (click)="saveDetails()" [disabled]="busy" class="ez-btn ez-btn-secondary w-full">
+          <lucide-icon [img]="icons.save" class="w-4 h-4"></lucide-icon>
+          Save details
+        </button>
+        }
+      </section>
+    </div>
+  </div>
+  } @else if (isLoading) {
+  <p class="text-ez-sm text-ez-muted">Loading order...</p>
+  }
+</div>

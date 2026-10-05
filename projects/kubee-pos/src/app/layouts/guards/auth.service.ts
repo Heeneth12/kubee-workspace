@@ -88,6 +88,7 @@ export class AuthService {
 
   logout() {
     localStorage.clear();
+    sessionStorage.clear(); // drop the previous user's ids
     this.drawerSvc.close();
     this.currentUserSubject.next(null);
     this.router.navigate(['/auth/login']);

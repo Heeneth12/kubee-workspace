@@ -27,7 +27,7 @@ export const routes: Routes = [
         path: '',
         component: PosLayoutComponent,
         canActivate: [AuthGuard],
-        data: { moduleKey: 'KUBEE_POS' },
+        data: { moduleKey: 'KUB_OPS_CATALOG' },
         children: [
             {
                 path: 'dashboard',
@@ -43,6 +43,31 @@ export const routes: Routes = [
                 path: 'orders',
                 loadComponent: () => import('./views/orders/orders.component')
                     .then(c => c.OrdersComponent)
+            },
+            {
+                path: 'orders/:uuid',
+                loadComponent: () => import('./views/orders/order-detail.component')
+                    .then(c => c.OrderDetailComponent)
+            },
+            {
+                path: 'bills',
+                loadComponent: () => import('./views/billing/bill-list.component')
+                    .then(c => c.BillListComponent)
+            },
+            {
+                path: 'bills/:uuid',
+                loadComponent: () => import('./views/billing/bill-detail.component')
+                    .then(c => c.BillDetailComponent)
+            },
+            {
+                path: 'reports',
+                loadChildren: () => import('./views/reports/reports.routes')
+                    .then(m => m.ReportsRoutes)
+            },
+            {
+                path: 'catalog',
+                loadChildren: () => import('./views/catalog/catalog.routes')
+                    .then(m => m.CatalogRoutes)
             }
         ]
     },

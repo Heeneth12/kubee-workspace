@@ -1,0 +1,157 @@
+<div class="flex flex-col lg:flex-row h-full">
+
+  <!-- List -->
+  <section class="flex-1 min-w-0 p-6 overflow-y-auto">
+    <div class="flex items-center justify-between mb-4">
+      <p class="text-ez-sm text-ez-secondary">Extras like toppings or spice level, offered when an item is billed.</p>
+      <button (click)="openCreate()" class="ez-btn ez-btn-primary shrink-0">
+        <lucide-icon [img]="icons.plus" class="w-4 h-4"></lucide-icon>
+        New group
+      </button>
+    </div>
+
+    @if (isLoading && !groups.length) {
+    <p class="py-10 text-center text-ez-sm text-ez-muted">Loading add-on groups...</p>
+    } @else {
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-3">
+      @for (group of groups; track group.uuid) {
+      <div class="border p-4 transition-colors duration-ez"
+        [class]="editingGroup?.uuid === group.uuid ? 'border-ez-primary bg-ez-primary-tint' : 'border-ez-border'">
+        <div class="flex items-start gap-3 mb-3">
+          <div class="flex-1 min-w-0">
+            <p class="text-ez-lg font-medium text-ez-heading truncate">
+              {{ group.name }}
+              @if (!group.active) { <span class="ez-micro-label ml-2">Inactive</span> }
+            </p>
+            <p class="text-ez-xs text-ez-muted">{{ selectionRule(group) }}</p>
+          </div>
+          <button (click)="openEdit(group)" title="Edit" class="text-ez-secondary hover:text-ez-primary outline-none">
+            <lucide-icon [img]="icons.edit" class="w-4 h-4"></lucide-icon>
+          </button>
+          <button (click)="deleteGroup(group)" title="Delete" class="text-ez-secondary hover:text-red-500 outline-none">
+            <lucide-icon [img]="icons.trash" class="w-4 h-4"></lucide-icon>
+          </button>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          @for (addon of group.addons; track addon.uuid) {
+          <span class="inline-flex items-center gap-1.5 px-2 py-1 bg-ez-ash text-ez-sm"
+            [class]="addon.active ? 'text-ez-body' : 'text-ez-muted line-through'">
+            {{ addon.name }}
+            @if (addon.price) { <span class="text-ez-muted">+{{ addon.price | currency:'INR' }}</span> }
+          </span>
+          } @empty {
+          <span class="text-ez-sm text-ez-muted">No add-ons</span>
+          }
+        </div>
+      </div>
+      } @empty {
+      <div class="xl:col-span-2 border border-ez-border px-4 py-12 text-center text-ez-muted">
+        <lucide-icon [img]="icons.list" class="w-8 h-8 mx-auto mb-2"></lucide-icon>
+        <p class="text-ez-sm">No add-on groups yet</p>
+      </div>
+      }
+    </div>
+    }
+  </section>
+
+  <!-- Editor -->
+  @if (editing) {
+  <aside class="w-full lg:w-[28rem] shrink-0 border-t lg:border-t-0 lg:border-l border-ez-border flex flex-col bg-ez-white">
+    <div class="h-14 px-5 flex items-center justify-between border-b border-ez-border shrink-0">
+      <h2 class="text-ez-lg font-medium text-ez-heading">{{ editingGroup ? 'Edit add-on group' : 'New add-on group' }}</h2>
+      <button (click)="closeEditor()" class="text-ez-secondary hover:text-ez-heading outline-none">
+        <lucide-icon [img]="icons.close" class="w-5 h-5"></lucide-icon>
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="save()" class="flex-1 overflow-y-auto p-5 space-y-5">
+      @if (formError) {
+      <div class="border border-red-200 bg-red-50 text-red-700 text-ez-sm px-4 py-3">{{ formError }}</div>
+      }
+
+      <div>
+        <label class="ez-label">Name <span class="text-red-500">*</span></label>
+        <input type="text" formControlName="name" class="ez-input ez-input--default w-full" placeholder="Extra Toppings"
+          [class.ez-input--error]="controlError(ctrl(['name']))">
+        @if (controlError(ctrl(['name'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="ez-label">Min. selection</label>
+          <input type="number" min="0" formControlName="minSelect" class="ez-input ez-input--default w-full"
+            [class.ez-input--error]="controlError(ctrl(['minSelect']))">
+          @if (controlError(ctrl(['minSelect'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+        </div>
+        <div>
+          <label class="ez-label">Max. selection</label>
+          <input type="number" min="1" formControlName="maxSelect" class="ez-input ez-input--default w-full" placeholder="No limit"
+            [class.ez-input--error]="controlError(ctrl(['maxSelect']))">
+          @if (controlError(ctrl(['maxSelect'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+        </div>
+      </div>
+
+      @if (editingGroup) {
+      <label class="flex items-center gap-2 cursor-pointer text-ez-base text-ez-body">
+        <input type="checkbox" formControlName="active" style="accent-color: var(--ez-color-primary);" class="w-4 h-4">
+        Active
+      </label>
+      }
+
+      <!-- Add-ons -->
+      <div formArrayName="addons">
+        <div class="flex items-center justify-between mb-2">
+          <span class="ez-micro-label">Add-ons</span>
+          <button type="button" (click)="addAddon()" class="text-ez-sm font-medium text-ez-primary hover:underline flex items-center gap-1">
+            <lucide-icon [img]="icons.plus" class="w-3.5 h-3.5"></lucide-icon>
+            Add
+          </button>
+        </div>
+
+        <div class="space-y-3">
+          @for (row of addons.controls; track row; let i = $index) {
+          <div [formGroupName]="i" class="border border-ez-border p-3 space-y-2">
+            <div class="flex gap-2">
+              <div class="flex-1 min-w-0">
+                <input type="text" formControlName="name" class="ez-input ez-input--default w-full" placeholder="Cheese"
+                  [class.ez-input--error]="controlError(ctrl(['addons', i, 'name']))">
+                @if (controlError(ctrl(['addons', i, 'name'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+              </div>
+              <div class="w-24">
+                <input type="number" min="0" step="0.01" formControlName="price" class="ez-input ez-input--default w-full" placeholder="₹ 0"
+                  [class.ez-input--error]="controlError(ctrl(['addons', i, 'price']))">
+                @if (controlError(ctrl(['addons', i, 'price'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+              </div>
+              <button type="button" (click)="removeAddon(i)" title="Remove" class="text-ez-muted hover:text-red-500 outline-none self-start mt-2.5">
+                <lucide-icon [img]="icons.trash" class="w-4 h-4"></lucide-icon>
+              </button>
+            </div>
+            <div class="flex items-center gap-4">
+              <select formControlName="foodType" class="ez-select !py-1 text-ez-sm">
+                <option value="">Not food</option>
+                @for (ft of foodTypes; track ft) {
+                <option [value]="ft">{{ ft.replace('_', '-') }}</option>
+                }
+              </select>
+              <label class="flex items-center gap-2 cursor-pointer text-ez-sm text-ez-body">
+                <input type="checkbox" formControlName="active" style="accent-color: var(--ez-color-primary);" class="w-4 h-4">
+                Active
+              </label>
+            </div>
+          </div>
+          } @empty {
+          <p class="text-ez-sm text-ez-muted">No add-ons. Add at least one so customers have something to pick.</p>
+          }
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-2">
+        <button type="button" (click)="closeEditor()" class="ez-btn ez-btn-secondary flex-1">Cancel</button>
+        <button type="submit" [disabled]="isSaving" class="ez-btn ez-btn-primary flex-1">
+          {{ isSaving ? 'Saving...' : 'Save' }}
+        </button>
+      </div>
+    </form>
+  </aside>
+  }
+</div>

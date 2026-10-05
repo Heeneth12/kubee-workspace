@@ -1,0 +1,150 @@
+<div class="p-6">
+  <!-- Toolbar -->
+  <div class="flex flex-col xl:flex-row gap-3 mb-4">
+    <div class="relative flex-1 min-w-0">
+      <lucide-icon [img]="icons.search" class="w-4 h-4 text-ez-muted absolute left-3 top-1/2 -translate-y-1/2"></lucide-icon>
+      <input type="text" [(ngModel)]="search" (ngModelChange)="onSearchChange($event)"
+        placeholder="Search name, item code or barcode..." class="ez-input w-full pl-9">
+    </div>
+    <div class="flex flex-wrap gap-3 items-center">
+      <select [(ngModel)]="categoryUuid" (ngModelChange)="applyFilters()" class="ez-select w-44">
+        <option value="">All categories</option>
+        @for (cat of categories; track cat.uuid) {
+        <option [value]="cat.uuid">{{ categoryLabel(cat) }}</option>
+        }
+      </select>
+      <select [(ngModel)]="foodType" (ngModelChange)="applyFilters()" class="ez-select w-32">
+        <option value="">All food types</option>
+        @for (ft of foodTypes; track ft) {
+        <option [value]="ft">{{ ft.replace('_', '-') }}</option>
+        }
+      </select>
+      <select [(ngModel)]="active" (ngModelChange)="applyFilters()" class="ez-select w-32">
+        <option value="">Any status</option>
+        <option value="true">Available</option>
+        <option value="false">Not available</option>
+      </select>
+      <label class="flex items-center gap-2 text-ez-sm text-ez-body cursor-pointer select-none">
+        <input type="checkbox" [(ngModel)]="favouriteOnly" (ngModelChange)="applyFilters()"
+          style="accent-color: var(--ez-color-primary);" class="w-4 h-4">
+        Favourites
+      </label>
+      <a routerLink="new" class="ez-btn ez-btn-primary">
+        <lucide-icon [img]="icons.plus" class="w-4 h-4"></lucide-icon>
+        New item
+      </a>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="border border-ez-border overflow-x-auto">
+    <table class="w-full text-ez-base">
+      <thead class="bg-ez-ash text-left">
+        <tr>
+          <th class="px-4 py-3 ez-micro-label w-10"></th>
+          <th class="px-4 py-3 ez-micro-label">Item</th>
+          <th class="px-4 py-3 ez-micro-label">Category</th>
+          <th class="px-4 py-3 ez-micro-label">Type</th>
+          <th class="px-4 py-3 ez-micro-label">Tax</th>
+          <th class="px-4 py-3 ez-micro-label text-right">Price</th>
+          <th class="px-4 py-3 ez-micro-label">Available</th>
+          <th class="px-4 py-3 ez-micro-label text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (isLoading && !items.length) {
+        <tr>
+          <td colspan="8" class="px-4 py-10 text-center text-ez-sm text-ez-muted">Loading items...</td>
+        </tr>
+        } @else {
+        @for (item of items; track item.uuid) {
+        <tr class="border-t border-ez-border" [class.opacity-60]="busyUuid === item.uuid">
+          <td class="px-4 py-3">
+            <button (click)="toggleFavourite(item)" [disabled]="busyUuid === item.uuid"
+              [title]="item.favourite ? 'Remove from quick buttons' : 'Show as quick button'"
+              class="outline-none" [class]="item.favourite ? 'text-amber-500' : 'text-ez-muted hover:text-ez-secondary'">
+              <lucide-icon [img]="icons.star" class="w-4 h-4" [class.fill-current]="item.favourite"></lucide-icon>
+            </button>
+          </td>
+          <td class="px-4 py-3">
+            <a [routerLink]="item.uuid" class="font-medium text-ez-heading hover:text-ez-primary">{{ item.name }}</a>
+            <div class="text-ez-xs text-ez-muted flex flex-wrap gap-x-3">
+              @if (item.itemCode) { <span>Code {{ item.itemCode }}</span> }
+              @if (item.barcode) { <span>{{ item.barcode }}</span> }
+              @if (item.hasVariants) { <span>{{ item.variants.length }} variants</span> }
+              @if (item.openPrice) { <span>Open price</span> }
+            </div>
+          </td>
+          <td class="px-4 py-3 text-ez-secondary">{{ item.categoryName ?? '-' }}</td>
+          <td class="px-4 py-3">
+            @if (item.foodType) {
+            <span class="inline-flex items-center gap-1.5 ez-micro-label">
+              <span class="w-2 h-2 rounded-full"
+                [class]="item.foodType === 'VEG' ? 'bg-green-600' : item.foodType === 'EGG' ? 'bg-amber-500' : 'bg-red-600'"></span>
+              {{ item.foodType.replace('_', '-') }}
+            </span>
+            } @else {
+            <span class="ez-micro-label">{{ item.itemType }}</span>
+            }
+          </td>
+          <td class="px-4 py-3 text-ez-secondary">{{ item.taxGroupName ?? 'No tax' }}</td>
+          <td class="px-4 py-3 text-right">
+            @if (item.openPrice) {
+            <span class="text-ez-muted">-</span>
+            } @else {
+            <span class="font-medium text-ez-heading">{{ item.sellingPrice | currency:'INR' }}</span>
+            @if (item.mrp !== null) {
+            <div class="text-ez-xs text-ez-muted">MRP {{ item.mrp | currency:'INR' }}</div>
+            }
+            }
+          </td>
+          <td class="px-4 py-3">
+            <button (click)="toggleActive(item)" [disabled]="busyUuid === item.uuid" role="switch"
+              [attr.aria-checked]="item.active"
+              class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-ez outline-none"
+              [class]="item.active ? 'bg-ez-primary' : 'bg-ez-border'">
+              <span class="inline-block h-4 w-4 rounded-full bg-white transition-transform duration-ez"
+                [class]="item.active ? 'translate-x-[18px]' : 'translate-x-0.5'"></span>
+            </button>
+          </td>
+          <td class="px-4 py-3">
+            <div class="flex justify-end gap-3">
+              <a [routerLink]="item.uuid" title="Edit" class="text-ez-secondary hover:text-ez-primary">
+                <lucide-icon [img]="icons.edit" class="w-4 h-4"></lucide-icon>
+              </a>
+              <button (click)="deleteItem(item)" [disabled]="busyUuid === item.uuid" title="Delete"
+                class="text-ez-secondary hover:text-red-500 outline-none">
+                <lucide-icon [img]="icons.trash" class="w-4 h-4"></lucide-icon>
+              </button>
+            </div>
+          </td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="8" class="px-4 py-12 text-center text-ez-muted">
+            <lucide-icon [img]="icons.package" class="w-8 h-8 mx-auto mb-2"></lucide-icon>
+            <p class="text-ez-sm">No items found</p>
+          </td>
+        </tr>
+        }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paging -->
+  @if (totalPages > 1) {
+  <div class="flex items-center justify-between mt-4 text-ez-sm text-ez-secondary">
+    <span>{{ totalElements }} items</span>
+    <div class="flex items-center gap-3">
+      <button (click)="goToPage(page - 1)" [disabled]="page === 0 || isLoading" class="ez-btn ez-btn-secondary !min-h-0 !p-1.5">
+        <lucide-icon [img]="icons.prev" class="w-4 h-4"></lucide-icon>
+      </button>
+      <span>Page {{ page + 1 }} of {{ totalPages }}</span>
+      <button (click)="goToPage(page + 1)" [disabled]="page >= totalPages - 1 || isLoading" class="ez-btn ez-btn-secondary !min-h-0 !p-1.5">
+        <lucide-icon [img]="icons.next" class="w-4 h-4"></lucide-icon>
+      </button>
+    </div>
+  </div>
+  }
+</div>

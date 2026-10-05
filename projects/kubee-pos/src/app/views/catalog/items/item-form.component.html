@@ -1,0 +1,307 @@
+<div class="flex flex-col h-full">
+
+  <!-- Header -->
+  <div class="px-6 h-16 flex items-center justify-between gap-3 border-b border-ez-border shrink-0">
+    <div class="flex items-center gap-3 min-w-0">
+      <button type="button" (click)="goBack()" class="text-ez-secondary hover:text-ez-heading outline-none" title="Back to items">
+        <lucide-icon [img]="icons.back" class="w-5 h-5"></lucide-icon>
+      </button>
+      <h2 class="text-ez-xl font-medium text-ez-heading truncate">
+        {{ isEdit ? (form.value.name || 'Edit item') : 'New item' }}
+      </h2>
+    </div>
+    <div class="flex items-center gap-3">
+      <button type="button" (click)="goBack()" class="ez-btn ez-btn-secondary">Cancel</button>
+      <button type="button" (click)="save()" [disabled]="isSaving || isLoading" class="ez-btn ez-btn-primary">
+        <lucide-icon [img]="icons.save" class="w-4 h-4"></lucide-icon>
+        {{ isSaving ? 'Saving...' : 'Save item' }}
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading) {
+  <p class="p-6 text-ez-sm text-ez-muted">Loading...</p>
+  } @else {
+  <form [formGroup]="form" (ngSubmit)="save()" class="flex-1 overflow-y-auto p-6 space-y-8 max-w-6xl">
+
+    @if (formError) {
+    <div class="border border-red-200 bg-red-50 text-red-700 text-ez-sm px-4 py-3">{{ formError }}</div>
+    }
+
+    <!-- Basic details -->
+    <section>
+      <h3 class="ez-micro-label mb-4">Details</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5">
+        <div class="sm:col-span-2">
+          <label class="ez-label">Name <span class="text-red-500">*</span></label>
+          <input type="text" formControlName="name" class="ez-input ez-input--default w-full" placeholder="Veg Maggi"
+            [class.ez-input--error]="controlError(ctrl(['name']))">
+          @if (controlError(ctrl(['name'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+        </div>
+        <div>
+          <label class="ez-label">Short name <span class="text-ez-muted font-normal">(on bill)</span></label>
+          <input type="text" formControlName="shortName" class="ez-input ez-input--default w-full"
+            [class.ez-input--error]="controlError(ctrl(['shortName']))">
+          @if (controlError(ctrl(['shortName'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+        </div>
+        <div>
+          <label class="ez-label">Category</label>
+          <select formControlName="categoryUuid" class="ez-select w-full">
+            <option value="">No category</option>
+            @for (cat of categories; track cat.uuid) {
+            <option [value]="cat.uuid">{{ categoryLabel(cat) }}{{ cat.active ? '' : ' (inactive)' }}</option>
+            }
+          </select>
+          @if (controlError(ctrl(['categoryUuid'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+        </div>
+
+        <div>
+          <label class="ez-label">Item code</label>
+          <input type="text" formControlName="itemCode" class="ez-input ez-input--default w-full" placeholder="101"
+            [class.ez-input--error]="controlError(ctrl(['itemCode']))">
+          @if (controlError(ctrl(['itemCode'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+        </div>
+        <div>
+          <label class="ez-label">Barcode</label>
+          <input type="text" formControlName="barcode" class="ez-input ez-input--default w-full"
+            [class.ez-input--error]="controlError(ctrl(['barcode']))">
+          @if (controlError(ctrl(['barcode'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+        </div>
+        <div>
+          <label class="ez-label">Unit</label>
+          <input type="text" formControlName="unitOfMeasure" list="pos-units" class="ez-input ez-input--default w-full uppercase"
+            [class.ez-input--error]="controlError(ctrl(['unitOfMeasure']))">
+          <datalist id="pos-units">
+            @for (unit of units; track unit) { <option [value]="unit"></option> }
+          </datalist>
+          @if (controlError(ctrl(['unitOfMeasure'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+        </div>
+        <div>
+          <label class="ez-label">HSN / SAC</label>
+          <input type="text" formControlName="hsnSacCode" inputmode="numeric" class="ez-input ez-input--default w-full"
+            placeholder="4–8 digits" [class.ez-input--error]="controlError(ctrl(['hsnSacCode']))">
+          @if (controlError(ctrl(['hsnSacCode'])); as e) {
+          <p class="text-ez-xs text-red-500 mt-1">{{ e === 'Invalid format' ? 'Must be 4 to 8 digits' : e }}</p>
+          }
+        </div>
+
+        <div>
+          <label class="ez-label">Item type</label>
+          <div class="flex items-center gap-5 h-[38px]">
+            @for (type of itemTypes; track type) {
+            <label class="flex items-center gap-2 cursor-pointer text-ez-base text-ez-body">
+              <input type="radio" formControlName="itemType" [value]="type" style="accent-color: var(--ez-color-primary);" class="w-4 h-4">
+              {{ type === 'GOODS' ? 'Goods' : 'Service' }}
+            </label>
+            }
+          </div>
+        </div>
+        <div>
+          <label class="ez-label">Food type</label>
+          <select formControlName="foodType" class="ez-select w-full">
+            <option value="">Not food</option>
+            @for (ft of foodTypes; track ft) {
+            <option [value]="ft">{{ ft.replace('_', '-') }}</option>
+            }
+          </select>
+        </div>
+        <div>
+          <label class="ez-label">Sort order</label>
+          <input type="number" formControlName="sortOrder" class="ez-input ez-input--default w-full">
+        </div>
+        <div>
+          <label class="ez-label">Image URL</label>
+          <input type="url" formControlName="imageUrl" class="ez-input ez-input--default w-full" placeholder="https://..."
+            [class.ez-input--error]="controlError(ctrl(['imageUrl']))">
+          @if (controlError(ctrl(['imageUrl'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+        </div>
+
+        <div class="sm:col-span-2 lg:col-span-4">
+          <label class="ez-label">Description</label>
+          <textarea formControlName="description" rows="2" class="ez-input ez-input--default w-full resize-y"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing & tax -->
+    <section class="bg-ez-ash -mx-6 px-6 py-6 border-y border-ez-border">
+      <h3 class="ez-micro-label mb-4">Pricing & tax</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5">
+        @if (!variants.length && !isOpenPrice) {
+        <div>
+          <label class="ez-label">Selling price <span class="text-red-500">*</span></label>
+          <div class="flex bg-white border focus-within:border-ez-primary transition-[border-color] duration-ez"
+            [class]="controlError(ctrl(['sellingPrice'])) ? 'border-red-300' : 'border-ez-border'">
+            <span class="flex items-center pl-3 text-ez-muted text-ez-base">₹</span>
+            <input type="number" min="0" step="0.01" formControlName="sellingPrice"
+              class="flex-1 min-w-0 px-3 py-2 bg-transparent text-ez-base text-ez-heading outline-none">
+          </div>
+          @if (controlError(ctrl(['sellingPrice'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+        </div>
+        }
+        @if (!variants.length) {
+        <div>
+          <label class="ez-label">MRP</label>
+          <div class="flex bg-white border border-ez-border focus-within:border-ez-primary transition-[border-color] duration-ez">
+            <span class="flex items-center pl-3 text-ez-muted text-ez-base">₹</span>
+            <input type="number" min="0" step="0.01" formControlName="mrp"
+              class="flex-1 min-w-0 px-3 py-2 bg-transparent text-ez-base text-ez-heading outline-none">
+          </div>
+          @if (controlError(ctrl(['mrp'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+        </div>
+        }
+        <div>
+          <label class="ez-label">Tax group</label>
+          <select formControlName="taxGroupUuid" class="ez-select w-full">
+            <option value="">No tax</option>
+            @for (tax of taxGroups; track tax.uuid) {
+            <option [value]="tax.uuid">{{ tax.label }}</option>
+            }
+          </select>
+          @if (controlError(ctrl(['taxGroupUuid'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+        </div>
+        <div class="flex flex-col justify-end gap-2 pb-1">
+          <label class="flex items-center gap-2 cursor-pointer text-ez-base text-ez-body">
+            <input type="checkbox" formControlName="priceIncludesTax" style="accent-color: var(--ez-color-primary);" class="w-4 h-4">
+            Price includes tax
+          </label>
+          <label class="flex items-center gap-2 text-ez-base text-ez-body"
+            [class]="variants.length ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
+            [title]="variants.length ? 'Open-price items cannot have variants' : ''">
+            <input type="checkbox" formControlName="openPrice" [attr.disabled]="variants.length ? true : null"
+              style="accent-color: var(--ez-color-primary);" class="w-4 h-4">
+            Open price <span class="text-ez-xs text-ez-muted">(cashier enters price)</span>
+          </label>
+        </div>
+      </div>
+      @if (variants.length) {
+      <p class="text-ez-xs text-ez-secondary mt-4">Prices come from the variants below. The default variant's price is shown as the item price.</p>
+      }
+    </section>
+
+    <!-- Variants -->
+    <section formArrayName="variants">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <h3 class="ez-micro-label">Variants</h3>
+          <p class="text-ez-xs text-ez-muted mt-1">Sizes or portions such as Half / Full, 250g / 500g.</p>
+        </div>
+        <button type="button" (click)="addVariant()" [disabled]="isOpenPrice" class="ez-btn ez-btn-secondary"
+          [title]="isOpenPrice ? 'Open-price items cannot have variants' : ''">
+          <lucide-icon [img]="icons.plus" class="w-4 h-4"></lucide-icon>
+          Add variant
+        </button>
+      </div>
+
+      @if (variants.length) {
+      <div class="border border-ez-border overflow-x-auto">
+        <table class="w-full text-ez-base">
+          <thead class="bg-ez-ash text-left">
+            <tr>
+              <th class="px-3 py-2 ez-micro-label">Name *</th>
+              <th class="px-3 py-2 ez-micro-label">Code</th>
+              <th class="px-3 py-2 ez-micro-label">Barcode</th>
+              <th class="px-3 py-2 ez-micro-label">Price *</th>
+              <th class="px-3 py-2 ez-micro-label">MRP</th>
+              <th class="px-3 py-2 ez-micro-label text-center">Default</th>
+              <th class="px-3 py-2 ez-micro-label text-center">Active</th>
+              <th class="px-3 py-2"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of variants.controls; track row; let i = $index) {
+            <tr [formGroupName]="i" class="border-t border-ez-border align-top">
+              <td class="px-3 py-2 min-w-32">
+                <input type="text" formControlName="name" class="ez-input ez-input--default w-full" placeholder="Half"
+                  [class.ez-input--error]="controlError(ctrl(['variants', i, 'name']))">
+                @if (controlError(ctrl(['variants', i, 'name'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+              </td>
+              <td class="px-3 py-2 min-w-24">
+                <input type="text" formControlName="itemCode" class="ez-input ez-input--default w-full"
+                  [class.ez-input--error]="controlError(ctrl(['variants', i, 'itemCode']))">
+                @if (controlError(ctrl(['variants', i, 'itemCode'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+              </td>
+              <td class="px-3 py-2 min-w-32">
+                <input type="text" formControlName="barcode" class="ez-input ez-input--default w-full"
+                  [class.ez-input--error]="controlError(ctrl(['variants', i, 'barcode']))">
+                @if (controlError(ctrl(['variants', i, 'barcode'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+              </td>
+              <td class="px-3 py-2 min-w-24">
+                <input type="number" min="0" step="0.01" formControlName="sellingPrice" class="ez-input ez-input--default w-full"
+                  [class.ez-input--error]="controlError(ctrl(['variants', i, 'sellingPrice']))">
+                @if (controlError(ctrl(['variants', i, 'sellingPrice'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+              </td>
+              <td class="px-3 py-2 min-w-24">
+                <input type="number" min="0" step="0.01" formControlName="mrp" class="ez-input ez-input--default w-full"
+                  [class.ez-input--error]="controlError(ctrl(['variants', i, 'mrp']))">
+                @if (controlError(ctrl(['variants', i, 'mrp'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+              </td>
+              <td class="px-3 py-2 text-center">
+                <input type="radio" name="defaultVariant" [checked]="row.value.isDefault" (change)="setDefaultVariant(i)"
+                  style="accent-color: var(--ez-color-primary);" class="w-4 h-4 mt-2.5 cursor-pointer">
+              </td>
+              <td class="px-3 py-2 text-center">
+                <input type="checkbox" formControlName="active" [attr.disabled]="row.value.isDefault ? true : null"
+                  [title]="row.value.isDefault ? 'The default variant must be active' : ''"
+                  style="accent-color: var(--ez-color-primary);" class="w-4 h-4 mt-2.5 cursor-pointer">
+              </td>
+              <td class="px-3 py-2 text-right">
+                <button type="button" (click)="removeVariant(i)" title="Remove variant"
+                  class="text-ez-muted hover:text-red-500 mt-2.5 outline-none">
+                  <lucide-icon [img]="icons.trash" class="w-4 h-4"></lucide-icon>
+                </button>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      }
+    </section>
+
+    <!-- Add-on groups -->
+    <section>
+      <h3 class="ez-micro-label">Add-on groups</h3>
+      <p class="text-ez-xs text-ez-muted mt-1 mb-3">Extras offered when this item is billed. They are shown in the order you select them.</p>
+      @if (addonGroups.length) {
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        @for (group of addonGroups; track group.uuid) {
+        <label class="flex items-start gap-3 p-3 border cursor-pointer transition-colors duration-ez"
+          [class]="isAddonGroupSelected(group.uuid) ? 'border-ez-primary bg-ez-primary-tint' : 'border-ez-border hover:border-ez-subtle'">
+          <input type="checkbox" [checked]="isAddonGroupSelected(group.uuid)" (change)="toggleAddonGroup(group.uuid)"
+            style="accent-color: var(--ez-color-primary);" class="w-4 h-4 mt-0.5">
+          <span class="min-w-0">
+            <span class="block text-ez-base font-medium text-ez-heading">
+              {{ group.name }}
+              @if (isAddonGroupSelected(group.uuid)) {
+              <span class="text-ez-xs text-ez-primary ml-1">#{{ selectedAddonGroupUuids.indexOf(group.uuid) + 1 }}</span>
+              }
+              @if (!group.active) { <span class="text-ez-xs text-ez-muted ml-1">(inactive)</span> }
+            </span>
+            <span class="block text-ez-xs text-ez-muted">{{ addonGroupSummary(group) }}</span>
+          </span>
+        </label>
+        }
+      </div>
+      } @else {
+      <p class="text-ez-sm text-ez-muted">No add-on groups yet. <a routerLink="/catalog/addon-groups" class="text-ez-primary hover:underline">Create one</a>.</p>
+      }
+    </section>
+
+    <!-- Availability -->
+    <section class="border-t border-ez-border pt-6 flex flex-wrap gap-8">
+      <label class="flex items-center gap-2 cursor-pointer text-ez-base text-ez-body">
+        <input type="checkbox" formControlName="active" style="accent-color: var(--ez-color-primary);" class="w-4 h-4">
+        Available for billing
+      </label>
+      <label class="flex items-center gap-2 cursor-pointer text-ez-base text-ez-body">
+        <input type="checkbox" formControlName="favourite" style="accent-color: var(--ez-color-primary);" class="w-4 h-4">
+        Show as quick button on the terminal
+      </label>
+    </section>
+
+    <!-- Lets Enter submit the form -->
+    <button type="submit" class="hidden"></button>
+  </form>
+  }
+</div>

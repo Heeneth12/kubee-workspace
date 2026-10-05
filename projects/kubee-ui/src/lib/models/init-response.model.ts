@@ -21,6 +21,7 @@ export interface UserInitResponse {
     userType: string;
     isActive: boolean;
     tenantId: number;
+    tenantUuid: string;
     tenantName: string;
     userApplications: UserApplicationDto[];
     userRoles: string[];

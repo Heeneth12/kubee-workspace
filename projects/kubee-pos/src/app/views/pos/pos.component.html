@@ -1,26 +1,45 @@
 <div class="flex flex-col lg:flex-row h-full">
 
-  <!-- Catalogue -->
+  <!-- ===================== Catalogue ===================== -->
   <section class="flex-1 min-w-0 flex flex-col p-6 overflow-hidden">
-    <div class="flex flex-col sm:flex-row gap-3 mb-4">
-      <div class="relative flex-1">
-        <lucide-icon [img]="icons.search" class="w-4 h-4 text-ez-muted absolute left-3 top-1/2 -translate-y-1/2"></lucide-icon>
-        <input type="text" [(ngModel)]="searchQuery" (keydown.enter)="onSearchEnter()" autofocus
-          placeholder="Search name, code or scan barcode..." class="ez-input w-full pl-9">
-      </div>
+    <div class="relative mb-4">
+      <lucide-icon [img]="icons.search" class="w-4 h-4 text-ez-muted absolute left-3 top-1/2 -translate-y-1/2"></lucide-icon>
+      <input #searchBox type="text" [(ngModel)]="searchQuery" (keydown.enter)="onSearchEnter()" autofocus
+        placeholder="Search name, type a code or scan a barcode, then Enter" class="ez-input w-full pl-9">
     </div>
 
-    <div class="flex gap-2 mb-4 overflow-x-auto pb-1">
-      @for (cat of categories; track cat) {
-      <button (click)="selectedCategory = cat"
+    <div class="flex gap-2 mb-2 overflow-x-auto pb-1">
+      <button (click)="selectCategory('')"
         class="px-3 py-1.5 text-ez-sm font-medium whitespace-nowrap border rounded transition-colors duration-ez"
-        [class]="selectedCategory === cat ? 'bg-ez-carbon text-white border-ez-carbon' : 'bg-ez-white text-ez-body border-ez-border hover:border-ez-subtle'">
-        {{ cat }}
+        [class]="!selectedCategory ? 'bg-ez-carbon text-white border-ez-carbon' : 'bg-ez-white text-ez-body border-ez-border hover:border-ez-subtle'">
+        All
+      </button>
+      <button (click)="selectCategory(FAVOURITES)"
+        class="px-3 py-1.5 text-ez-sm font-medium whitespace-nowrap border rounded transition-colors duration-ez flex items-center gap-1"
+        [class]="selectedCategory === FAVOURITES ? 'bg-ez-carbon text-white border-ez-carbon' : 'bg-ez-white text-ez-body border-ez-border hover:border-ez-subtle'">
+        <lucide-icon [img]="icons.star" class="w-3.5 h-3.5"></lucide-icon> Favourites
+      </button>
+      @for (cat of topCategories; track cat.uuid) {
+      <button (click)="selectCategory(cat.uuid)"
+        class="px-3 py-1.5 text-ez-sm font-medium whitespace-nowrap border rounded transition-colors duration-ez"
+        [class]="selectedCategory === cat.uuid ? 'bg-ez-carbon text-white border-ez-carbon' : 'bg-ez-white text-ez-body border-ez-border hover:border-ez-subtle'">
+        {{ cat.name }}
       </button>
       }
     </div>
+    @if (subCategories.length) {
+    <div class="flex gap-2 mb-2 overflow-x-auto pb-1">
+      @for (sub of subCategories; track sub.uuid) {
+      <button (click)="selectedSubCategory = selectedSubCategory === sub.uuid ? '' : sub.uuid"
+        class="px-3 py-1 text-ez-xs font-medium whitespace-nowrap border rounded transition-colors duration-ez"
+        [class]="selectedSubCategory === sub.uuid ? 'bg-ez-primary-tint text-ez-primary border-ez-primary' : 'bg-ez-white text-ez-secondary border-ez-border hover:border-ez-subtle'">
+        {{ sub.name }}
+      </button>
+      }
+    </div>
+    }
 
-    <div class="flex-1 overflow-y-auto">
+    <div class="flex-1 overflow-y-auto mt-2">
       @if (isLoading) {
       <p class="text-ez-sm text-ez-muted">Loading items...</p>
       } @else if (!filteredItems.length) {
@@ -30,12 +49,22 @@
       </div>
       } @else {
       <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
-        @for (item of filteredItems; track item.id) {
-        <button (click)="addToCart(item)"
-          class="text-left bg-ez-ash border border-transparent hover:border-ez-primary p-4 transition-colors duration-ez outline-none">
-          <span class="ez-micro-label block mb-1 truncate">{{ item.category }}</span>
+        @for (item of filteredItems; track item.uuid) {
+        <button (click)="pickItem(item, null)" [disabled]="order !== null && order.status !== 'OPEN'"
+          class="text-left bg-ez-ash border border-transparent hover:border-ez-primary p-4 transition-colors duration-ez outline-none disabled:opacity-50">
+          <span class="flex items-center gap-1.5 mb-1">
+            @if (item.foodType) { <span class="w-2 h-2 rounded-full shrink-0" [class]="foodDot(item)"></span> }
+            <span class="ez-micro-label truncate">{{ item.categoryName ?? (item.itemCode ? '#' + item.itemCode : '') }}</span>
+          </span>
           <span class="block text-ez-base font-medium text-ez-heading line-clamp-2 min-h-[2.5em]">{{ item.name }}</span>
-          <span class="block text-ez-lg font-medium text-ez-primary mt-2">{{ item.sellingPrice | currency:'INR' }}</span>
+          <span class="block text-ez-lg font-medium text-ez-primary mt-2">
+            @if (item.openPrice) { Enter price } @else { {{ item.sellingPrice | currency:'INR' }} }
+          </span>
+          @if (item.hasVariants || item.addonGroupUuids.length) {
+          <span class="block text-ez-2xs text-ez-muted mt-0.5">
+            {{ item.hasVariants ? item.variants.length + ' sizes' : '' }}{{ item.hasVariants && item.addonGroupUuids.length ? ' · ' : '' }}{{ item.addonGroupUuids.length ? 'add-ons' : '' }}
+          </span>
+          }
         </button>
         }
       </div>
@@ -43,69 +72,312 @@
     </div>
   </section>
 
-  <!-- Cart -->
-  <aside class="w-full lg:w-96 shrink-0 border-t lg:border-t-0 lg:border-l border-ez-border flex flex-col bg-ez-white">
-    <div class="h-14 px-5 flex items-center justify-between border-b border-ez-border">
-      <h2 class="text-ez-lg font-medium text-ez-heading">Current sale <span class="text-ez-muted">({{ itemCount }})</span></h2>
-      @if (cart.length) {
-      <button (click)="clearCart()" class="text-ez-sm text-ez-secondary hover:text-red-500">Clear</button>
+  <!-- ===================== Current sale ===================== -->
+  <aside class="w-full lg:w-[26rem] shrink-0 border-t lg:border-t-0 lg:border-l border-ez-border flex flex-col bg-ez-white">
+
+    <!-- Header -->
+    <div class="h-14 px-4 flex items-center gap-2 border-b border-ez-border shrink-0">
+      <h2 class="text-ez-lg font-medium text-ez-heading flex-1 truncate">
+        {{ order ? 'Order #' + order.orderNumber : 'New sale' }}
+        @if (busy) { <span class="text-ez-xs text-ez-muted font-normal ml-1">saving...</span> }
+      </h2>
+      <button (click)="openHeld()" title="Held orders" class="ez-btn ez-btn-secondary !min-h-0 !px-2 !py-1.5 relative">
+        <lucide-icon [img]="icons.held" class="w-4 h-4"></lucide-icon>
+        @if (heldCount) {
+        <span class="absolute -top-1.5 -right-1.5 min-w-4 h-4 px-1 rounded-full bg-amber-500 text-white text-[10px] leading-4 text-center">{{ heldCount }}</span>
+        }
+      </button>
+      @if (order?.status === 'OPEN') {
+      <button (click)="hold()" [disabled]="!order?.lines?.length" title="Hold this sale" class="ez-btn ez-btn-secondary !min-h-0 !px-2 !py-1.5">
+        <lucide-icon [img]="icons.hold" class="w-4 h-4"></lucide-icon>
+      </button>
+      <button (click)="cancelSale()" title="Cancel sale" class="ez-btn ez-btn-secondary !min-h-0 !px-2 !py-1.5 hover:!text-red-600">
+        <lucide-icon [img]="icons.trash" class="w-4 h-4"></lucide-icon>
+      </button>
       }
     </div>
 
+    <!-- Order type & customer -->
+    <div class="px-4 py-2 border-b border-ez-border space-y-2 shrink-0">
+      <div class="flex items-center gap-1">
+        @for (type of orderTypes; track type) {
+        <button (click)="setOrderType(type)"
+          class="px-2 py-1 text-ez-xs font-medium border rounded transition-colors duration-ez"
+          [class]="details.orderType === type ? 'bg-ez-primary-tint text-ez-primary border-ez-primary' : 'text-ez-secondary border-ez-border hover:border-ez-subtle'">
+          {{ label(type) }}
+        </button>
+        }
+        <button (click)="detailsOpen = !detailsOpen" title="Customer & table"
+          class="ml-auto p-1.5 outline-none" [class]="detailsOpen || details.customerName || details.customerPhone || details.tableLabel ? 'text-ez-primary' : 'text-ez-muted hover:text-ez-heading'">
+          <lucide-icon [img]="icons.user" class="w-4 h-4"></lucide-icon>
+        </button>
+      </div>
+      @if (detailsOpen) {
+      <div class="grid grid-cols-2 gap-2">
+        <input type="text" [(ngModel)]="details.customerName" (change)="saveDetails()" placeholder="Customer name" class="ez-input ez-input--default !py-1.5">
+        <input type="tel" [(ngModel)]="details.customerPhone" (change)="saveDetails()" placeholder="Phone" class="ez-input ez-input--default !py-1.5">
+        @if (details.orderType === 'DINE_IN') {
+        <input type="text" [(ngModel)]="details.tableLabel" (change)="saveDetails()" placeholder="Table, e.g. T4" class="ez-input ez-input--default !py-1.5 col-span-2">
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Lines -->
     <div class="flex-1 overflow-y-auto">
-      @for (line of cart; track line.item.id) {
-      <div class="px-5 py-3 border-b border-ez-border flex items-center gap-3">
-        <div class="flex-1 min-w-0">
-          <p class="text-ez-base font-medium text-ez-heading truncate">{{ line.item.name }}</p>
-          <p class="text-ez-xs text-ez-muted">{{ line.item.sellingPrice | currency:'INR' }} each</p>
-        </div>
-        <div class="flex items-center border border-ez-border">
+      @for (line of order?.lines ?? []; track line.uuid) {
+      <div class="px-4 py-3 border-b border-ez-border flex items-start gap-3">
+        <button (click)="openLineEditor(line)" class="flex-1 min-w-0 text-left outline-none group">
+          <p class="text-ez-base font-medium text-ez-heading truncate group-hover:text-ez-primary">
+            {{ line.itemName }}{{ line.variantName ? ' (' + line.variantName + ')' : '' }}
+          </p>
+          @if (line.addons.length) { <p class="text-ez-xs text-ez-secondary truncate">+ {{ addonText(line) }}</p> }
+          @if (line.notes) { <p class="text-ez-xs text-ez-muted italic truncate">{{ line.notes }}</p> }
+          <p class="text-ez-xs text-ez-muted">
+            {{ line.unitPrice + line.addonsUnitPrice | currency:'INR' }} each
+            @if (line.discountAmount) { <span class="text-green-700">· -{{ line.discountAmount | currency:'INR' }}</span> }
+          </p>
+        </button>
+        @if (order?.status === 'OPEN') {
+        <div class="flex items-center border border-ez-border shrink-0">
           <button (click)="changeQty(line, -1)" class="p-1.5 text-ez-secondary hover:text-ez-heading">
             <lucide-icon [img]="icons.minus" class="w-3.5 h-3.5"></lucide-icon>
           </button>
-          <span class="w-8 text-center text-ez-sm font-medium">{{ line.quantity }}</span>
+          <span class="min-w-8 px-1 text-center text-ez-sm font-medium">{{ line.quantity | number:'1.0-3' }}</span>
           <button (click)="changeQty(line, 1)" class="p-1.5 text-ez-secondary hover:text-ez-heading">
             <lucide-icon [img]="icons.plus" class="w-3.5 h-3.5"></lucide-icon>
           </button>
         </div>
-        <span class="w-20 text-right text-ez-base font-medium text-ez-heading">{{ lineTotal(line) | currency:'INR' }}</span>
-        <button (click)="removeLine(line)" class="text-ez-muted hover:text-red-500">
-          <lucide-icon [img]="icons.trash" class="w-4 h-4"></lucide-icon>
-        </button>
+        } @else {
+        <span class="text-ez-sm text-ez-secondary">×{{ line.quantity | number:'1.0-3' }}</span>
+        }
+        <span class="w-20 text-right text-ez-base font-medium text-ez-heading shrink-0">{{ line.totalAmount | currency:'INR' }}</span>
       </div>
       } @empty {
-      <p class="px-5 py-10 text-center text-ez-sm text-ez-muted">Tap an item to add it to the sale.</p>
+      <p class="px-5 py-10 text-center text-ez-sm text-ez-muted">Tap an item or scan a barcode to start a sale.</p>
       }
     </div>
 
-    <div class="border-t border-ez-border p-5 space-y-2 bg-ez-ash">
+    <!-- Totals & payment -->
+    @if (order && order.lines.length) {
+    <div class="border-t border-ez-border p-4 space-y-1.5 bg-ez-ash shrink-0">
       <div class="flex justify-between text-ez-sm text-ez-secondary">
-        <span>Subtotal</span><span>{{ subTotal | currency:'INR' }}</span>
-      </div>
-      <div class="flex justify-between text-ez-sm text-ez-secondary">
-        <span>Tax</span><span>{{ taxTotal | currency:'INR' }}</span>
+        <span>Subtotal</span><span>{{ order.subTotal | currency:'INR' }}</span>
       </div>
       <div class="flex justify-between items-center text-ez-sm text-ez-secondary">
-        <label for="discount">Discount</label>
-        <input id="discount" type="number" min="0" [(ngModel)]="discount" class="ez-input w-24 text-right py-1">
+        @if (order.status === 'OPEN') {
+        <button (click)="openDiscount()" class="flex items-center gap-1 text-ez-primary hover:underline">
+          <lucide-icon [img]="icons.discount" class="w-3.5 h-3.5"></lucide-icon>
+          {{ order.discountType ? 'Discount' + (order.discountType === 'PERCENT' ? ' ' + order.discountValue + '%' : '') : 'Add discount' }}
+        </button>
+        } @else { <span>Discount</span> }
+        <span>{{ order.discountAmount ? '-' : '' }}{{ order.discountAmount | currency:'INR' }}</span>
       </div>
+      @if (discountOpen) {
+      <div class="bg-ez-white border border-ez-border p-3 space-y-2">
+        <div class="flex gap-2">
+          <select [(ngModel)]="discountForm.type" class="ez-select !py-1.5 w-20">
+            <option value="PERCENT">%</option>
+            <option value="FLAT">₹</option>
+          </select>
+          <input type="number" min="0" step="0.01" [(ngModel)]="discountForm.value" (keydown.enter)="applyDiscount()" placeholder="Value" class="ez-input ez-input--default !py-1.5 flex-1 min-w-0">
+        </div>
+        <input type="text" [(ngModel)]="discountForm.reason" placeholder="Reason (optional)" class="ez-input ez-input--default !py-1.5 w-full">
+        <div class="flex gap-2 justify-end">
+          @if (order.discountType) { <button (click)="removeDiscount()" class="text-ez-sm text-red-600 hover:underline mr-auto">Remove</button> }
+          <button (click)="discountOpen = false" class="ez-btn ez-btn-secondary !min-h-0 !py-1.5">Close</button>
+          <button (click)="applyDiscount()" [disabled]="!discountForm.value" class="ez-btn ez-btn-primary !min-h-0 !py-1.5">Apply</button>
+        </div>
+      </div>
+      }
+      <div class="flex justify-between text-ez-sm text-ez-secondary">
+        <span>Tax</span><span>{{ order.taxAmount | currency:'INR' }}</span>
+      </div>
+      @if (order.roundOffAmount) {
+      <div class="flex justify-between text-ez-sm text-ez-secondary">
+        <span>Round off</span><span>{{ order.roundOffAmount | currency:'INR' }}</span>
+      </div>
+      }
       <div class="flex justify-between text-ez-xl font-medium text-ez-heading pt-2 border-t border-ez-border">
-        <span>Total</span><span>{{ grandTotal | currency:'INR' }}</span>
+        <span>Total</span><span>{{ order.grandTotal | currency:'INR' }}</span>
       </div>
+      @if (order.paidAmount) {
+      <div class="flex justify-between text-ez-sm text-ez-secondary">
+        <span>Paid</span><span>{{ order.paidAmount | currency:'INR' }}</span>
+      </div>
+      <div class="flex justify-between text-ez-md font-medium text-amber-700">
+        <span>Due</span><span>{{ order.dueAmount | currency:'INR' }}</span>
+      </div>
+      }
 
-      <div class="grid grid-cols-3 gap-2 pt-2">
-        @for (method of paymentMethods; track method) {
-        <button (click)="paymentMethod = method"
-          class="py-2 text-ez-sm font-medium border rounded transition-colors duration-ez"
-          [class]="paymentMethod === method ? 'bg-ez-primary-tint text-ez-primary border-ez-primary' : 'bg-ez-white text-ez-body border-ez-border hover:border-ez-subtle'">
-          {{ method }}
+      @if (order.status === 'OPEN') {
+      @if (order.grandTotal === 0) {
+      <button (click)="completeZero()" [disabled]="busy" class="ez-btn ez-btn-primary w-full mt-2">Complete (nothing to pay)</button>
+      } @else {
+      <!-- Method -->
+      <div class="grid grid-cols-4 gap-2 pt-2">
+        @for (method of payMethods; track method) {
+        <button (click)="selectPayMethod(method)"
+          class="py-2 text-ez-xs font-medium border rounded transition-colors duration-ez"
+          [class]="payMethod === method ? 'bg-ez-primary-tint text-ez-primary border-ez-primary' : 'bg-ez-white text-ez-body border-ez-border hover:border-ez-subtle'">
+          {{ method }}{{ method === 'CASH' ? ' F2' : method === 'UPI' ? ' F3' : '' }}
         </button>
         }
       </div>
 
-      <button (click)="checkout()" [disabled]="!cart.length" class="ez-btn ez-btn-primary w-full mt-2">
-        Charge {{ grandTotal | currency:'INR' }}
+      @if (payMethod === 'CASH') {
+      <div class="flex gap-2 items-center">
+        <div class="flex flex-1 min-w-0 bg-white border border-ez-border focus-within:border-ez-primary">
+          <span class="flex items-center pl-3 text-ez-muted text-ez-sm">Given ₹</span>
+          <input #tenderedBox type="number" min="0" step="1" [(ngModel)]="tendered" (keydown.enter)="pay()"
+            class="flex-1 min-w-0 px-2 py-2 bg-transparent text-ez-base text-ez-heading outline-none">
+        </div>
+        @if (changePreview) { <span class="text-ez-sm text-green-700 whitespace-nowrap">Change {{ changePreview | currency:'INR' }}</span> }
+      </div>
+      <div class="flex gap-2">
+        @for (amount of cashSuggestions; track amount) {
+        <button (click)="tendered = amount" class="flex-1 py-1 text-ez-xs border border-ez-border bg-ez-white hover:border-ez-subtle">
+          {{ amount | currency:'INR':'symbol':'1.0-2' }}
+        </button>
+        }
+      </div>
+      } @else {
+      <div class="flex gap-2">
+        <div class="flex w-36 bg-white border border-ez-border focus-within:border-ez-primary">
+          <span class="flex items-center pl-3 text-ez-muted text-ez-sm">₹</span>
+          <input type="number" min="0" step="0.01" [(ngModel)]="payAmount" [max]="order.dueAmount"
+            class="flex-1 min-w-0 px-2 py-2 bg-transparent text-ez-base text-ez-heading outline-none">
+        </div>
+        <input type="text" [(ngModel)]="referenceNo" (keydown.enter)="pay()"
+          [placeholder]="payMethod === 'UPI' ? 'UTR (optional)' : 'Ref no. (optional)'" class="ez-input ez-input--default flex-1 min-w-0">
+      </div>
+      @if (payAmount && payAmount < order.dueAmount) {
+      <p class="text-ez-xs text-ez-muted">Split payment: the rest ({{ order.dueAmount - payAmount | currency:'INR' }}) can be paid another way.</p>
+      }
+      }
+
+      <button (click)="pay()" [disabled]="!canPay || busy" class="ez-btn ez-btn-primary w-full mt-1">
+        Charge {{ (payMethod === 'CASH' ? order.dueAmount : (payAmount ?? 0)) | currency:'INR' }} · {{ payMethod }}
       </button>
+      }
+      }
     </div>
+    }
   </aside>
 </div>
+
+<!-- ===================== Dialogs ===================== -->
+
+@if (optionsItem) {
+<app-item-options [item]="optionsItem" [addonGroups]="addonGroups" [preselectVariantUuid]="optionsVariantUuid"
+  (confirm)="onOptionsConfirm($event)" (cancel)="optionsItem = null"></app-item-options>
+}
+
+<!-- Line editor -->
+@if (editingLine) {
+<div class="fixed inset-0 z-40 bg-ez-carbon/60 flex items-center justify-center p-6" (click)="editingLine = null">
+  <div class="bg-ez-white w-full max-w-sm" (click)="$event.stopPropagation()">
+    <div class="h-14 px-5 flex items-center justify-between border-b border-ez-border">
+      <h2 class="text-ez-lg font-medium text-ez-heading truncate">
+        {{ editingLine.itemName }}{{ editingLine.variantName ? ' (' + editingLine.variantName + ')' : '' }}
+      </h2>
+      <button (click)="editingLine = null" class="text-ez-secondary hover:text-ez-heading outline-none">
+        <lucide-icon [img]="icons.close" class="w-5 h-5"></lucide-icon>
+      </button>
+    </div>
+    <div class="p-5 space-y-4">
+      <div>
+        <label class="ez-label">Quantity ({{ editingLine.unitOfMeasure }})</label>
+        <input type="number" min="0.001" step="any" [(ngModel)]="lineForm.quantity" class="ez-input ez-input--default w-full">
+      </div>
+      <div>
+        <label class="ez-label">Line discount</label>
+        <div class="flex gap-2">
+          <select [(ngModel)]="lineForm.discountType" class="ez-select w-24">
+            <option value="">None</option>
+            <option value="PERCENT">%</option>
+            <option value="FLAT">₹</option>
+          </select>
+          <input type="number" min="0" step="0.01" [(ngModel)]="lineForm.discountValue" [disabled]="!lineForm.discountType"
+            class="ez-input ez-input--default flex-1 min-w-0">
+        </div>
+      </div>
+      <div>
+        <label class="ez-label">Note</label>
+        <input type="text" [(ngModel)]="lineForm.notes" placeholder="e.g. less spicy" class="ez-input ez-input--default w-full">
+      </div>
+      <p class="text-ez-xs text-ez-muted">To change the size or add-ons, remove the line and add the item again.</p>
+    </div>
+    <div class="border-t border-ez-border p-4 flex gap-2">
+      <button (click)="removeLine(editingLine); editingLine = null" class="ez-btn ez-btn-secondary hover:!text-red-600">
+        <lucide-icon [img]="icons.trash" class="w-4 h-4"></lucide-icon> Remove
+      </button>
+      <button (click)="saveLine()" [disabled]="!lineForm.quantity || lineForm.quantity <= 0" class="ez-btn ez-btn-primary flex-1">Save</button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Held orders -->
+@if (heldOpen) {
+<div class="fixed inset-0 z-40 bg-ez-carbon/60 flex items-center justify-center p-6" (click)="heldOpen = false">
+  <div class="bg-ez-white w-full max-w-md max-h-[80vh] flex flex-col" (click)="$event.stopPropagation()">
+    <div class="h-14 px-5 flex items-center justify-between border-b border-ez-border shrink-0">
+      <h2 class="text-ez-lg font-medium text-ez-heading">Held orders</h2>
+      <button (click)="heldOpen = false" class="text-ez-secondary hover:text-ez-heading outline-none">
+        <lucide-icon [img]="icons.close" class="w-5 h-5"></lucide-icon>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto">
+      @for (held of heldOrders; track held.uuid) {
+      <button (click)="recall(held)" class="w-full text-left px-5 py-3 border-b border-ez-border hover:bg-ez-ash flex items-center gap-3">
+        <span class="text-ez-lg font-medium text-ez-heading w-12">#{{ held.orderNumber }}</span>
+        <span class="flex-1 min-w-0">
+          <span class="block text-ez-sm text-ez-heading truncate">
+            {{ held.customerName ?? held.customerPhone ?? label(held.orderType) }}{{ held.tableLabel ? ' · ' + held.tableLabel : '' }}
+          </span>
+          <span class="block text-ez-xs text-ez-muted">{{ held.lineCount }} items</span>
+        </span>
+        <span class="text-ez-base font-medium text-ez-heading">{{ held.grandTotal | currency:'INR' }}</span>
+      </button>
+      } @empty {
+      <p class="px-5 py-10 text-center text-ez-sm text-ez-muted">No held orders.</p>
+      }
+    </div>
+    @if (order?.lines?.length) {
+    <p class="px-5 py-3 text-ez-xs text-ez-muted border-t border-ez-border">The current sale will be held when you recall another one.</p>
+    }
+  </div>
+</div>
+}
+
+<!-- Sale completed -->
+@if (order?.status === 'COMPLETED') {
+<div class="fixed inset-0 z-40 bg-ez-carbon/60 flex items-center justify-center p-4 sm:p-6">
+  <div class="bg-ez-white w-full max-w-3xl max-h-[92vh] flex flex-col">
+    <div class="px-6 py-5 border-b border-ez-border flex items-center gap-4 shrink-0">
+      <lucide-icon [img]="icons.done" class="w-8 h-8 text-green-600"></lucide-icon>
+      <div class="flex-1">
+        <h2 class="text-ez-xl font-medium text-ez-heading">Order #{{ order!.orderNumber }} paid · {{ order!.grandTotal | currency:'INR' }}</h2>
+        @if (lastChange) {
+        <p class="text-ez-lg text-green-700 font-medium">Give change {{ lastChange | currency:'INR' }}</p>
+        }
+      </div>
+      <button (click)="resetSale()" class="ez-btn ez-btn-primary">New sale</button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-6">
+      @if (bill) {
+      <app-bill-panel [bill]="bill" [allowCancel]="false" (billChange)="bill = $event"></app-bill-panel>
+      } @else if (issuingBill) {
+      <p class="text-ez-sm text-ez-muted">Issuing bill...</p>
+      } @else if (billError) {
+      <div class="border border-red-200 bg-red-50 text-red-700 text-ez-sm px-4 py-3 flex items-center gap-3">
+        <span class="flex-1">Bill not issued: {{ billError }}</span>
+        <button (click)="issueBill()" class="ez-btn ez-btn-secondary !min-h-0 !py-1.5">Retry</button>
+      </div>
+      <p class="text-ez-xs text-ez-muted mt-2">The sale is saved. You can issue the bill later from Orders.</p>
+      }
+    </div>
+  </div>
+</div>
+}
