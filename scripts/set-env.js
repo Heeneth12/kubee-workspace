@@ -17,7 +17,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const APP = process.argv[2]; // 'kubee-app' | 'kubee-admin' | 'kubee-ehr'
+const APP = process.argv[2]; // 'kubee-app' | 'kubee-admin' | 'kubee-ehr' | 'kubee-pos'
 
 if (!APP) {
   console.error('Usage: node scripts/set-env.js <app-name>');

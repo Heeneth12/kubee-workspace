@@ -5,7 +5,7 @@ import { routes } from './app.routes';
 import { AuthInterceptor } from './layouts/interceptors/auth.interceptor';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { provideKubeeConfig } from 'kubee-ui';
-import { environment } from '../environments/environment';
+import { environment } from '../environments/environment.development';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,6 +14,7 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(NgxPermissionsModule.forRoot()),
     provideHttpClient(withInterceptorsFromDi()),
     provideKubeeConfig(environment),
+
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

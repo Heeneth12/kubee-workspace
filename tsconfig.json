@@ -51,6 +51,12 @@
     },
     {
       "path": "./projects/kubee-ehr/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/kubee-pos/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/kubee-pos/tsconfig.spec.json"
     }
   ]
 }

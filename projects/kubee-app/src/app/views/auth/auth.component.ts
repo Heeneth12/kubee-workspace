@@ -3,11 +3,16 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../layouts/guards/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, take } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import { ToastService, CommonService } from 'kubee-ui';
 import { ForgotPasswordModel, ResendOtpModel, ResetPasswordModel } from './auth.model';
 import { MarketingRequestDto, SupportCategory, SupportPriority } from '../../layouts/models/user-request.model';
+import {
+  LucideAngularModule,
+  Eye,
+  EyeOff
+} from 'lucide-angular';
 
 
 declare const google: any;
@@ -19,6 +24,7 @@ type AuthMode = 'login' | 'register' | 'booking' | 'forgot-password' | 'otp-veri
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    LucideAngularModule
   ],
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.css']
@@ -35,6 +41,12 @@ export class AuthComponent implements OnInit, OnDestroy, AfterViewInit {
   private forgotTenantId: number = 0;
   forgotEmail: string = '';
   errorMessage: string = '';
+  showPassword: boolean = false;
+
+  readonly icons = {
+    eye: Eye,
+    eyeOff: EyeOff
+  }
 
   countries = [
     { code: '+91', label: 'IN (+91)', countryName: 'India' },

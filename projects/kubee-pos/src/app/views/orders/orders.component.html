@@ -1,0 +1,96 @@
+<div class="p-6">
+  <h1 class="text-ez-2xl font-medium text-ez-heading mb-1">Orders</h1>
+  <p class="text-ez-md text-ez-secondary mb-6">Sales taken on the terminal. Open one for payments, refunds and its bill.</p>
+
+  <!-- Filters -->
+  <div class="flex flex-col xl:flex-row gap-3 mb-4">
+    <div class="relative flex-1 min-w-0">
+      <lucide-icon [img]="icons.search" class="w-4 h-4 text-ez-muted absolute left-3 top-1/2 -translate-y-1/2"></lucide-icon>
+      <input type="text" [(ngModel)]="search" (ngModelChange)="search$.next($event)"
+        placeholder="Order number, phone or name..." class="ez-input w-full pl-9">
+    </div>
+    <div class="flex flex-wrap gap-3 items-center">
+      <select [(ngModel)]="status" (ngModelChange)="applyFilters()" class="ez-select w-32">
+        <option value="">Any status</option>
+        @for (s of statuses; track s) { <option [value]="s">{{ label(s) }}</option> }
+      </select>
+      <select [(ngModel)]="paymentStatus" (ngModelChange)="applyFilters()" class="ez-select w-40">
+        <option value="">Any payment</option>
+        @for (s of paymentStatuses; track s) { <option [value]="s">{{ label(s) }}</option> }
+      </select>
+      <select [(ngModel)]="orderType" (ngModelChange)="applyFilters()" class="ez-select w-32">
+        <option value="">Any type</option>
+        @for (t of orderTypes; track t) { <option [value]="t">{{ label(t) }}</option> }
+      </select>
+      <input type="date" [(ngModel)]="from" (ngModelChange)="applyFilters()" class="ez-input w-40" title="From">
+      <input type="date" [(ngModel)]="to" (ngModelChange)="applyFilters()" class="ez-input w-40" title="To">
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="border border-ez-border overflow-x-auto">
+    <table class="w-full text-ez-base">
+      <thead class="bg-ez-ash text-left">
+        <tr>
+          <th class="px-4 py-3 ez-micro-label">Token</th>
+          <th class="px-4 py-3 ez-micro-label">Time</th>
+          <th class="px-4 py-3 ez-micro-label">Type</th>
+          <th class="px-4 py-3 ez-micro-label">Customer</th>
+          <th class="px-4 py-3 ez-micro-label">Items</th>
+          <th class="px-4 py-3 ez-micro-label">Status</th>
+          <th class="px-4 py-3 ez-micro-label">Payment</th>
+          <th class="px-4 py-3 ez-micro-label text-right">Total</th>
+          <th class="px-4 py-3 ez-micro-label text-right">Due</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (isLoading && !orders.length) {
+        <tr><td colspan="9" class="px-4 py-10 text-center text-ez-sm text-ez-muted">Loading orders...</td></tr>
+        } @else {
+        @for (order of orders; track order.uuid) {
+        <tr class="border-t border-ez-border hover:bg-ez-ash cursor-pointer" [routerLink]="order.uuid">
+          <td class="px-4 py-3 font-medium text-ez-heading">#{{ order.orderNumber }}</td>
+          <td class="px-4 py-3 text-ez-secondary">{{ order.createdAt | date:'short' }}</td>
+          <td class="px-4 py-3 text-ez-secondary">
+            {{ label(order.orderType) }}{{ order.tableLabel ? ' · ' + order.tableLabel : '' }}
+          </td>
+          <td class="px-4 py-3 text-ez-secondary">{{ order.customerName ?? order.customerPhone ?? '-' }}</td>
+          <td class="px-4 py-3 text-ez-secondary">{{ order.lineCount }}</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-0.5 text-ez-xs font-medium" [class]="orderStatusClass(order.status)">{{ label(order.status) }}</span>
+          </td>
+          <td class="px-4 py-3 text-ez-sm" [class]="paymentStatusClass(order.paymentStatus)">{{ label(order.paymentStatus) }}</td>
+          <td class="px-4 py-3 text-right font-medium text-ez-heading">{{ order.grandTotal | currency:'INR' }}</td>
+          <td class="px-4 py-3 text-right" [class]="order.dueAmount ? 'text-amber-700' : 'text-ez-muted'">
+            {{ order.dueAmount | currency:'INR' }}
+          </td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="9" class="px-4 py-12 text-center text-ez-muted">
+            <lucide-icon [img]="icons.empty" class="w-8 h-8 mx-auto mb-2"></lucide-icon>
+            <p class="text-ez-sm">No orders found</p>
+          </td>
+        </tr>
+        }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paging -->
+  @if (totalPages > 1) {
+  <div class="flex items-center justify-between mt-4 text-ez-sm text-ez-secondary">
+    <span>{{ totalElements }} orders</span>
+    <div class="flex items-center gap-3">
+      <button (click)="goToPage(page - 1)" [disabled]="page === 0 || isLoading" class="ez-btn ez-btn-secondary !min-h-0 !p-1.5">
+        <lucide-icon [img]="icons.prev" class="w-4 h-4"></lucide-icon>
+      </button>
+      <span>Page {{ page + 1 }} of {{ totalPages }}</span>
+      <button (click)="goToPage(page + 1)" [disabled]="page >= totalPages - 1 || isLoading" class="ez-btn ez-btn-secondary !min-h-0 !p-1.5">
+        <lucide-icon [img]="icons.next" class="w-4 h-4"></lucide-icon>
+      </button>
+    </div>
+  </div>
+  }
+</div>

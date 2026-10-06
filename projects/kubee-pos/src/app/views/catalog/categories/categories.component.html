@@ -1,0 +1,123 @@
+<div class="flex flex-col lg:flex-row h-full">
+
+  <!-- List -->
+  <section class="flex-1 min-w-0 p-6 overflow-y-auto">
+    <div class="flex items-center justify-between mb-4">
+      <p class="text-ez-sm text-ez-secondary">{{ categories.length }} categories · up to 2 levels</p>
+      <button (click)="openCreate()" class="ez-btn ez-btn-primary">
+        <lucide-icon [img]="icons.plus" class="w-4 h-4"></lucide-icon>
+        New category
+      </button>
+    </div>
+
+    <div class="border border-ez-border">
+      @if (isLoading && !categories.length) {
+      <p class="px-4 py-10 text-center text-ez-sm text-ez-muted">Loading categories...</p>
+      } @else {
+      @for (node of tree; track node.category.uuid) {
+      <ng-container *ngTemplateOutlet="row; context: { $implicit: node.category, child: false }"></ng-container>
+      @for (child of node.children; track child.uuid) {
+      <ng-container *ngTemplateOutlet="row; context: { $implicit: child, child: true }"></ng-container>
+      }
+      } @empty {
+      <div class="px-4 py-12 text-center text-ez-muted">
+        <lucide-icon [img]="icons.tree" class="w-8 h-8 mx-auto mb-2"></lucide-icon>
+        <p class="text-ez-sm">No categories yet</p>
+      </div>
+      }
+      }
+    </div>
+  </section>
+
+  <ng-template #row let-cat let-child="child">
+    <div class="flex items-center gap-3 px-4 py-3 border-b border-ez-border last:border-b-0"
+      [class]="editingCategory?.uuid === cat.uuid ? 'bg-ez-primary-tint' : 'hover:bg-ez-ash'">
+      @if (child) {
+      <lucide-icon [img]="icons.child" class="w-4 h-4 text-ez-muted ml-2 shrink-0"></lucide-icon>
+      }
+      <div class="flex-1 min-w-0">
+        <p class="text-ez-base font-medium text-ez-heading truncate">
+          {{ cat.name }}
+          @if (!cat.active) { <span class="ez-micro-label ml-2">Inactive</span> }
+        </p>
+        <p class="text-ez-xs text-ez-muted">{{ cat.itemCount }} {{ cat.itemCount === 1 ? 'item' : 'items' }} · order {{ cat.sortOrder }}</p>
+      </div>
+      @if (!child) {
+      <button (click)="openCreate(cat)" title="Add sub-category" class="text-ez-secondary hover:text-ez-primary outline-none">
+        <lucide-icon [img]="icons.plus" class="w-4 h-4"></lucide-icon>
+      </button>
+      }
+      <button (click)="openEdit(cat)" title="Edit" class="text-ez-secondary hover:text-ez-primary outline-none">
+        <lucide-icon [img]="icons.edit" class="w-4 h-4"></lucide-icon>
+      </button>
+      <button (click)="deleteCategory(cat)" title="Delete" class="text-ez-secondary hover:text-red-500 outline-none">
+        <lucide-icon [img]="icons.trash" class="w-4 h-4"></lucide-icon>
+      </button>
+    </div>
+  </ng-template>
+
+  <!-- Editor -->
+  @if (editing) {
+  <aside class="w-full lg:w-96 shrink-0 border-t lg:border-t-0 lg:border-l border-ez-border flex flex-col bg-ez-white">
+    <div class="h-14 px-5 flex items-center justify-between border-b border-ez-border shrink-0">
+      <h2 class="text-ez-lg font-medium text-ez-heading">{{ editingCategory ? 'Edit category' : 'New category' }}</h2>
+      <button (click)="closeEditor()" class="text-ez-secondary hover:text-ez-heading outline-none">
+        <lucide-icon [img]="icons.close" class="w-5 h-5"></lucide-icon>
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="save()" class="flex-1 overflow-y-auto p-5 space-y-5">
+      @if (formError) {
+      <div class="border border-red-200 bg-red-50 text-red-700 text-ez-sm px-4 py-3">{{ formError }}</div>
+      }
+
+      <div>
+        <label class="ez-label">Name <span class="text-red-500">*</span></label>
+        <input type="text" formControlName="name" class="ez-input ez-input--default w-full" placeholder="Maggi"
+          [class.ez-input--error]="controlError(ctrl('name'))">
+        @if (controlError(ctrl('name')); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+      </div>
+
+      <div>
+        <label class="ez-label">Parent category</label>
+        <select formControlName="parentUuid" class="ez-select w-full">
+          <option value="">None (top level)</option>
+          @for (parent of parentOptions; track parent.uuid) {
+          <option [value]="parent.uuid">{{ parent.name }}</option>
+          }
+        </select>
+        @if (editingCategory && !parentOptions.length && !editingCategory.parentUuid) {
+        <p class="text-ez-xs text-ez-muted mt-1">Has sub-categories, so it must stay top level.</p>
+        }
+        @if (controlError(ctrl('parentUuid')); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+      </div>
+
+      <div>
+        <label class="ez-label">Sort order</label>
+        <input type="number" formControlName="sortOrder" class="ez-input ez-input--default w-full">
+      </div>
+
+      <div>
+        <label class="ez-label">Image URL</label>
+        <input type="url" formControlName="imageUrl" class="ez-input ez-input--default w-full" placeholder="https://..."
+          [class.ez-input--error]="controlError(ctrl('imageUrl'))">
+        @if (controlError(ctrl('imageUrl')); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+      </div>
+
+      @if (editingCategory) {
+      <label class="flex items-center gap-2 cursor-pointer text-ez-base text-ez-body">
+        <input type="checkbox" formControlName="active" style="accent-color: var(--ez-color-primary);" class="w-4 h-4">
+        Active
+      </label>
+      }
+
+      <div class="flex gap-3 pt-2">
+        <button type="button" (click)="closeEditor()" class="ez-btn ez-btn-secondary flex-1">Cancel</button>
+        <button type="submit" [disabled]="isSaving" class="ez-btn ez-btn-primary flex-1">
+          {{ isSaving ? 'Saving...' : 'Save' }}
+        </button>
+      </div>
+    </form>
+  </aside>
+  }
+</div>

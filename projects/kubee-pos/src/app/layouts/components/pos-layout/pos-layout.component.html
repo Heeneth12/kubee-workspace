@@ -1,0 +1,107 @@
+<div class="flex w-full h-screen bg-ez-white text-ez-body overflow-hidden">
+
+  @if (isMobileMenuOpen) {
+  <div (click)="closeMenu()" class="fixed inset-0 bg-ez-carbon/80 z-20 lg:hidden"></div>
+  }
+
+  <!-- Sidebar -->
+  <aside class="fixed inset-y-0 left-0 z-30 bg-ez-carbon flex flex-col transition-all duration-ez lg:static" [ngClass]="{
+      'translate-x-0': isMobileMenuOpen,
+      '-translate-x-full lg:translate-x-0': !isMobileMenuOpen,
+      'w-60': !isSidebarCollapsed,
+      'w-20': isSidebarCollapsed
+    }">
+    <div class="relative h-16 flex items-center shrink-0 border-b border-white/10"
+      [ngClass]="isSidebarCollapsed ? 'justify-center px-0' : 'justify-between px-6'">
+      <a class="cursor-pointer" routerLink="/pos">
+        <div class="flex items-center gap-1">
+          <div class="w-8 h-8 flex items-center justify-center flex-shrink-0">
+            <img src="/assets/images/Kubee_logo.png" width="42" alt="Kubee">
+          </div>
+          @if (!isSidebarCollapsed) {
+          <div class="text-left" style="line-height: 1">
+            <span class="block text-ez-lg font-medium text-white leading-tight">Kubee</span>
+            <span class="block text-ez-2xs text-white/70 tracking-widest uppercase">POS</span>
+          </div>
+          }
+        </div>
+      </a>
+      <button (click)="closeMenu()" class="lg:hidden text-white/50 hover:text-white p-1 outline-none">
+        <lucide-icon [img]="XIcon" class="w-6 h-6"></lucide-icon>
+      </button>
+      <button (click)="toggleSidebarCollapse()"
+        class="hidden lg:flex absolute -right-3 top-5 z-50 items-center justify-center w-6 h-6 bg-ez-white border border-ez-border rounded text-ez-secondary hover:text-ez-primary hover:border-ez-primary outline-none"
+        [ngClass]="{'rotate-180': isSidebarCollapsed}">
+        <lucide-icon [img]="ChevronLeft" class="w-3.5 h-3.5"></lucide-icon>
+      </button>
+    </div>
+
+    <nav class="flex-1 mt-4 px-3 space-y-1 overflow-y-auto overflow-x-hidden">
+      @for (item of navItems; track item.link) {
+      <a [routerLink]="item.link" (click)="closeMenu()"
+        class="group relative flex items-center p-3 text-ez-sm font-medium transition-[background-color,color] duration-ez outline-none"
+        [ngClass]="{
+          'justify-center': isSidebarCollapsed,
+          'text-white bg-white/5': isItemActive(item),
+          'text-white/60 hover:text-white hover:bg-white/5': !isItemActive(item)
+        }">
+        <lucide-icon [img]="item.icon" class="h-5 w-5 shrink-0"
+          [ngClass]="isItemActive(item) ? 'text-white' : 'text-white/40 group-hover:text-white'"></lucide-icon>
+        @if (!isSidebarCollapsed) {
+        <span class="ml-3 truncate">{{ item.label }}</span>
+        }
+      </a>
+      }
+    </nav>
+
+    <div class="p-3 border-t border-white/10">
+      <button (click)="authService.logout()"
+        class="w-full flex items-center p-3 text-ez-sm font-medium text-white/60 hover:text-white hover:bg-white/5 outline-none"
+        [ngClass]="{ 'justify-center': isSidebarCollapsed }">
+        <lucide-icon [img]="LogOut" class="h-5 w-5 shrink-0"></lucide-icon>
+        @if (!isSidebarCollapsed) {
+        <span class="ml-3">Sign out</span>
+        }
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="flex-1 min-w-0 flex flex-col overflow-hidden">
+    <header class="h-16 bg-ez-white border-b border-ez-border flex items-center justify-between px-6 shrink-0">
+      <button (click)="toggleMenu()" class="lg:hidden text-ez-secondary hover:text-ez-heading outline-none">
+        <lucide-icon [img]="Menu" class="w-6 h-6"></lucide-icon>
+      </button>
+      <div class="flex-1"></div>
+      <!-- Cash-drawer shift -->
+      @if (shift !== undefined) {
+      <button (click)="shiftService.openDialog()" title="Cash drawer shift"
+        class="mr-4 flex items-center gap-2 px-3 py-1.5 border rounded text-ez-sm font-medium transition-colors duration-ez outline-none"
+        [ngClass]="shift ? 'border-green-200 bg-green-50 text-green-700 hover:border-green-400' : 'border-ez-border text-ez-secondary hover:border-ez-subtle hover:text-ez-heading'">
+        <lucide-icon [img]="Wallet" class="w-4 h-4"></lucide-icon>
+        @if (shift) {
+        <span class="hidden sm:inline">Shift open since {{ shift.openedAt | date:'h:mm a' }}</span>
+        <span class="sm:hidden">Shift</span>
+        } @else {
+        <span>Open shift</span>
+        }
+      </button>
+      }
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:flex flex-col items-end leading-tight">
+          <span class="text-ez-sm font-medium text-ez-heading capitalize">{{ user.name }}</span>
+          <span class="ez-micro-label">{{ user.role }}</span>
+        </div>
+        <div class="w-8 h-8 rounded-full bg-ez-carbon text-white flex items-center justify-center text-ez-sm font-medium">
+          {{ user.initials }}
+        </div>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto bg-ez-white">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>
+
+<app-shift-dialog></app-shift-dialog>

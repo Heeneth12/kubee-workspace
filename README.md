@@ -5,12 +5,13 @@ This repository is an Angular Monorepo that houses the entire frontend ecosystem
 
 ## Architecture
 
-The workspace is divided into four core projects:
+The workspace is divided into five core projects:
 
 1. **`kubee-app`**: The primary tenant-facing inventory management application.
 2. **`kubee-admin`**: The internal command center for global SaaS management, tenant oversight, and subscription control.
 3. **`kubee-ehr`**: The Electronic Health Record (EHR) management application tailored for specific clinical workflows.
-4. **`kubee-ui`**: The shared internal library containing our Tailwind-powered design system, standalone UI components (modals, drawers, toasts, etc.), and global assets.
+4. **`kubee-pos`**: The point-of-sale application: billing terminal (orders, payments, hold/recall), orders with refunds, GST bills (issue, print, share, cancel), cash-drawer shifts (open, cash in/out, blind count at close), reports (day sales, payment modes, item-wise, categories, busy hours, staff, GST summary, cancellations, shift history; CSV/Excel export and GSTR-1 JSON), dashboard and the catalog (items, categories, add-on groups).
+5. **`kubee-ui`**: The shared internal library containing our Tailwind-powered design system, standalone UI components (modals, drawers, toasts, etc.), and global assets.
 
 ---
 
@@ -35,6 +36,33 @@ ng serve kubee-admin --port 4201
 ng serve kubee-ehr --port 4202
 ```
 *Accessible at: [http://localhost:4202](http://localhost:4202)*
+
+**4. Start the POS Application (Port 4200)**
+```bash
+ng serve kubee-pos
+```
+*Accessible at: [http://localhost:4200](http://localhost:4200). The POS backend's CORS setup allows this origin
+(see below), so don't run kubee-app on 4200 at the same time.*
+
+### kubee-pos: backend
+
+The POS screens (terminal, orders, bills, catalog) call the **Kubee POS backend** directly at `environment.devUrl` +
+`/api/v1/...` (local: `http://localhost:8086`, set in `projects/kubee-pos/src/environments/environment.development.ts`).
+
+1. Start ezauth (`authUrl`, port `8080`) and the POS backend (port `8086`). Check with:
+   ```bash
+   lsof -nP -iTCP:8086 -sTCP:LISTEN
+   ```
+2. Serve the app on a port the backend's CORS config allows (`SecurityConfig.corsConfigurationSource`, currently
+   `http://localhost:4200`): `ng serve kubee-pos`. Don't run kubee-app on 4200 at the same time.
+3. Sign in. On login **and on every reload**, `AuthGuard` validates the token and calls ezauth `/user/init`.
+   Every POS API call sends `Authorization: Bearer <JWT>`. The backend takes the shop (`tenantUuid`) and user
+   (`userUuid`) from the token's claims. An expired token is refreshed automatically by `AuthInterceptor`.
+4. Open [http://localhost:4200/pos](http://localhost:4200/pos).
+
+API contracts: [`catalog-api.md`](projects/kubee-pos/doc/catalog-api.md),
+[`orders-api.md`](projects/kubee-pos/doc/orders-api.md), [`billing-api.md`](projects/kubee-pos/doc/billing-api.md),
+[`reports-api.md`](projects/kubee-pos/doc/reports-api.md), [`shifts-api.md`](projects/kubee-pos/doc/shifts-api.md).
 
 ---
 
@@ -89,7 +117,16 @@ The `package.json` includes scripts that build `kubee-ui` first (required), then
 npm run build:app    # builds kubee-ui + kubee-app
 npm run build:admin  # builds kubee-ui + kubee-admin
 npm run build:ehr    # builds kubee-ui + kubee-ehr
+npm run build:pos    # builds kubee-ui + kubee-pos
 ```
+
+> The `npm run build:*` scripts first run `scripts/set-env.js`, which **overwrites** the app's environment files and
+> requires the `AUTH_URL` / `API_URL` variables (they are meant for Vercel). To check that everything compiles on your
+> machine without touching the environment files, build directly:
+>
+> ```bash
+> ng build kubee-ui && for app in kubee-app kubee-admin kubee-ehr kubee-pos; do ng build $app || break; done
+> ```
 
 Build output is written to `dist/<app-name>/browser/`.
 
@@ -97,17 +134,18 @@ Build output is written to `dist/<app-name>/browser/`.
 
 ## Deploying to Vercel
 
-This monorepo is deployed as **three separate Vercel projects**, each pointing at the same GitHub repository but building a different app. The shared `kubee-ui` library is compiled automatically as part of each app's build script.
+This monorepo is deployed as **separate Vercel projects** (one per app), each pointing at the same GitHub repository but building a different app. The shared `kubee-ui` library is compiled automatically as part of each app's build script.
 
 | Application | Vercel Project | Domain | Build Script | Output Directory |
 |---|---|---|---|---|
 | `kubee-app` | kubee-app | `app.kubee.in` | `npm run build:app` | `dist/kubee-app/browser` |
 | `kubee-admin` | kubee-admin | `ops.kubee.in` | `npm run build:admin` | `dist/kubee-admin/browser` |
 | `kubee-ehr` | kubee-ehr | *(your domain)* | `npm run build:ehr` | `dist/kubee-ehr/browser` |
+| `kubee-pos` | kubee-pos | *(your domain)* | `npm run build:pos` | `dist/kubee-pos/browser` |
 
 ### Step 1 — Create a Vercel Project for Each App
 
-Repeat the following steps once for each of the three applications.
+Repeat the following steps once for each application.
 
 1. Go to [vercel.com](https://vercel.com) and click **Add New Project**.
 2. Import this GitHub repository.
@@ -195,6 +233,17 @@ This file is picked up automatically by all three Vercel projects since they sha
 ---
 
 ## Common Issues
+
+**kubee-pos: `net::ERR_CONNECTION_REFUSED` on `localhost:8086/api/...`**
+The POS backend is not running, or runs on a different port than `devUrl` in the environment file. Start it or fix `devUrl`.
+
+**kubee-pos: "blocked by CORS policy" in the browser console**
+The app's origin or the HTTP method isn't allowed by the POS backend (`SecurityConfig.corsConfigurationSource`).
+Serve the app on an allowed origin, and make sure `PATCH` is in the allowed methods (used to change order lines and
+the catalog's available / favourite toggles).
+
+**kubee-pos API calls return `401` / `403`**
+The request had no valid ezauth token, or the token has no `tenantUuid` claim. Sign out and back in.
 
 **Build fails with "Cannot find module 'kubee-ui'"**
 Run `ng build kubee-ui` first, or use the `npm run build:*` scripts which do this automatically.

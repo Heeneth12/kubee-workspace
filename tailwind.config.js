@@ -4,7 +4,8 @@ module.exports = {
     "./projects/kubee-app/**/*.{html,ts}",
     "./projects/kubee-admin/**/*.{html,ts}",
     "./projects/kubee-ui/**/*.{html,ts}",
-    "./projects/kubee-ehr/**/*.{html,ts}"
+    "./projects/kubee-ehr/**/*.{html,ts}",
+    "./projects/kubee-pos/**/*.{html,ts}"
   ],
   theme: {
     extend: {},
