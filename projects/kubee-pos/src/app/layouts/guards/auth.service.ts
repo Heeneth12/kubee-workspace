@@ -6,6 +6,8 @@ import { NgxPermissionsService } from 'ngx-permissions';
 import { BannerLoaderService } from '../components/banner-loader/banner-loader.service';
 import { ShiftService } from '../../views/shifts/shift.service';
 import { StaffDirectoryService } from '../../views/shared/staff-directory.service';
+import { ForgotPasswordModel, ResendOtpModel, ResetPasswordModel } from '../../views/auth/auth.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -62,6 +64,40 @@ export class AuthService {
         (err: any) => { observer.error(err); }
       );
     });
+  }
+
+  loginWithGoogle(idToken: string, success: (res: any) => void, error: (err: any) => void) {
+    const payload = { idToken, appKey: environment.appKey };
+    this.commonService.signInWithGoogle(payload,
+      (res: any) => {
+        localStorage.setItem('access_token', res.data.accessToken);
+        localStorage.setItem('refresh_token', res.data.refreshToken);
+
+        this.fetchUserInit().subscribe({
+          next: () => {
+            // Navigate to root - RedirectGuard will route to the POS terminal
+            this.router.navigate(['/']).then(() => success(res));
+          },
+          error: (err) => {
+            this.logout();
+            error(err);
+          }
+        });
+      },
+      (err: any) => error(err)
+    );
+  }
+
+  forgotPassword(payload: ForgotPasswordModel, success: (res: any) => void, error: (err: any) => void) {
+    this.commonService.forgotPassword(payload, success, error);
+  }
+
+  resendOtp(payload: ResendOtpModel, success: (res: any) => void, error: (err: any) => void) {
+    this.commonService.resendOtp(payload, success, error);
+  }
+
+  resetPassword(payload: ResetPasswordModel, success: (res: any) => void, error: (err: any) => void) {
+    this.commonService.resetPassword(payload, success, error);
   }
 
   public loadPermissionsIntoStore(user: UserInitResponse) {
