@@ -1,7 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { ShiftView } from './shifts.models';
 import { label } from '../orders/order-utils';
+import { StaffDirectoryService } from '../shared/staff-directory.service';
 
 /**
  * The cash tally of a shift: opening + cash sales + cash in − cash out = expected; counted − expected = difference.
@@ -92,14 +93,18 @@ import { label } from '../orders/order-utils';
     </div>
   `
 })
-export class ShiftSummaryComponent {
+export class ShiftSummaryComponent implements OnInit {
+  private staff = inject(StaffDirectoryService);
   @Input({ required: true }) shift!: ShiftView;
   @Input() showExpected = true;
   readonly label = label;
 
+  ngOnInit() {
+    this.staff.ensureLoaded();
+  }
+
   who(userUuid: string | null): string {
-    if (!userUuid) return '-';
-    return userUuid === sessionStorage.getItem('currentUserUuid') ? 'you' : userUuid.slice(0, 8);
+    return this.staff.name(userUuid);
   }
 
   differenceLabel(diff: number | null): string {

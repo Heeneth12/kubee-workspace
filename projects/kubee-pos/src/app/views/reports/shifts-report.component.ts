@@ -53,7 +53,7 @@ import { ReportsService } from './reports.service';
                 @if (row.closedAt) { {{ row.closedAt | date:'h:mm a' }} }
                 @else { <span class="px-2 py-0.5 text-ez-xs font-medium bg-blue-50 text-blue-700">Open</span> }
               </td>
-              <td class="px-4 py-2.5 text-ez-secondary font-mono text-ez-xs">{{ who(row.closedBy ?? row.openedBy) }}</td>
+              <td class="px-4 py-2.5 text-ez-secondary">{{ who(row.closedBy ?? row.openedBy) }}</td>
               <td class="px-4 py-2.5 text-right text-ez-secondary">{{ row.openingCash | currency:'INR' }}</td>
               <td class="px-4 py-2.5 text-right text-ez-secondary">{{ row.cashSales | currency:'INR' }}</td>
               <td class="px-4 py-2.5 text-right text-ez-secondary">+{{ row.cashIn | currency:'INR' }} / -{{ row.cashOut | currency:'INR' }}</td>

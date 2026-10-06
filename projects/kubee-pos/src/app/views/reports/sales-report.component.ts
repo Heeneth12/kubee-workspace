@@ -1,14 +1,14 @@
 import { Component, inject } from '@angular/core';
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { CurrencyPipe, DatePipe, formatCurrency, formatDate } from '@angular/common';
 import { ReportPage } from './report-page';
 import { ReportPeriod, SalesSummaryReport } from './reports.models';
 import { ReportsService } from './reports.service';
-import { DailySalesChartComponent } from './daily-sales-chart.component';
+import { ColumnChartComponent, ColumnPoint } from './column-chart.component';
 
 @Component({
   selector: 'app-sales-report',
   standalone: true,
-  imports: [CurrencyPipe, DatePipe, DailySalesChartComponent],
+  imports: [CurrencyPipe, DatePipe, ColumnChartComponent],
   template: `
     <div class="p-6 space-y-8">
       @if (error) {
@@ -69,7 +69,7 @@ import { DailySalesChartComponent } from './daily-sales-chart.component';
       <section>
         <h2 class="text-ez-lg font-medium text-ez-heading mb-1">Net sales per day</h2>
         <p class="text-ez-xs text-ez-muted mb-4">Hover a day for its total. Days without sales are left empty.</p>
-        <app-daily-sales-chart [days]="r.days" [from]="r.from" [to]="r.to"></app-daily-sales-chart>
+        <app-column-chart [points]="dailyPoints(r)" [axisLabels]="dailyAxis(r)" ariaLabel="Net sales per day"></app-column-chart>
       </section>
       }
 
@@ -110,7 +110,43 @@ import { DailySalesChartComponent } from './daily-sales-chart.component';
 export class SalesReportComponent extends ReportPage<SalesSummaryReport> {
   private reports = inject(ReportsService);
 
+  private chartFor: SalesSummaryReport | null = null;
+  private chartPoints: ColumnPoint[] = [];
+
   protected fetch(period: ReportPeriod) {
     return this.reports.salesSummary(period);
+  }
+
+  /** One column per calendar day; the API only returns days that had sales. Cached per report. */
+  dailyPoints(report: SalesSummaryReport): ColumnPoint[] {
+    if (this.chartFor === report) return this.chartPoints;
+    const byDate = new Map(report.days.map(d => [d.date, d]));
+    const points: ColumnPoint[] = [];
+    const cursor = new Date(report.from + 'T00:00:00');
+    const end = new Date(report.to + 'T00:00:00');
+    while (cursor <= end) {
+      const key = formatDate(cursor, 'yyyy-MM-dd', 'en-US');
+      const day = byDate.get(key);
+      const orders = day?.orders ?? 0;
+      points.push({
+        key,
+        value: day?.netSales ?? 0,
+        tooltip: [
+          formatDate(cursor, 'EEE d MMM', 'en-US'),
+          `${formatCurrency(day?.netSales ?? 0, 'en-US', '₹', 'INR')} · ${orders} ${orders === 1 ? 'order' : 'orders'}`,
+        ],
+      });
+      cursor.setDate(cursor.getDate() + 1);
+    }
+    this.chartFor = report;
+    this.chartPoints = points;
+    return points;
+  }
+
+  dailyAxis(report: SalesSummaryReport): string[] {
+    const points = this.dailyPoints(report);
+    const label = (p?: ColumnPoint) => p ? formatDate(p.key + 'T00:00:00', 'd MMM', 'en-US') : '';
+    if (points.length < 3) return points.map(p => label(p));
+    return [label(points[0]), label(points[Math.floor((points.length - 1) / 2)]), label(points[points.length - 1])];
   }
 }

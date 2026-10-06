@@ -104,3 +104,42 @@ export interface ShiftReport {
   totalExcess: number;            // sum of positive differences
   shifts: ShiftReportRow[];
 }
+
+// ---- Not in reports-api.md yet; shapes from the backend records (CategorySalesReport, HourlySalesReport, StaffSalesReport). ----
+
+/** GET /reports/categories: item-wise sales rolled up to each item's current category (null uuid = uncategorised). */
+export interface CategorySalesRow {
+  categoryUuid: string | null;
+  categoryName: string | null;
+  parentCategoryName: string | null;
+  quantity: number;
+  orderCount: number;
+  grossAmount: number; discountAmount: number; taxableAmount: number; taxAmount: number;
+  netAmount: number;
+  shareOfSales: number;           // % of totalNetAmount
+}
+export interface CategorySalesReport { from: string; to: string; totalNetAmount: number; categories: CategorySalesRow[]; }
+
+/** GET /reports/hourly: completed orders per hour of day (all 24 rows), summed over the period. */
+export interface HourlySalesReport {
+  from: string; to: string;
+  hours: { hour: number; orders: number; netSales: number; averageOrderValue: number }[];
+}
+
+/** GET /reports/staff: per ezauth user, orders completed, money received / refunded and cancellations. */
+export interface StaffSalesRow {
+  userUuid: string | null;
+  completedOrders: number;
+  netSales: number;
+  discountAmount: number;
+  paymentCount: number; paymentAmount: number;
+  refundCount: number; refundAmount: number;
+  cancelledOrders: number;
+  cancelledBills: number;
+}
+export interface StaffSalesReport { from: string; to: string; staff: StaffSalesRow[]; }
+
+/** Report names accepted by GET /reports/{report}/export. */
+export type ExportableReport = 'sales-summary' | 'payment-modes' | 'items' | 'categories' | 'hourly' | 'staff'
+  | 'gst' | 'cancellations' | 'shifts';
+export type ExportFormat = 'csv' | 'xlsx';

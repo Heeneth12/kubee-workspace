@@ -6,6 +6,7 @@ import { Observable, Subject, catchError, combineLatest, distinctUntilChanged, m
 import { ReportPeriod } from './reports.models';
 import { isoDate } from '../orders/order-utils';
 import { readApiError } from '../catalog/catalog-errors';
+import { StaffDirectoryService } from '../shared/staff-directory.service';
 
 export const MAX_REPORT_DAYS = 366;
 
@@ -37,6 +38,7 @@ export abstract class ReportPage<T> implements OnInit {
   protected route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
   private reload$ = new Subject<void>();
+  protected staff = inject(StaffDirectoryService);
 
   period: ReportPeriod = readPeriod(this.route.snapshot.queryParamMap);
   data: T | null = null;
@@ -46,6 +48,7 @@ export abstract class ReportPage<T> implements OnInit {
   protected abstract fetch(period: ReportPeriod): Observable<T>;
 
   ngOnInit() {
+    this.staff.ensureLoaded();
     const period$ = this.route.queryParamMap.pipe(
       map(readPeriod),
       distinctUntilChanged((a, b) => a.from === b.from && a.to === b.to),
@@ -79,9 +82,8 @@ export abstract class ReportPage<T> implements OnInit {
     this.reload$.next();
   }
 
-  /** A user uuid shown as "You" for the signed-in user, else shortened. */
+  /** "You", the staff member's name, or a short id. */
   who(userUuid: string | null): string {
-    if (!userUuid) return '-';
-    return userUuid === sessionStorage.getItem('currentUserUuid') ? 'You' : userUuid.slice(0, 8);
+    return this.staff.name(userUuid);
   }
 }

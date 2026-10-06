@@ -23,6 +23,21 @@ export const ReportsRoutes: Routes = [
                     .then(c => c.ItemsReportComponent)
             },
             {
+                path: 'categories',
+                loadComponent: () => import('./categories-report.component')
+                    .then(c => c.CategoriesReportComponent)
+            },
+            {
+                path: 'hourly',
+                loadComponent: () => import('./hourly-report.component')
+                    .then(c => c.HourlyReportComponent)
+            },
+            {
+                path: 'staff',
+                loadComponent: () => import('./staff-report.component')
+                    .then(c => c.StaffReportComponent)
+            },
+            {
                 path: 'gst',
                 loadComponent: () => import('./gst-report.component')
                     .then(c => c.GstReportComponent)

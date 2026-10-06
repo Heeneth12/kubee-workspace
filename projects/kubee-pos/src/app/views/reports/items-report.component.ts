@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ReportPage } from './report-page';
 import { ItemSalesReport, ItemSalesSort, ReportPeriod } from './reports.models';
 import { ReportsService } from './reports.service';
@@ -14,7 +15,7 @@ import { Category } from '../catalog/catalog.models';
   template: `
     <div class="p-6 space-y-4">
       <div class="flex flex-wrap items-center gap-3">
-        <select [(ngModel)]="categoryUuid" (ngModelChange)="reload()" class="ez-select w-52">
+        <select [ngModel]="categoryUuid" (ngModelChange)="setFilter({ categoryUuid: $event || null })" class="ez-select w-52">
           <option value="">All categories</option>
           @for (cat of categories; track cat.uuid) {
           <option [value]="cat.uuid">{{ categoryLabel(cat) }}</option>
@@ -22,7 +23,7 @@ import { Category } from '../catalog/catalog.models';
         </select>
         <div class="flex border border-ez-border">
           @for (option of sortOptions; track option.value) {
-          <button (click)="sort = option.value; reload()"
+          <button (click)="setFilter({ sort: option.value === 'AMOUNT' ? null : option.value })"
             class="px-3 py-2 text-ez-sm font-medium transition-colors duration-ez"
             [class]="sort === option.value ? 'bg-ez-carbon text-white' : 'bg-ez-white text-ez-body hover:text-ez-heading'">
             {{ option.label }}
@@ -103,15 +104,37 @@ export class ItemsReportComponent extends ReportPage<ItemSalesReport> implements
     { value: 'QUANTITY', label: 'By quantity' },
   ];
   categories: Category[] = [];
+  private router = inject(Router);
+
+  // Kept in the URL (?categoryUuid=&sort=) so the header's export uses the same filters
   categoryUuid = '';
   sort: ItemSalesSort = 'AMOUNT';
 
   override ngOnInit() {
+    this.readFilters();
     super.ngOnInit();
+    this.route.queryParamMap.subscribe(() => {
+      if (this.readFilters()) this.reload();
+    });
     this.catalogService.listCategories().subscribe({
       next: categories => this.categories = categories,
       error: () => { /* filter stays empty */ }
     });
+  }
+
+  /** Reads the filters from the URL; true when they changed. */
+  private readFilters(): boolean {
+    const q = this.route.snapshot.queryParamMap;
+    const categoryUuid = q.get('categoryUuid') ?? '';
+    const sort = (q.get('sort') as ItemSalesSort) || 'AMOUNT';
+    const changed = categoryUuid !== this.categoryUuid || sort !== this.sort;
+    this.categoryUuid = categoryUuid;
+    this.sort = sort;
+    return changed;
+  }
+
+  setFilter(filter: { categoryUuid?: string | null; sort?: ItemSalesSort | null }) {
+    this.router.navigate([], { relativeTo: this.route, queryParams: filter, queryParamsHandling: 'merge' });
   }
 
   protected fetch(period: ReportPeriod) {

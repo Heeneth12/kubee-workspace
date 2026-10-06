@@ -1,18 +1,35 @@
 import { Component, inject } from '@angular/core';
 import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
-import { LucideAngularModule, TriangleAlert } from 'lucide-angular';
+import { ToastService } from 'kubee-ui';
+import { LucideAngularModule, TriangleAlert, FileJson } from 'lucide-angular';
 import { ReportPage } from './report-page';
 import { GstReport, ReportPeriod } from './reports.models';
 import { ReportsService } from './reports.service';
+import { readBlobError, saveFile } from './download';
 
 /** GSTR-1 style summary for the shop's CA, from issued bills only. */
 @Component({
   selector: 'app-gst-report',
   standalone: true,
-  imports: [CurrencyPipe, DatePipe, DecimalPipe, RouterModule, LucideAngularModule],
+  imports: [FormsModule, CurrencyPipe, DatePipe, DecimalPipe, RouterModule, LucideAngularModule],
   template: `
     <div class="p-6 space-y-8">
+      <!-- GSTR-1 file for the GST offline tool (monthly, independent of the period above) -->
+      <div class="border border-ez-border p-4 flex flex-wrap items-center gap-3">
+        <lucide-icon [img]="icons.json" class="w-5 h-5 text-ez-muted"></lucide-icon>
+        <div class="flex-1 min-w-48">
+          <p class="text-ez-base font-medium text-ez-heading">GSTR-1 return file</p>
+          <p class="text-ez-xs text-ez-muted">JSON for the GST offline tool / portal upload, built from the month's issued bills.</p>
+        </div>
+        <input type="month" [(ngModel)]="gstrMonth" [max]="thisMonth" class="ez-input w-44">
+        <button (click)="downloadGstr1()" [disabled]="!gstrMonth || downloading" class="ez-btn ez-btn-primary">
+          {{ downloading ? 'Preparing...' : 'Download JSON' }}
+        </button>
+      </div>
+
       @if (error) {
       <div class="border border-red-200 bg-red-50 text-red-700 text-ez-sm px-4 py-3">{{ error }}</div>
       } @else if (data; as r) {
@@ -226,13 +243,37 @@ import { ReportsService } from './reports.service';
 })
 export class GstReportComponent extends ReportPage<GstReport> {
   private reports = inject(ReportsService);
-  readonly icons = { warn: TriangleAlert };
+  private toastService = inject(ToastService);
+  readonly icons = { warn: TriangleAlert, json: FileJson };
+  readonly thisMonth = monthOf(new Date());
+  /** GSTR-1 is filed for the month just ended, so default to last month. */
+  gstrMonth = monthOf(new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1));
+  downloading = false;
 
   protected fetch(period: ReportPeriod) {
     return this.reports.gst(period);
   }
 
+  downloadGstr1() {
+    this.downloading = true;
+    this.reports.gstr1(this.gstrMonth).subscribe({
+      next: ({ json, fileName }) => {
+        this.downloading = false;
+        saveFile(new Blob([JSON.stringify(json)], { type: 'application/json' }), fileName);
+      },
+      error: async (err: HttpErrorResponse) => {
+        this.downloading = false;
+        this.toastService.show(await readBlobError(err), 'error');
+      }
+    });
+  }
+
   missingHsn(report: GstReport): boolean {
     return report.hsn.some(h => !h.hsnSacCode);
   }
+}
+
+/** yyyy-MM */
+function monthOf(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 }

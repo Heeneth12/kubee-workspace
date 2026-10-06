@@ -56,7 +56,7 @@ import { label } from '../orders/order-utils';
                   {{ row.cancelledAt | date:'short' }}
                   <div class="text-ez-xs text-ez-muted">Created {{ row.createdAt | date:'shortTime' }}</div>
                 </td>
-                <td class="px-4 py-2.5 text-ez-secondary font-mono text-ez-xs">{{ who(row.cancelledBy) }}</td>
+                <td class="px-4 py-2.5 text-ez-secondary">{{ who(row.cancelledBy) }}</td>
                 <td class="px-4 py-2.5 text-ez-secondary">{{ row.reason }}</td>
                 <td class="px-4 py-2.5 text-right tabular-nums text-ez-secondary">{{ row.lineCount }}</td>
                 <td class="px-4 py-2.5 text-right tabular-nums font-medium text-ez-heading">{{ row.orderValue | currency:'INR' }}</td>
@@ -92,7 +92,7 @@ import { label } from '../orders/order-utils';
                 <td class="px-4 py-2.5 text-ez-secondary">#{{ row.orderNumber }}</td>
                 <td class="px-4 py-2.5 text-ez-secondary">{{ row.billDate | date:'short' }}</td>
                 <td class="px-4 py-2.5 text-ez-secondary">{{ row.cancelledAt | date:'short' }}</td>
-                <td class="px-4 py-2.5 text-ez-secondary font-mono text-ez-xs">{{ who(row.cancelledBy) }}</td>
+                <td class="px-4 py-2.5 text-ez-secondary">{{ who(row.cancelledBy) }}</td>
                 <td class="px-4 py-2.5 text-ez-secondary">{{ row.reason }}</td>
                 <td class="px-4 py-2.5 text-right tabular-nums font-medium text-ez-heading">{{ row.billValue | currency:'INR' }}</td>
               </tr>
@@ -124,7 +124,7 @@ import { label } from '../orders/order-utils';
               <tr class="border-t border-ez-border hover:bg-ez-ash cursor-pointer" [routerLink]="['/orders', row.orderUuid]">
                 <td class="px-4 py-2.5 font-medium text-ez-heading">#{{ row.orderNumber }}</td>
                 <td class="px-4 py-2.5 text-ez-secondary">{{ row.refundedAt | date:'short' }}</td>
-                <td class="px-4 py-2.5 text-ez-secondary font-mono text-ez-xs">{{ who(row.refundedBy) }}</td>
+                <td class="px-4 py-2.5 text-ez-secondary">{{ who(row.refundedBy) }}</td>
                 <td class="px-4 py-2.5 text-ez-secondary">{{ label(row.method) }}</td>
                 <td class="px-4 py-2.5 text-ez-secondary">{{ row.reason ?? '-' }}</td>
                 <td class="px-4 py-2.5 text-right tabular-nums font-medium text-red-600">-{{ row.amount | currency:'INR' }}</td>
