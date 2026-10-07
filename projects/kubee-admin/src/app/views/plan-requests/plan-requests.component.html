@@ -1,0 +1,74 @@
+<div class="p-6">
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+        <div>
+            <h1 class="text-2xl font-semibold text-ez-heading">Plan Requests</h1>
+            <p class="text-sm text-ez-secondary mt-1">Tenants waiting to move to a new plan. Activate once payment is confirmed.</p>
+        </div>
+        <button (click)="load()" [disabled]="isLoading"
+            class="px-4 py-2 text-sm font-medium border border-ez-border rounded-lg bg-ez-white hover:bg-gray-50 transition-colors">
+            Refresh
+        </button>
+    </div>
+
+    <div class="bg-ez-white border border-ez-border rounded-sm shadow-sm overflow-hidden">
+        @if (isLoading && requests.length === 0) {
+        <div class="p-12 flex justify-center items-center">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-ez-primary"></div>
+        </div>
+        } @else if (requests.length === 0) {
+        <div class="p-12 text-center text-sm text-ez-secondary">
+            No pending plan requests.
+        </div>
+        } @else {
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b border-ez-border">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tenant</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Current plan</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Requested plan</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Requested</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @for (req of requests; track req.subscriptionId) {
+                    <tr class="hover:bg-gray-50 transition-colors" [class.opacity-60]="busyId === req.subscriptionId">
+                        <td class="px-6 py-4">
+                            <div class="font-medium text-ez-heading">{{ req.tenantName }}</div>
+                            <div class="text-xs text-gray-500 font-mono">{{ req.tenantCode }} · #{{ req.tenantId }}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            @if (req.currentPlan) {
+                            <div class="text-ez-heading">{{ req.currentPlan.name }}</div>
+                            <div class="text-xs text-gray-500">ends {{ req.currentPlanEndsAt | date:'mediumDate' }}</div>
+                            } @else {
+                            <span class="text-xs text-red-600">No active plan</span>
+                            }
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="font-medium text-ez-heading">{{ req.requestedPlan.name }}</div>
+                            <div class="text-xs text-gray-500">
+                                {{ req.requestedPlan.price | number:'1.2-2' }} / {{ period(req.requestedPlan) }}
+                                · {{ req.requestedPlan.maxUsers ? req.requestedPlan.maxUsers + ' users' : 'unlimited users' }}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-gray-500">{{ req.requestedAt | date:'medium' }}</td>
+                        <td class="px-6 py-4 text-right whitespace-nowrap">
+                            <button (click)="reject(req)" [disabled]="busyId !== null"
+                                class="px-3 py-1.5 text-sm font-medium text-red-600 border border-ez-border rounded-lg hover:bg-red-50 transition-colors mr-2">
+                                Reject
+                            </button>
+                            <button (click)="activate(req)" [disabled]="busyId !== null"
+                                class="px-3 py-1.5 text-sm font-medium text-white bg-ez-primary rounded-lg hover:opacity-90 transition-opacity">
+                                Activate
+                            </button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        }
+    </div>
+</div>

@@ -2,7 +2,12 @@
 
 ## Overview
 
-The `SubscriptionsComponent` provides a full-featured subscription management UI for both **regular users** and **admins**. It handles plan discovery, tenant subscription, cancellation, and admin plan creation.
+The `SubscriptionsComponent` shows the tenant's current plan, the plans of the apps the tenant uses, and any pending plan request.
+
+- **Requesting a plan** creates a `PENDING_PAYMENT` request in ezauth; the current plan keeps running until the platform activates it (kubee-admin → Plan Requests). Free plans can't be requested again.
+- **Cancelling** an active plan only turns off auto-renew; access continues until the end date. Cancelling a pending request withdraws it.
+- Only the owner (`SUPER_ADMIN`) or users with a `*_SETTINGS_EDIT` privilege see the request / withdraw / auto-renew actions (ezauth enforces the same).
+- Plans are created by the platform in kubee-admin, not here.
 
 ---
 

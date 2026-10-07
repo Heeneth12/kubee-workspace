@@ -126,6 +126,7 @@
     <!-- Pricing & tax -->
     <section class="bg-ez-ash -mx-6 px-6 py-6 border-y border-ez-border">
       <h3 class="ez-micro-label mb-4">Pricing & tax</h3>
+      @if (lockPricing) { <p class="text-ez-xs text-ez-muted -mt-2 mb-4">You don't have permission to change prices.</p> }
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5">
         @if (!variants.length && !isOpenPrice) {
         <div>
@@ -133,7 +134,7 @@
           <div class="flex bg-white border focus-within:border-ez-primary transition-[border-color] duration-ez"
             [class]="controlError(ctrl(['sellingPrice'])) ? 'border-red-300' : 'border-ez-border'">
             <span class="flex items-center pl-3 text-ez-muted text-ez-base">₹</span>
-            <input type="number" min="0" step="0.01" formControlName="sellingPrice"
+            <input type="number" min="0" step="0.01" formControlName="sellingPrice" [readOnly]="lockPricing"
               class="flex-1 min-w-0 px-3 py-2 bg-transparent text-ez-base text-ez-heading outline-none">
           </div>
           @if (controlError(ctrl(['sellingPrice'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
@@ -144,7 +145,7 @@
           <label class="ez-label">MRP</label>
           <div class="flex bg-white border border-ez-border focus-within:border-ez-primary transition-[border-color] duration-ez">
             <span class="flex items-center pl-3 text-ez-muted text-ez-base">₹</span>
-            <input type="number" min="0" step="0.01" formControlName="mrp"
+            <input type="number" min="0" step="0.01" formControlName="mrp" [readOnly]="lockPricing"
               class="flex-1 min-w-0 px-3 py-2 bg-transparent text-ez-base text-ez-heading outline-none">
           </div>
           @if (controlError(ctrl(['mrp'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
@@ -168,7 +169,7 @@
           <label class="flex items-center gap-2 text-ez-base text-ez-body"
             [class]="variants.length ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
             [title]="variants.length ? 'Open-price items cannot have variants' : ''">
-            <input type="checkbox" formControlName="openPrice" [attr.disabled]="variants.length ? true : null"
+            <input type="checkbox" formControlName="openPrice" [attr.disabled]="variants.length || lockPricing ? true : null"
               style="accent-color: var(--ez-color-primary);" class="w-4 h-4">
             Open price <span class="text-ez-xs text-ez-muted">(cashier enters price)</span>
           </label>
@@ -227,12 +228,12 @@
                 @if (controlError(ctrl(['variants', i, 'barcode'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
               </td>
               <td class="px-3 py-2 min-w-24">
-                <input type="number" min="0" step="0.01" formControlName="sellingPrice" class="ez-input ez-input--default w-full"
+                <input type="number" min="0" step="0.01" formControlName="sellingPrice" [readOnly]="lockPricing" class="ez-input ez-input--default w-full"
                   [class.ez-input--error]="controlError(ctrl(['variants', i, 'sellingPrice']))">
                 @if (controlError(ctrl(['variants', i, 'sellingPrice'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
               </td>
               <td class="px-3 py-2 min-w-24">
-                <input type="number" min="0" step="0.01" formControlName="mrp" class="ez-input ez-input--default w-full"
+                <input type="number" min="0" step="0.01" formControlName="mrp" [readOnly]="lockPricing" class="ez-input ez-input--default w-full"
                   [class.ez-input--error]="controlError(ctrl(['variants', i, 'mrp']))">
                 @if (controlError(ctrl(['variants', i, 'mrp'])); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
               </td>

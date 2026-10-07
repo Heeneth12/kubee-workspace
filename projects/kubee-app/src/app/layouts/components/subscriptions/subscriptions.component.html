@@ -102,11 +102,11 @@
                 {{ currentSubscription()!.autoRenew ? 'On' : 'Off' }}
               </span>
             </div>
-            @if (currentSubscription()!.status === 'ACTIVE') {
+            @if (canManage() && currentSubscription()!.status === 'ACTIVE' && currentSubscription()!.autoRenew) {
             <button (click)="openCancelModal()"
               class="w-full py-2 flex items-center justify-center gap-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors duration-ez text-ez-sm font-medium outline-none">
               <lucide-icon [img]="BanIcon" class="w-4 h-4"></lucide-icon>
-              Cancel plan
+              Turn off auto-renew
             </button>
             }
           </div>
@@ -134,12 +134,27 @@
       }
     </div>
 
+    @if (pendingRequest()) {
+    <div class="flex flex-wrap items-center justify-between gap-3 p-4 border border-amber-300 bg-amber-50">
+      <div class="flex items-start gap-3">
+        <lucide-icon [img]="ClockIcon" class="w-5 h-5 text-amber-600 shrink-0"></lucide-icon>
+        <p class="text-ez-sm text-amber-800 leading-relaxed">
+          You requested <span class="font-medium">{{ pendingRequest()!.plan.name }}</span>.
+          It will be activated once payment is confirmed. Your current plan keeps working until then.
+        </p>
+      </div>
+      @if (canManage()) {
+      <button (click)="withdrawRequest()" [disabled]="isCancelling()" class="ez-btn ez-btn-secondary">Withdraw request</button>
+      }
+    </div>
+    }
+
     <div class="bg-white border border-ez-border">
 
       <div class="px-6 py-4 border-b border-ez-border flex items-center justify-between bg-ez-ash shrink-0">
         <div>
           <h2 class="text-ez-base font-medium text-ez-heading">Available plans</h2>
-          <p class="text-ez-xs text-ez-secondary mt-0.5">Compare and subscribe to a plan that suits your team</p>
+          <p class="text-ez-xs text-ez-secondary mt-0.5">Compare plans and request an upgrade</p>
         </div>
         <button (click)="loadActivePlans()"
           class="flex items-center gap-1.5 text-ez-sm text-ez-secondary hover:text-ez-heading transition-colors duration-ez outline-none">
@@ -160,7 +175,6 @@
             <lucide-icon [img]="PackageIcon" class="w-5 h-5"></lucide-icon>
           </div>
           <p class="text-ez-base font-medium text-ez-heading mb-1">No active plans available</p>
-          <p *ngIf="isAdmin()" class="text-ez-sm text-ez-secondary">Use "Create plan" to add packages</p>
         </div>
 
         <div *ngIf="!isPlansLoading() && activePlans().length > 0"
@@ -204,11 +218,16 @@
                 <span *ngIf="plan.price > 0" class="text-ez-xs text-ez-secondary">/ {{ plan.durationDays }}d</span>
               </div>
 
-              <button (click)="openSubscribeModal(plan)" [disabled]="isCurrentPlan(plan.id)"
-                class="px-4 py-2 text-ez-sm font-medium transition-colors duration-ez outline-none"
-                [ngClass]="isCurrentPlan(plan.id) ? 'text-ez-muted cursor-not-allowed' : 'text-ez-primary hover:text-ez-primary-hover'">
-                {{ isCurrentPlan(plan.id) ? 'Active' : 'Subscribe' }}
+              @if (isCurrentPlan(plan.id)) {
+              <span class="px-4 py-2 text-ez-sm font-medium text-ez-muted">Active</span>
+              } @else if (isRequestedPlan(plan.id)) {
+              <span class="px-4 py-2 text-ez-sm font-medium text-amber-600">Requested</span>
+              } @else if (canManage() && plan.price > 0) {
+              <button (click)="openSubscribeModal(plan)"
+                class="px-4 py-2 text-ez-sm font-medium text-ez-primary hover:text-ez-primary-hover transition-colors duration-ez outline-none">
+                Request
               </button>
+              }
             </div>
 
           </div>
@@ -264,7 +283,8 @@
       <div class="flex items-start gap-3 p-4 border-l-2 border-amber-500 bg-ez-ash mb-8">
         <lucide-icon [img]="AlertTriangleIcon" class="w-5 h-5 text-amber-500 shrink-0"></lucide-icon>
         <p class="text-ez-sm text-ez-heading leading-relaxed">
-          Any existing active subscription will be replaced immediately when you confirm.
+          This sends a request. Your current plan keeps working until payment for the new one is confirmed
+          and it is activated.
         </p>
       </div>
 
@@ -281,7 +301,7 @@
           } @else {
           <lucide-icon [img]="CheckCircleIcon" class="w-4 h-4"></lucide-icon>
           }
-          Confirm subscription
+          Send request
         </button>
       </div>
     </div>
@@ -294,7 +314,7 @@
   <div class="bg-white border border-ez-border font-sans">
 
     <div class="flex items-center justify-between px-6 py-4 border-b border-ez-border bg-ez-ash shrink-0">
-      <h3 class="text-ez-base font-medium text-ez-heading">Cancel subscription</h3>
+      <h3 class="text-ez-base font-medium text-ez-heading">Turn off auto-renew</h3>
       <button (click)="closeModal()"
         class="text-ez-secondary hover:text-ez-heading transition-colors duration-ez outline-none">
         <lucide-icon [img]="XIcon" class="w-5 h-5"></lucide-icon>
@@ -303,21 +323,21 @@
 
     <div class="p-6">
       <p class="text-ez-base text-ez-body leading-relaxed mb-6">
-        Are you sure you want to cancel your <span class="font-medium text-ez-heading">{{
+        Stop renewing your <span class="font-medium text-ez-heading">{{
           currentSubscription()?.plan?.name }}</span> plan?
       </p>
 
       <div class="flex items-start gap-3 p-4 border-l-2 border-red-500 bg-ez-ash mb-8">
         <lucide-icon [img]="AlertTriangleIcon" class="w-5 h-5 text-red-500 shrink-0"></lucide-icon>
         <p class="text-ez-sm text-ez-heading leading-relaxed">
-          This cannot be undone. Access will remain until <span class="font-medium">{{ currentSubscription()?.endDate |
-            date:'dd MMM yyyy' }}</span>.
+          Everyone keeps access until <span class="font-medium">{{ currentSubscription()?.endDate |
+            date:'dd MMM yyyy' }}</span>. After that, nobody can sign in until a plan is active again.
         </p>
       </div>
 
       <div class="flex justify-end gap-3 pt-2">
         <button (click)="closeModal()" class="ez-btn ez-btn-secondary">
-          Keep plan
+          Keep renewing
         </button>
         <button (click)="confirmCancel()" [disabled]="isCancelling()"
           class="flex items-center justify-center gap-2 px-4 py-2 border border-red-500 bg-red-500 text-white hover:bg-red-600 hover:border-red-600 transition-colors duration-ez text-ez-sm font-medium rounded min-w-[140px] outline-none disabled:opacity-50">
@@ -329,7 +349,7 @@
           } @else {
           <lucide-icon [img]="BanIcon" class="w-4 h-4"></lucide-icon>
           }
-          Yes, cancel
+          Turn off
         </button>
       </div>
     </div>

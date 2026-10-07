@@ -76,7 +76,7 @@ export class UserManagementService {
     }
 
     updateUser(requestBody: any, id: number, successfn: any, errorfn: any) {
-        return this.httpService.postHttp(`${UserManagementService.USER_BASE_URL}/${id}/update`, requestBody, successfn, errorfn);
+        return this.httpService.putHttp(`${UserManagementService.USER_BASE_URL}/${id}`, requestBody, successfn, errorfn);
     }
 
     getAllUsers(page: number, size: number, filter: any, successfn: any, errorfn: any) {

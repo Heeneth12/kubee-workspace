@@ -8,6 +8,8 @@ import { LucideAngularModule, ArrowLeft, Plus, Save, Trash2 } from 'lucide-angul
 import { CatalogService } from '../catalog.service';
 import { AddonGroup, Category, FoodType, Item, ItemRequest, ItemType, ItemVariant, VariantRequest } from '../catalog.models';
 import { applyServerErrors, blankToNull, controlError, numOrNull, readApiError } from '../catalog-errors';
+import { AuthService } from '../../../layouts/guards/auth.service';
+import { PosPrivileges } from '../../../layouts/guards/pos-permissions';
 
 /** A tax group as seen on existing items. The catalog API has no tax-group list endpoint yet. */
 interface TaxGroupOption {
@@ -39,6 +41,8 @@ export class ItemFormComponent implements OnInit {
   private toastService = inject(ToastService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private authService = inject(AuthService);
+  private readonly canEditPricing = this.authService.hasPermission(PosPrivileges.CATALOG_PRICING);
 
   readonly icons = { back: ArrowLeft, plus: Plus, save: Save, trash: Trash2 };
   readonly itemTypes: ItemType[] = ['GOODS', 'SERVICE'];
@@ -86,6 +90,11 @@ export class ItemFormComponent implements OnInit {
 
   get isEdit(): boolean {
     return !!this.itemUuid;
+  }
+
+  /** Prices of existing items need the pricing privilege; new items always get a price. */
+  get lockPricing(): boolean {
+    return this.isEdit && !this.canEditPricing;
   }
 
   get isOpenPrice(): boolean {

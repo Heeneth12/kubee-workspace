@@ -13,6 +13,8 @@ import { BillingService } from '../billing/billing.service';
 import { BillView } from '../billing/billing.models';
 import { BillPanelComponent } from '../billing/bill-panel.component';
 import { blankToNull, readApiError } from '../catalog/catalog-errors';
+import { AuthService } from '../../layouts/guards/auth.service';
+import { PosPrivileges } from '../../layouts/guards/pos-permissions';
 
 interface RefundForm {
   payment: PaymentView;
@@ -33,6 +35,17 @@ export class OrderDetailComponent implements OnInit {
   private toastService = inject(ToastService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private authService = inject(AuthService);
+
+  readonly can = {
+    // Resuming opens the order in the terminal, which needs create access too
+    resume: this.authService.hasPermission(PosPrivileges.ORDERS_EDIT)
+      && this.authService.hasPermission(PosPrivileges.ORDERS_CREATE),
+    edit: this.authService.hasPermission(PosPrivileges.ORDERS_EDIT),
+    cancel: this.authService.hasPermission(PosPrivileges.ORDERS_CANCEL),
+    refund: this.authService.hasPermission(PosPrivileges.BILLS_REFUND),
+    issueBill: this.authService.hasPermission(PosPrivileges.BILLS_CREATE),
+  };
 
   readonly icons = { back: ArrowLeft, terminal: ShoppingCart, cancel: Ban, refund: Undo2, save: Save, bill: FileText };
   readonly orderTypes = ORDER_TYPES;
@@ -113,16 +126,16 @@ export class OrderDetailComponent implements OnInit {
   }
 
   get canCancel(): boolean {
-    return !!this.order && this.order.status !== 'CANCELLED' && this.order.paidAmount === 0;
+    return this.can.cancel && !!this.order && this.order.status !== 'CANCELLED' && this.order.paidAmount === 0;
   }
 
   get canResume(): boolean {
-    return !!this.order && (this.order.status === 'OPEN' || this.order.status === 'HELD');
+    return this.can.resume && !!this.order && (this.order.status === 'OPEN' || this.order.status === 'HELD');
   }
 
   /** A cancelled (or missing) bill on a completed order can be (re)issued. */
   get canIssueBill(): boolean {
-    return !!this.order && this.order.status === 'COMPLETED' && this.order.paymentStatus !== 'REFUNDED'
+    return this.can.issueBill && !!this.order && this.order.status === 'COMPLETED' && this.order.paymentStatus !== 'REFUNDED'
       && (!this.bill || this.bill.status === 'CANCELLED');
   }
 
@@ -133,6 +146,7 @@ export class OrderDetailComponent implements OnInit {
   // ---------- actions ----------
 
   saveDetails() {
+    if (!this.can.edit) return;
     const d = this.details;
     this.run(this.ordersService.updateDetails(this.order!.uuid, {
       orderType: d.orderType,
@@ -144,6 +158,7 @@ export class OrderDetailComponent implements OnInit {
   }
 
   cancelOrder() {
+    if (!this.can.cancel) return;
     this.run(this.ordersService.cancel(this.order!.uuid, this.cancelReason.trim()), 'Order cancelled', () => {
       this.cancelOpen = false;
       this.cancelReason = '';
@@ -155,10 +170,12 @@ export class OrderDetailComponent implements OnInit {
   }
 
   openRefund(payment: PaymentView) {
+    if (!this.can.refund) return;
     this.refundForm = { payment, amount: payment.refundableAmount, method: payment.method, reason: '' };
   }
 
   submitRefund() {
+    if (!this.can.refund) return;
     const f = this.refundForm!;
     this.run(this.ordersService.refund(this.order!.uuid, f.payment.uuid, {
       clientRef: newClientRef(),
@@ -184,6 +201,7 @@ export class OrderDetailComponent implements OnInit {
   }
 
   issueBill() {
+    if (!this.can.issueBill) return;
     const i = this.issue;
     this.busy = true;
     this.error = null;

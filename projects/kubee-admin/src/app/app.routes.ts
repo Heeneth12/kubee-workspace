@@ -44,6 +44,10 @@ export const routes: Routes = [
         loadChildren: () => import('./views/subscriptions/subscriptions.routes').then(m => m.subscriptionsRoutes)
       },
       {
+        path: 'plan-requests',
+        loadComponent: () => import('./views/plan-requests/plan-requests.component').then(c => c.PlanRequestsComponent)
+      },
+      {
         path: 'users',
         loadChildren: () => import('./views/users/users.routes').then(m => m.usersRoutes)
       },

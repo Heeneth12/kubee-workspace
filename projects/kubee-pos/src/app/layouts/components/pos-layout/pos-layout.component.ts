@@ -15,8 +15,12 @@ import {
   X,
   LogOut,
   Wallet,
+  Users,
+  Settings,
 } from 'lucide-angular';
 import { AuthService } from '../../guards/auth.service';
+import { AuthGuard } from '../../guards/auth.guard';
+import { PosModules, PosPrivileges } from '../../guards/pos-permissions';
 import { ShiftService } from '../../../views/shifts/shift.service';
 import { ShiftView } from '../../../views/shifts/shifts.models';
 import { SHIFT_PROMPT_DISMISSED, ShiftDialogComponent } from '../../../views/shifts/shift-dialog.component';
@@ -42,16 +46,19 @@ export class PosLayoutComponent implements OnInit, OnDestroy {
 
   user: UserProfile = { name: '', role: '', initials: '', email: '' };
 
-  navItems: NavItem[] = [
-    { label: 'Terminal', link: '/pos', icon: ShoppingCart },
-    { label: 'Orders', link: '/orders', icon: ReceiptText },
-    { label: 'Bills', link: '/bills', icon: FileText },
-    { label: 'Reports', link: '/reports', icon: ChartColumn },
-    { label: 'Catalog', link: '/catalog', icon: BookOpen },
-    { label: 'Dashboard', link: '/dashboard', icon: LayoutDashboard },
+  private readonly allNavItems: NavItem[] = [
+    { label: 'Terminal', link: '/pos', icon: ShoppingCart, moduleKey: PosModules.ORDERS, privilegeKey: PosPrivileges.ORDERS_CREATE },
+    { label: 'Orders', link: '/orders', icon: ReceiptText, moduleKey: PosModules.ORDERS },
+    { label: 'Bills', link: '/bills', icon: FileText, moduleKey: PosModules.BILLS },
+    { label: 'Reports', link: '/reports', icon: ChartColumn, moduleKey: PosModules.REPORTS },
+    { label: 'Catalog', link: '/catalog', icon: BookOpen, moduleKey: PosModules.CATALOG },
+    { label: 'Dashboard', link: '/dashboard', icon: LayoutDashboard, moduleKey: PosModules.DASHBOARD },
+    { label: 'Users', link: '/users', icon: Users, moduleKey: PosModules.USER_MGMT },
+    { label: 'Settings', link: '/settings', icon: Settings },
   ];
+  navItems: NavItem[] = [];
 
-  constructor(public authService: AuthService, public router: Router, public shiftService: ShiftService) { }
+  constructor(public authService: AuthService, private authGuard: AuthGuard, public router: Router, public shiftService: ShiftService) { }
 
   ngOnInit() {
     this.userSub = this.authService.currentUser$.subscribe(user => {
@@ -62,6 +69,11 @@ export class PosLayoutComponent implements OnInit, OnDestroy {
           initials: this.getInitials(user.fullName),
           email: user.email
         };
+        this.navItems = this.allNavItems.filter(item =>
+          (!item.moduleKey || this.authGuard.hasModuleAccess(user, item.moduleKey))
+          && (!item.privilegeKey || this.authGuard.hasPrivilege(user, item.privilegeKey)));
+      } else {
+        this.navItems = [];
       }
     });
     this.userSub.add(this.shiftService.current$.subscribe(shift => this.shift = shift));
@@ -99,6 +111,8 @@ export interface NavItem {
   label: string;
   icon: any;
   link: string;
+  moduleKey?: string;
+  privilegeKey?: string;
 }
 
 export interface UserProfile {

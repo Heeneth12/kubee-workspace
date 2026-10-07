@@ -191,6 +191,16 @@ export class IntegrationsComponent implements OnInit {
     this.integrationRequest = new IntegrationRequest();
   }
 
+  /**
+   * extraConfig is stored and returned in plaintext, so secrets stay out of it; they travel in the
+   * encrypted key fields. On edit, secret inputs start empty and a blank value keeps the saved one.
+   */
+  private publicConfig(config: object, secretFields: string[]): string {
+    const copy: Record<string, unknown> = { ...config };
+    secretFields.forEach(field => delete copy[field]);
+    return JSON.stringify(copy);
+  }
+
   // CRUD
   saveIntegration(): void {
     if (this.isRazorpayType()) {
@@ -203,7 +213,7 @@ export class IntegrationsComponent implements OnInit {
       this.integrationRequest.secondaryKey = this.razorpayConfig.keySecret;
       this.integrationRequest.webhookConfig = this.razorpayConfig.webhookSecret;
       this.integrationRequest.isTestMode = this.integrationRequest.integrationType === IntegrationType.RAZORPAY_TEST;
-      this.integrationRequest.extraConfig = JSON.stringify(this.razorpayConfig);
+      this.integrationRequest.extraConfig = this.publicConfig(this.razorpayConfig, ['keySecret', 'webhookSecret']);
 
     } else if (this.isEmailSmtpType()) {
       if (!this.emailConfig.smtpUsername?.trim()) {
@@ -214,7 +224,7 @@ export class IntegrationsComponent implements OnInit {
       this.integrationRequest.primaryKey = this.emailConfig.smtpUsername;
       this.integrationRequest.secondaryKey = this.emailConfig.smtpPassword;
       this.integrationRequest.isTestMode = this.integrationRequest.integrationType === IntegrationType.EMAIL_SMTP_TEST;
-      this.integrationRequest.extraConfig = JSON.stringify(this.emailConfig);
+      this.integrationRequest.extraConfig = this.publicConfig(this.emailConfig, ['smtpPassword']);
 
     } else if (this.isGmailType()) {
       if (!this.gmailConfig.smtpUsername?.trim()) {
@@ -224,7 +234,7 @@ export class IntegrationsComponent implements OnInit {
       this.integrationRequest.primaryKey = this.gmailConfig.smtpUsername;
       this.integrationRequest.secondaryKey = this.gmailConfig.smtpPassword;
       this.integrationRequest.isTestMode = this.integrationRequest.integrationType === IntegrationType.GMAIL_TEST;
-      this.integrationRequest.extraConfig = JSON.stringify(this.gmailConfig);
+      this.integrationRequest.extraConfig = this.publicConfig(this.gmailConfig, ['smtpPassword']);
 
     } else {
       if (!this.integrationRequest.primaryKey?.trim()) {

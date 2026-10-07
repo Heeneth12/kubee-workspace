@@ -4,10 +4,12 @@
   <section class="flex-1 min-w-0 p-6 overflow-y-auto">
     <div class="flex items-center justify-between mb-4">
       <p class="text-ez-sm text-ez-secondary">{{ categories.length }} categories · up to 2 levels</p>
+      @if (can.create) {
       <button (click)="openCreate()" class="ez-btn ez-btn-primary">
         <lucide-icon [img]="icons.plus" class="w-4 h-4"></lucide-icon>
         New category
       </button>
+      }
     </div>
 
     <div class="border border-ez-border">
@@ -43,16 +45,22 @@
         <p class="text-ez-xs text-ez-muted">{{ cat.itemCount }} {{ cat.itemCount === 1 ? 'item' : 'items' }} · order {{ cat.sortOrder }}</p>
       </div>
       @if (!child) {
+      @if (can.create) {
       <button (click)="openCreate(cat)" title="Add sub-category" class="text-ez-secondary hover:text-ez-primary outline-none">
         <lucide-icon [img]="icons.plus" class="w-4 h-4"></lucide-icon>
       </button>
       }
+      }
+      @if (can.edit) {
       <button (click)="openEdit(cat)" title="Edit" class="text-ez-secondary hover:text-ez-primary outline-none">
         <lucide-icon [img]="icons.edit" class="w-4 h-4"></lucide-icon>
       </button>
+      }
+      @if (can.delete) {
       <button (click)="deleteCategory(cat)" title="Delete" class="text-ez-secondary hover:text-red-500 outline-none">
         <lucide-icon [img]="icons.trash" class="w-4 h-4"></lucide-icon>
       </button>
+      }
     </div>
   </ng-template>
 

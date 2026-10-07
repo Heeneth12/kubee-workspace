@@ -11,6 +11,8 @@ import { ReportsService } from './reports.service';
 import { readBlobError, saveFile } from './download';
 import { periodError, readPeriod } from './report-page';
 import { isoDate } from '../orders/order-utils';
+import { AuthService } from '../../layouts/guards/auth.service';
+import { PosPrivileges } from '../../layouts/guards/pos-permissions';
 
 interface Preset {
   id: string;
@@ -55,6 +57,7 @@ function financialYearStart(): Date {
             <span class="text-ez-muted">–</span>
             <input type="date" [(ngModel)]="to" (change)="applyCustom()" [max]="today" class="ez-input w-40" title="To">
             <!-- Export the open report with the same period and filters -->
+            @if (canExport) {
             <div class="relative">
               <button (click)="exportOpen = !exportOpen" [disabled]="exporting || !!rangeError" class="ez-btn ez-btn-secondary">
                 <lucide-icon [img]="icons.download" class="w-4 h-4"></lucide-icon>
@@ -68,6 +71,7 @@ function financialYearStart(): Date {
               </div>
               }
             </div>
+            }
           </div>
         </div>
         @if (rangeError) {
@@ -94,6 +98,8 @@ export class ReportsComponent {
   private router = inject(Router);
   private reports = inject(ReportsService);
   private toastService = inject(ToastService);
+  private authService = inject(AuthService);
+  readonly canExport = this.authService.hasPermission(PosPrivileges.REPORTS_EXPORT);
 
   readonly icons = { download: Download };
   /** Tab path -> report name for GET /reports/{report}/export. */
@@ -154,6 +160,7 @@ export class ReportsComponent {
 
   /** Downloads the open tab's report as Excel or CSV. */
   exportFile(format: ExportFormat) {
+    if (!this.canExport) return;
     this.exportOpen = false;
     const tab = this.route.firstChild?.snapshot.url[0]?.path ?? 'sales';
     const report = this.exportNames[tab];

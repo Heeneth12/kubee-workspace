@@ -1,0 +1,87 @@
+<div class="p-6">
+  <div class="flex items-start justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-ez-2xl font-medium text-ez-heading mb-1">Users</h1>
+      <p class="text-ez-md text-ez-secondary">Staff who can sign in to the POS, and what each of them is allowed to do.</p>
+    </div>
+    @if (canEdit) {
+    <a routerLink="new" class="ez-btn ez-btn-primary shrink-0">
+      <lucide-icon [img]="icons.plus" class="w-4 h-4"></lucide-icon>
+      New user
+    </a>
+    }
+  </div>
+
+  <div class="relative mb-4">
+    <lucide-icon [img]="icons.search" class="w-4 h-4 text-ez-muted absolute left-3 top-1/2 -translate-y-1/2"></lucide-icon>
+    <input type="text" [(ngModel)]="search" (ngModelChange)="search$.next($event)"
+      placeholder="Name, email or phone..." class="ez-input w-full pl-9">
+  </div>
+
+  <div class="border border-ez-border overflow-x-auto">
+    <table class="w-full text-ez-base">
+      <thead class="bg-ez-ash text-left">
+        <tr>
+          <th class="px-4 py-3 ez-micro-label">Name</th>
+          <th class="px-4 py-3 ez-micro-label">Email</th>
+          <th class="px-4 py-3 ez-micro-label">Phone</th>
+          <th class="px-4 py-3 ez-micro-label">Role</th>
+          <th class="px-4 py-3 ez-micro-label">Active</th>
+          <th class="px-4 py-3 ez-micro-label text-right"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (isLoading && !users.length) {
+        <tr><td colspan="6" class="px-4 py-10 text-center text-ez-sm text-ez-muted">Loading users...</td></tr>
+        } @else {
+        @for (user of users; track user.id) {
+        <tr class="border-t border-ez-border" [class.opacity-60]="busyId === user.id">
+          <td class="px-4 py-3 font-medium text-ez-heading">{{ user.fullName }}</td>
+          <td class="px-4 py-3 text-ez-secondary">{{ user.email }}</td>
+          <td class="px-4 py-3 text-ez-secondary">{{ user.phone || '-' }}</td>
+          <td class="px-4 py-3 text-ez-secondary">{{ isSuperAdmin(user) ? 'Owner' : 'Staff' }}</td>
+          <td class="px-4 py-3">
+            <button (click)="toggleActive(user)" [disabled]="!canEdit || isSuperAdmin(user) || busyId === user.id" role="switch"
+              [attr.aria-checked]="user.isActive" [title]="isSuperAdmin(user) ? 'The owner account is always active' : ''"
+              class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-ez outline-none disabled:cursor-not-allowed"
+              [class]="user.isActive ? 'bg-ez-primary' : 'bg-ez-border'">
+              <span class="inline-block h-4 w-4 rounded-full bg-white transition-transform duration-ez"
+                [class]="user.isActive ? 'translate-x-[18px]' : 'translate-x-0.5'"></span>
+            </button>
+          </td>
+          <td class="px-4 py-3 text-right">
+            @if (canEdit && !isSuperAdmin(user)) {
+            <a [routerLink]="[user.id]" title="Edit privileges" class="text-ez-secondary hover:text-ez-primary inline-flex">
+              <lucide-icon [img]="icons.edit" class="w-4 h-4"></lucide-icon>
+            </a>
+            }
+          </td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="6" class="px-4 py-10 text-center text-ez-sm text-ez-muted">
+            <lucide-icon [img]="icons.empty" class="w-6 h-6 mx-auto mb-2"></lucide-icon>
+            No users found
+          </td>
+        </tr>
+        }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (totalPages > 1) {
+  <div class="flex items-center justify-between mt-4 text-ez-sm text-ez-secondary">
+    <span>{{ totalElements }} users</span>
+    <div class="flex items-center gap-3">
+      <button (click)="goToPage(page - 1)" [disabled]="page === 0 || isLoading" class="ez-btn ez-btn-secondary !min-h-0 !p-1.5">
+        <lucide-icon [img]="icons.prev" class="w-4 h-4"></lucide-icon>
+      </button>
+      <span>Page {{ page + 1 }} of {{ totalPages }}</span>
+      <button (click)="goToPage(page + 1)" [disabled]="page >= totalPages - 1 || isLoading" class="ez-btn ez-btn-secondary !min-h-0 !p-1.5">
+        <lucide-icon [img]="icons.next" class="w-4 h-4"></lucide-icon>
+      </button>
+    </div>
+  </div>
+  }
+</div>
