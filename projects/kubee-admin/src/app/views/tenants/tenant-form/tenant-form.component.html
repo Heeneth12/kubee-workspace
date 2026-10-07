@@ -51,14 +51,18 @@
 
                         @if (!isEditing) {
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Application Key <span
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Application <span
                                     class="text-red-500">*</span></label>
-                            <input type="text" formControlName="appKey"
-                                class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-ez-primary focus:border-transparent transition-all font-mono"
-                                [ngClass]="{'border-red-300 focus:ring-red-500': tenantForm.get('appKey')?.invalid && tenantForm.get('appKey')?.touched, 'border-gray-300': !(tenantForm.get('appKey')?.invalid && tenantForm.get('appKey')?.touched)}"
-                                placeholder="e.g. CORE_APP">
+                            <select formControlName="appKey"
+                                class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-ez-primary focus:border-transparent transition-all bg-white"
+                                [ngClass]="{'border-red-300 focus:ring-red-500': tenantForm.get('appKey')?.invalid && tenantForm.get('appKey')?.touched, 'border-gray-300': !(tenantForm.get('appKey')?.invalid && tenantForm.get('appKey')?.touched)}">
+                                <option value="" disabled>{{ isLoadingApps ? 'Loading applications...' : 'Select an application' }}</option>
+                                @for (app of applications; track app.id) {
+                                <option [value]="app.appKey">{{ app.appName }} ({{ app.appKey }})</option>
+                                }
+                            </select>
                             @if (tenantForm.get('appKey')?.invalid && tenantForm.get('appKey')?.touched) {
-                            <p class="text-red-500 text-xs mt-1">Application key is required</p>
+                            <p class="text-red-500 text-xs mt-1">Application is required</p>
                             }
                         </div>
 
@@ -70,9 +74,10 @@
                                 [ngClass]="{'border-red-300 focus:ring-red-500': tenantForm.get('businessType')?.invalid && tenantForm.get('businessType')?.touched, 'border-gray-300': !(tenantForm.get('businessType')?.invalid && tenantForm.get('businessType')?.touched)}">
                                 <option value="RETAIL">Retail</option>
                                 <option value="WHOLESALE">Wholesale</option>
-                                <option value="SERVICES">Services</option>
                                 <option value="MANUFACTURING">Manufacturing</option>
-                                <option value="OTHER">Other</option>
+                                <option value="DISTRIBUTION">Distribution</option>
+                                <option value="ECOMMERCE">E-commerce</option>
+                                <option value="SERVICE_PROVIDER">Service Provider</option>
                             </select>
                             @if (tenantForm.get('businessType')?.invalid && tenantForm.get('businessType')?.touched) {
                             <p class="text-red-500 text-xs mt-1">Business type is required</p>
