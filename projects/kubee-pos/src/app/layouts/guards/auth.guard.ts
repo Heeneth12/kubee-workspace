@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, Router, UrlTree } from '@angular/router';
+import { CanActivate, CanActivateChild, ActivatedRouteSnapshot, Router, UrlTree } from '@angular/router';
 import { AuthService } from './auth.service';
 import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { UserInitResponse } from 'kubee-ui';
 
 @Injectable({ providedIn: 'root' })
-export class AuthGuard implements CanActivate {
+export class AuthGuard implements CanActivate, CanActivateChild {
 
   constructor(
     private authService: AuthService,
@@ -46,16 +46,18 @@ export class AuthGuard implements CanActivate {
     );
   }
 
+  canActivateChild(route: ActivatedRouteSnapshot): Observable<boolean | UrlTree> {
+    return this.canActivate(route);
+  }
+
   private checkPermissions(route: ActivatedRouteSnapshot, user: UserInitResponse): boolean | UrlTree {
     const requiredModuleKey = route.data['moduleKey'] as string;
+    const requiredPrivilegeKey = route.data['privilegeKey'] as string;
 
-    if (!requiredModuleKey) {
-      return true;
-    }
+    const moduleOk = !requiredModuleKey || this.hasModuleAccess(user, requiredModuleKey);
+    const privilegeOk = !requiredPrivilegeKey || this.hasPrivilege(user, requiredPrivilegeKey);
 
-    const hasModuleAccess = this.hasModuleAccess(user, requiredModuleKey);
-
-    if (hasModuleAccess) {
+    if (moduleOk && privilegeOk) {
       return true;
     }
 
@@ -76,5 +78,13 @@ export class AuthGuard implements CanActivate {
       // Check if modulePrivileges exists and has the specific key
       return app.modulePrivileges && Object.prototype.hasOwnProperty.call(app.modulePrivileges, moduleKey);
     });
+  }
+
+  public hasPrivilege(user: UserInitResponse, privilegeKey: string): boolean {
+    return (user.userApplications || []).some((app: any) =>
+      Object.values(app.modulePrivileges || {}).some((perms: any) =>
+        Array.isArray(perms) && perms.includes(privilegeKey)
+      )
+    );
   }
 }

@@ -113,7 +113,7 @@
                   {{ p.type === 'REFUND' ? '-' : '' }}{{ p.amount | currency:'INR' }}
                 </td>
                 <td class="px-4 py-3 text-right">
-                  @if (p.type === 'PAYMENT' && (p.refundableAmount ?? 0) > 0 && order.status !== 'CANCELLED') {
+                  @if (can.refund && p.type === 'PAYMENT' && (p.refundableAmount ?? 0) > 0 && order.status !== 'CANCELLED') {
                   <button (click)="openRefund(p)" [disabled]="busy" class="text-ez-sm text-ez-primary hover:underline inline-flex items-center gap-1">
                     <lucide-icon [img]="icons.refund" class="w-3.5 h-3.5"></lucide-icon>
                     Refund
@@ -264,7 +264,7 @@
           <label class="ez-label">Notes</label>
           <textarea [(ngModel)]="details.notes" rows="2" [disabled]="order.status === 'CANCELLED'" class="ez-input ez-input--default w-full resize-y"></textarea>
         </div>
-        @if (order.status !== 'CANCELLED') {
+        @if (can.edit && order.status !== 'CANCELLED') {
         <button (click)="saveDetails()" [disabled]="busy" class="ez-btn ez-btn-secondary w-full">
           <lucide-icon [img]="icons.save" class="w-4 h-4"></lucide-icon>
           Save details

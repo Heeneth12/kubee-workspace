@@ -1,13 +1,20 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal, TemplateRef, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import {
   LucideAngularModule, Crown, Calendar, CheckCircle, XCircle,
   Clock, Users, Zap, Star, ShieldCheck, Plus, Ban, RefreshCw,
   AlertTriangle, Package, X
 } from 'lucide-angular';
 import { AuthService } from '../../guards/auth.service';
-import { ModalService, ToastService, CommonService, SubscriptionPlanModel, SubscriptionModel } from 'kubee-ui';
+import { ModalService, ToastService, CommonService, SubscriptionPlanModel, SubscriptionModel, UserInitResponse } from 'kubee-ui';
+import { HttpService } from '../../service/http-svc/http.service';
+import { environment } from '../../../../environments/environment.development';
+
+/**
+ * Plan changes are requests: ezauth keeps them pending until the platform activates them after payment.
+ * Cancelling turns off auto-renew; the plan keeps working until its end date.
+ */
 
 
 @Component({
@@ -42,54 +49,50 @@ export class SubscriptionsComponent implements OnInit {
   // State
   currentSubscription = signal<SubscriptionModel | null>(null);
   activePlans = signal<SubscriptionPlanModel[]>([]);
-  isAdmin = signal(false);
+  pendingRequest = signal<SubscriptionModel | null>(null);
+  // Mirrors ezauth: the owner, or anyone with a *_SETTINGS_EDIT privilege
+  canManage = signal(false);
   tenantId = signal<number>(0);
   isLoading = signal(false);
   isPlansLoading = signal(false);
   isSubscribing = signal(false);
   isCancelling = signal(false);
-  isCreatingPlan = signal(false);
   selectedPlan = signal<SubscriptionPlanModel | null>(null);
-
-
-  createPlanForm!: FormGroup;
-
-  readonly planTypes = ['BASIC', 'STANDARD', 'PREMIUM', 'ENTERPRISE'];
+  private tenantAppIds = new Set<number>();
 
   constructor(
     private commonSvc: CommonService,
     private authSvc: AuthService,
     private toastSvc: ToastService,
     private modalSvc: ModalService,
-    private fb: FormBuilder
+    private http: HttpService
   ) { }
 
   ngOnInit() {
     this.authSvc.currentUser$.subscribe(user => {
       if (user) {
         this.tenantId.set(user.tenantId);
-        this.isAdmin.set(
-          user.userRoles?.includes('ADMIN') ||
-          user.userRoles?.includes('SUPER_ADMIN') ||
-          user.userType === 'ADMIN'
-        );
+        this.canManage.set(this.canEditSettings(user));
         this.loadCurrentSubscription();
+        this.loadPendingRequest();
       }
     });
     this.loadActivePlans();
-    this.initCreatePlanForm();
   }
 
-  private initCreatePlanForm() {
-    this.createPlanForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
-      description: ['', Validators.required],
-      type: ['BASIC', Validators.required],
-      price: [0, [Validators.required, Validators.min(0)]],
-      durationDays: [30, [Validators.required, Validators.min(1)]],
-      maxUsers: [5, [Validators.required, Validators.min(1)]],
-      isActive: [true]
-    });
+  private canEditSettings(user: UserInitResponse): boolean {
+    if (user.userRoles?.includes('SUPER_ADMIN')) return true;
+    return (user.userApplications || []).some((app: any) =>
+      Object.values(app.modulePrivileges || {}).some((perms: any) =>
+        Array.isArray(perms) && perms.some((key: string) => key.endsWith('_SETTINGS_EDIT'))));
+  }
+
+  loadPendingRequest() {
+    this.http.getHttp(
+      `${environment.authUrl}/api/v1/subscription/tenant/${this.tenantId()}/pending`,
+      (res: any) => this.pendingRequest.set(res.data ?? null),
+      (_err: any) => this.pendingRequest.set(null)
+    );
   }
 
   loadCurrentSubscription() {
@@ -109,9 +112,23 @@ export class SubscriptionsComponent implements OnInit {
 
   loadActivePlans() {
     this.isPlansLoading.set(true);
+    // Only plans of apps this business uses; requesting another app's plan is rejected by ezauth
+    this.commonSvc.getAllApplications(
+      (appsRes: any) => {
+        this.tenantAppIds = new Set((appsRes.data || []).map((app: any) => app.id));
+        this.fetchPlans();
+      },
+      (_err: any) => this.fetchPlans()
+    );
+  }
+
+  private fetchPlans() {
     this.commonSvc.getActiveSubscriptionPlans(
       (res: any) => {
-        this.activePlans.set(res.data || []);
+        const plans: SubscriptionPlanModel[] = res.data || [];
+        this.activePlans.set(plans
+          .filter((plan: any) => !this.tenantAppIds.size || this.tenantAppIds.has(plan.applicationId))
+          .sort((a, b) => a.price - b.price));
         this.isPlansLoading.set(false);
       },
       (_err: any) => {
@@ -137,15 +154,16 @@ export class SubscriptionsComponent implements OnInit {
     this.commonSvc.subscribeTenant(
       this.tenantId(),
       plan.id,
-      (_res: any) => {
+      (res: any) => {
         this.isSubscribing.set(false);
-        this.toastSvc.show(`Subscribed to ${plan.name} successfully!`, 'success');
+        this.toastSvc.show(res?.data?.message || `Requested ${plan.name}`, 'success');
         this.closeModal();
         this.loadCurrentSubscription();
+        this.loadPendingRequest();
       },
       (err: any) => {
         this.isSubscribing.set(false);
-        this.toastSvc.show(err?.error?.message || 'Failed to subscribe', 'error');
+        this.toastSvc.show(err?.error?.message || 'Failed to request plan', 'error');
       }
     );
   }
@@ -164,41 +182,39 @@ export class SubscriptionsComponent implements OnInit {
     this.isCancelling.set(true);
     this.commonSvc.cancelSubscription(
       sub.id,
-      (_res: any) => {
+      (res: any) => {
         this.isCancelling.set(false);
-        this.toastSvc.show('Subscription cancelled successfully', 'success');
+        this.toastSvc.show(res?.data?.message || 'Auto-renew turned off', 'success');
         this.closeModal();
         this.loadCurrentSubscription();
       },
       (err: any) => {
         this.isCancelling.set(false);
-        this.toastSvc.show(err?.error?.message || 'Failed to cancel subscription', 'error');
+        this.toastSvc.show(err?.error?.message || 'Failed to update subscription', 'error');
       }
     );
   }
 
-
-  toggleCreatePlanActive() {
-    const current = this.createPlanForm.get('isActive')?.value;
-    this.createPlanForm.patchValue({ isActive: !current });
-  }
-
-  onCreatePlan() {
-    if (this.createPlanForm.invalid) return;
-    this.isCreatingPlan.set(true);
-    this.commonSvc.createSubscriptionPlan(
-      this.createPlanForm.value,
+  withdrawRequest() {
+    const pending = this.pendingRequest();
+    if (!pending) return;
+    this.isCancelling.set(true);
+    this.commonSvc.cancelSubscription(
+      pending.id,
       (_res: any) => {
-        this.isCreatingPlan.set(false);
-        this.toastSvc.show('Plan created successfully!', 'success');
-        this.closeModal();
-        this.loadActivePlans();
+        this.isCancelling.set(false);
+        this.toastSvc.show('Plan request withdrawn', 'success');
+        this.loadPendingRequest();
       },
       (err: any) => {
-        this.isCreatingPlan.set(false);
-        this.toastSvc.show(err?.error?.message || 'Failed to create plan', 'error');
+        this.isCancelling.set(false);
+        this.toastSvc.show(err?.error?.message || 'Failed to withdraw request', 'error');
       }
     );
+  }
+
+  isRequestedPlan(planId: number): boolean {
+    return this.pendingRequest()?.plan?.id === planId;
   }
 
   closeModal() {

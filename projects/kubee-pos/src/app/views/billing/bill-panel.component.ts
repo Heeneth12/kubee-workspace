@@ -8,6 +8,8 @@ import { BillingService } from './billing.service';
 import { BillView } from './billing.models';
 import { BillReceiptComponent, printElement } from './bill-receipt.component';
 import { readApiError } from '../catalog/catalog-errors';
+import { AuthService } from '../../layouts/guards/auth.service';
+import { PosPrivileges } from '../../layouts/guards/pos-permissions';
 
 /** A bill with its actions: print, share on WhatsApp, cancel. Emits the updated bill after each action. */
 @Component({
@@ -17,6 +19,7 @@ import { readApiError } from '../catalog/catalog-errors';
   template: `
     <div class="flex flex-col gap-4">
       <div class="flex flex-wrap items-center gap-2">
+        @if (can.print) {
         <button type="button" (click)="print()" [disabled]="busy" class="ez-btn ez-btn-primary">
           <lucide-icon [img]="icons.print" class="w-4 h-4"></lucide-icon>
           {{ bill.printCount ? 'Reprint' : 'Print' }}
@@ -25,7 +28,8 @@ import { readApiError } from '../catalog/catalog-errors';
           <lucide-icon [img]="icons.share" class="w-4 h-4"></lucide-icon>
           WhatsApp
         </button>
-        @if (allowCancel && bill.status === 'ISSUED') {
+        }
+        @if (allowCancel && can.void && bill.status === 'ISSUED') {
         <button type="button" (click)="cancelOpen = !cancelOpen" [disabled]="busy" class="ez-btn ez-btn-secondary hover:!text-red-600">
           <lucide-icon [img]="icons.cancel" class="w-4 h-4"></lucide-icon>
           Cancel bill
@@ -61,6 +65,12 @@ import { readApiError } from '../catalog/catalog-errors';
 export class BillPanelComponent {
   private billingService = inject(BillingService);
   private toastService = inject(ToastService);
+  private authService = inject(AuthService);
+
+  readonly can = {
+    print: this.authService.hasPermission(PosPrivileges.BILLS_PRINT),
+    void: this.authService.hasPermission(PosPrivileges.BILLS_VOID),
+  };
 
   @Input({ required: true }) bill!: BillView;
   @Input() allowCancel = true;
@@ -73,12 +83,14 @@ export class BillPanelComponent {
   cancelReason = '';
 
   async print() {
+    if (!this.can.print) return;
     const receipt = this.receiptRef.nativeElement.querySelector('.receipt') as HTMLElement;
     await printElement(receipt);
     this.run(this.billingService.markPrinted(this.bill.uuid));
   }
 
   shareWhatsApp() {
+    if (!this.can.print) return;
     const b = this.bill;
     const lines = [
       `*${b.seller.name}*`,
@@ -94,6 +106,7 @@ export class BillPanelComponent {
   }
 
   cancel() {
+    if (!this.can.void) return;
     this.run(this.billingService.cancelBill(this.bill.uuid, this.cancelReason.trim()), 'Bill cancelled');
   }
 

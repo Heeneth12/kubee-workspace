@@ -4,6 +4,8 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TenantsService } from '../tenants.service';
 import { CommonService, ToastService } from 'kubee-ui';
+import { ApplicationsService } from '../../applications/applications.service';
+import { ApplicationModel } from '../../../layout/models/application.model';
 
 @Component({
   selector: 'app-tenant-form',
@@ -17,6 +19,8 @@ export class TenantFormComponent implements OnInit {
   tenantId: number | null = null;
   isLoading = false;
   isSubmitting = false;
+  applications: ApplicationModel[] = [];
+  isLoadingApps = false;
 
   constructor(
     private fb: FormBuilder,
@@ -24,6 +28,7 @@ export class TenantFormComponent implements OnInit {
     private router: Router,
     private tenantsService: TenantsService,
     private commonService: CommonService,
+    private applicationsService: ApplicationsService,
     private toast: ToastService
   ) {
     this.tenantForm = this.fb.group({
@@ -81,8 +86,24 @@ export class TenantFormComponent implements OnInit {
         }
 
         this.loadTenant(this.tenantId);
+      } else {
+        this.loadApplications();
       }
     });
+  }
+
+  loadApplications() {
+    this.isLoadingApps = true;
+    this.applicationsService.getAllApplications(
+      (res: any) => {
+        this.applications = (res.data ?? []).filter((app: ApplicationModel) => app.isActive !== false);
+        this.isLoadingApps = false;
+      },
+      (error: any) => {
+        this.toast.show(error.message || 'Failed to load applications', 'error');
+        this.isLoadingApps = false;
+      }
+    );
   }
 
   loadTenant(id: number) {

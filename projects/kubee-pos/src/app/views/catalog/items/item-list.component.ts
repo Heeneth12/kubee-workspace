@@ -10,6 +10,8 @@ import { LucideAngularModule, Search, Plus, Pencil, Trash2, Star, Package, Chevr
 import { CatalogService } from '../catalog.service';
 import { Category, FoodType, Item, ItemSearchParams } from '../catalog.models';
 import { readApiError } from '../catalog-errors';
+import { AuthService } from '../../../layouts/guards/auth.service';
+import { PosPrivileges } from '../../../layouts/guards/pos-permissions';
 
 @Component({
   selector: 'app-item-list',
@@ -22,6 +24,13 @@ export class ItemListComponent implements OnInit {
   private toastService = inject(ToastService);
   private confirmService = inject(ConfirmationModalService);
   private destroyRef = inject(DestroyRef);
+  private authService = inject(AuthService);
+
+  readonly can = {
+    create: this.authService.hasPermission(PosPrivileges.CATALOG_CREATE),
+    edit: this.authService.hasPermission(PosPrivileges.CATALOG_EDIT),
+    delete: this.authService.hasPermission(PosPrivileges.CATALOG_DELETE),
+  };
 
   readonly icons = { search: Search, plus: Plus, edit: Pencil, trash: Trash2, star: Star, package: Package, prev: ChevronLeft, next: ChevronRight };
   readonly foodTypes: FoodType[] = ['VEG', 'NON_VEG', 'EGG'];
@@ -102,6 +111,7 @@ export class ItemListComponent implements OnInit {
   }
 
   toggleActive(item: Item) {
+    if (!this.can.edit) return;
     this.busyUuid = item.uuid;
     this.catalogService.setItemActive(item.uuid, !item.active).subscribe({
       next: updated => this.replace(updated),
@@ -110,6 +120,7 @@ export class ItemListComponent implements OnInit {
   }
 
   toggleFavourite(item: Item) {
+    if (!this.can.edit) return;
     this.busyUuid = item.uuid;
     this.catalogService.setItemFavourite(item.uuid, !item.favourite).subscribe({
       next: updated => this.replace(updated),
@@ -118,6 +129,7 @@ export class ItemListComponent implements OnInit {
   }
 
   async deleteItem(item: Item) {
+    if (!this.can.delete) return;
     const confirmed = await this.confirmService.open({
       title: 'Delete item',
       message: `Delete "${item.name}"? It will no longer be available for billing.`,

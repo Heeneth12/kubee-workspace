@@ -204,7 +204,7 @@
       <div class="space-y-1.5">
         <label class="block text-[11px] font-semibold uppercase tracking-wide text-gray-500">Key Secret</label>
         <div class="relative">
-          <input type="text" [(ngModel)]="razorpayConfig.keySecret" placeholder="Enter secret key"
+          <input type="password" autocomplete="off" [(ngModel)]="razorpayConfig.keySecret" [placeholder]="editingId() ? 'Leave blank to keep the saved value' : 'Enter secret key'"
             class="w-full border border-gray-200 rounded-lg pl-2 pr-3 py-2.5 text-[13px] font-mono outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-shadow">
         </div>
       </div>
@@ -212,7 +212,7 @@
       <div class="space-y-1.5">
         <label class="block text-[11px] font-semibold uppercase tracking-wide text-gray-500">Webhook Secret</label>
         <div class="relative">
-          <input type="text" [(ngModel)]="razorpayConfig.webhookSecret" placeholder="Webhook signing secret"
+          <input type="password" autocomplete="off" [(ngModel)]="razorpayConfig.webhookSecret" [placeholder]="editingId() ? 'Leave blank to keep the saved value' : 'Webhook signing secret'"
             class="w-full border border-gray-200 rounded-lg pl-2 pr-3 py-2.5 text-[13px] font-mono outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-shadow">
         </div>
       </div>
@@ -261,7 +261,7 @@
             <label class="block text-[11px] font-semibold uppercase tracking-wide text-gray-500">Password / App
               Password</label>
             <div class="relative">
-              <input type="password" [(ngModel)]="emailConfig.smtpPassword" placeholder="Enter password"
+              <input type="password" autocomplete="off" [(ngModel)]="emailConfig.smtpPassword" [placeholder]="editingId() ? 'Leave blank to keep the saved value' : 'Enter password'"
                 class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-[13px] font-mono outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-shadow">
             </div>
           </div>
@@ -300,7 +300,7 @@
           <div class="space-y-1.5">
             <label class="block text-[11px] font-semibold uppercase tracking-wide text-gray-500">App Password</label>
             <div class="relative">
-              <input type="password" [(ngModel)]="gmailConfig.smtpPassword" placeholder="Enter 16-digit app password"
+              <input type="password" autocomplete="off" [(ngModel)]="gmailConfig.smtpPassword" [placeholder]="editingId() ? 'Leave blank to keep the saved value' : 'Enter 16-digit app password'"
                 class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-[13px] font-mono outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-shadow">
             </div>
           </div>

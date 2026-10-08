@@ -1,0 +1,99 @@
+<div class="flex flex-col h-full">
+
+  <!-- Header -->
+  <div class="px-6 h-16 flex items-center justify-between gap-3 border-b border-ez-border shrink-0">
+    <div class="flex items-center gap-3 min-w-0">
+      <button type="button" (click)="goBack()" class="text-ez-secondary hover:text-ez-heading outline-none" title="Back to users">
+        <lucide-icon [img]="icons.back" class="w-5 h-5"></lucide-icon>
+      </button>
+      <h2 class="text-ez-xl font-medium text-ez-heading truncate">
+        {{ isEdit ? (user?.fullName || 'Edit user') : 'New user' }}
+      </h2>
+    </div>
+    <div class="flex items-center gap-3">
+      <button type="button" (click)="goBack()" class="ez-btn ez-btn-secondary">Cancel</button>
+      <button type="button" (click)="save()" [disabled]="isSaving || isLoading || !posApp" class="ez-btn ez-btn-primary">
+        <lucide-icon [img]="icons.save" class="w-4 h-4"></lucide-icon>
+        {{ isSaving ? 'Saving...' : 'Save user' }}
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading) {
+  <p class="p-6 text-ez-sm text-ez-muted">Loading...</p>
+  } @else {
+  <form [formGroup]="form" (ngSubmit)="save()" class="flex-1 overflow-y-auto p-6 space-y-8 max-w-5xl">
+
+    @if (formError) {
+    <div class="border border-red-200 bg-red-50 text-red-700 text-ez-sm px-4 py-3">{{ formError }}</div>
+    }
+
+    <!-- Details -->
+    <section>
+      <h3 class="ez-micro-label mb-4">Details</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+        <div>
+          <label class="ez-label">Full name <span class="text-red-500">*</span></label>
+          <input type="text" formControlName="fullName" class="ez-input ez-input--default w-full"
+            [class.ez-input--error]="controlError('fullName')">
+          @if (controlError('fullName'); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+        </div>
+        <div>
+          <label class="ez-label">Phone <span class="text-red-500">*</span></label>
+          <input type="tel" formControlName="phone" class="ez-input ez-input--default w-full"
+            [class.ez-input--error]="controlError('phone')">
+          @if (controlError('phone'); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+        </div>
+        <div>
+          <label class="ez-label">Email <span class="text-red-500">*</span> <span class="text-ez-muted font-normal">(used to sign in)</span></label>
+          <input type="email" formControlName="email" class="ez-input ez-input--default w-full"
+            [class.ez-input--error]="controlError('email')">
+          @if (controlError('email'); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+        </div>
+        <div>
+          <label class="ez-label">
+            Password @if (!isEdit) { <span class="text-red-500">*</span> }
+            @if (isEdit) { <span class="text-ez-muted font-normal">(leave blank to keep the current one)</span> }
+          </label>
+          <input type="password" formControlName="password" autocomplete="new-password" class="ez-input ez-input--default w-full"
+            [class.ez-input--error]="controlError('password')">
+          @if (controlError('password'); as e) { <p class="text-ez-xs text-red-500 mt-1">{{ e }}</p> }
+        </div>
+      </div>
+    </section>
+
+    <!-- Privileges -->
+    <section>
+      <h3 class="ez-micro-label mb-1">What this user can do</h3>
+      <p class="text-ez-sm text-ez-muted mb-4">Each section shows up in their menu once they have at least one privilege in it.</p>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        @for (module of modules; track module.id) {
+        <div class="border border-ez-border">
+          <div class="flex items-center justify-between px-4 py-3 bg-ez-ash border-b border-ez-border">
+            <span class="text-ez-base font-medium text-ez-heading">{{ module.moduleName }}</span>
+            <button type="button" (click)="toggleModule(module)" class="text-ez-sm text-ez-primary hover:underline">
+              {{ isModuleFull(module) ? 'Clear' : 'Select all' }}
+            </button>
+          </div>
+          <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            @for (privilege of module.privileges; track privilege.id) {
+            <label class="flex items-center gap-2 text-ez-base text-ez-body"
+              [class]="canGrant(privilege) ? 'cursor-pointer' : 'opacity-50 cursor-not-allowed'"
+              [title]="canGrant(privilege) ? '' : 'You can only give privileges you have yourself'">
+              <input type="checkbox" [checked]="isSelected(privilege)" (change)="toggle(privilege)" [disabled]="!canGrant(privilege)"
+                style="accent-color: var(--ez-color-primary);" class="w-4 h-4">
+              {{ privilege.privilegeName }}
+            </label>
+            }
+          </div>
+        </div>
+        }
+      </div>
+    </section>
+
+    <!-- Lets Enter submit the form -->
+    <button type="submit" class="hidden"></button>
+  </form>
+  }
+</div>

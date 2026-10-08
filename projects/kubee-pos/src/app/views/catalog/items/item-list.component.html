@@ -30,10 +30,12 @@
           style="accent-color: var(--ez-color-primary);" class="w-4 h-4">
         Favourites
       </label>
+      @if (can.create) {
       <a routerLink="new" class="ez-btn ez-btn-primary">
         <lucide-icon [img]="icons.plus" class="w-4 h-4"></lucide-icon>
         New item
       </a>
+      }
     </div>
   </div>
 
@@ -61,14 +63,18 @@
         @for (item of items; track item.uuid) {
         <tr class="border-t border-ez-border" [class.opacity-60]="busyUuid === item.uuid">
           <td class="px-4 py-3">
-            <button (click)="toggleFavourite(item)" [disabled]="busyUuid === item.uuid"
+            <button (click)="toggleFavourite(item)" [disabled]="!can.edit || busyUuid === item.uuid"
               [title]="item.favourite ? 'Remove from quick buttons' : 'Show as quick button'" class="outline-none"
               [class]="item.favourite ? 'text-amber-500' : 'text-ez-muted hover:text-ez-secondary'">
               <lucide-icon [img]="icons.star" class="w-4 h-4" [class.fill-current]="item.favourite"></lucide-icon>
             </button>
           </td>
           <td class="px-4 py-3">
+            @if (can.edit) {
             <a [routerLink]="item.uuid" class="font-medium text-ez-heading hover:text-ez-primary">{{ item.name }}</a>
+            } @else {
+            <span class="font-medium text-ez-heading">{{ item.name }}</span>
+            }
             <div class="text-ez-xs text-ez-muted flex flex-wrap gap-x-3">
               @if (item.itemCode) { <span>Code {{ item.itemCode }}</span> }
               @if (item.barcode) { <span>{{ item.barcode }}</span> }
@@ -100,7 +106,7 @@
             }
           </td>
           <td class="px-4 py-3">
-            <button (click)="toggleActive(item)" [disabled]="busyUuid === item.uuid" role="switch"
+            <button (click)="toggleActive(item)" [disabled]="!can.edit || busyUuid === item.uuid" role="switch"
               [attr.aria-checked]="item.active"
               class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-ez outline-none"
               [class]="item.active ? 'bg-ez-primary' : 'bg-ez-border'">
@@ -110,13 +116,17 @@
           </td>
           <td class="px-4 py-3">
             <div class="flex justify-end gap-3">
+              @if (can.edit) {
               <a [routerLink]="item.uuid" title="Edit" class="text-ez-secondary hover:text-ez-primary">
                 <lucide-icon [img]="icons.edit" class="w-4 h-4"></lucide-icon>
               </a>
+              }
+              @if (can.delete) {
               <button (click)="deleteItem(item)" [disabled]="busyUuid === item.uuid" title="Delete"
                 class="text-ez-secondary hover:text-red-500 outline-none">
                 <lucide-icon [img]="icons.trash" class="w-4 h-4"></lucide-icon>
               </button>
+              }
             </div>
           </td>
         </tr>

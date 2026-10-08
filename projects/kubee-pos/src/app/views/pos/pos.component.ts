@@ -21,6 +21,8 @@ import { BillView } from '../billing/billing.models';
 import { BillPanelComponent } from '../billing/bill-panel.component';
 import { ItemOptionsComponent, itemAddonGroups } from './item-options.component';
 import { readApiError } from '../catalog/catalog-errors';
+import { AuthService } from '../../layouts/guards/auth.service';
+import { PosPrivileges } from '../../layouts/guards/pos-permissions';
 
 const CURRENT_ORDER_KEY = 'pos.currentOrderUuid';
 const FAVOURITES = '__favourites__';
@@ -43,6 +45,12 @@ export class PosComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
+  private authService = inject(AuthService);
+
+  readonly can = {
+    discount: this.authService.hasPermission(PosPrivileges.BILLS_DISCOUNT),
+    cancel: this.authService.hasPermission(PosPrivileges.ORDERS_CANCEL),
+  };
 
   @ViewChild('searchBox') searchBox?: ElementRef<HTMLInputElement>;
   @ViewChild('tenderedBox') tenderedBox?: ElementRef<HTMLInputElement>;
@@ -361,6 +369,7 @@ export class PosComponent implements OnInit {
   // ---------- bill discount ----------
 
   openDiscount() {
+    if (!this.can.discount) return;
     this.discountForm = {
       type: this.order?.discountType ?? 'PERCENT',
       value: this.order?.discountValue ?? null,
@@ -370,6 +379,7 @@ export class PosComponent implements OnInit {
   }
 
   applyDiscount() {
+    if (!this.can.discount) return;
     const f = this.discountForm;
     if (f.value === null || Number(f.value) <= 0) return;
     this.discountOpen = false;
@@ -379,6 +389,7 @@ export class PosComponent implements OnInit {
   }
 
   removeDiscount() {
+    if (!this.can.discount) return;
     this.discountOpen = false;
     this.enqueue(order => this.ordersService.removeDiscount(order!.uuid));
   }
@@ -494,6 +505,7 @@ export class PosComponent implements OnInit {
   }
 
   async cancelSale() {
+    if (!this.can.cancel) return;
     if (!this.order) return;
     if (this.order.paidAmount > 0) {
       this.toastService.show('Money has been taken on this order. Refund it from Orders before cancelling.', 'warning');

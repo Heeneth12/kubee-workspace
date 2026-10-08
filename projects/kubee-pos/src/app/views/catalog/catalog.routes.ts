@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { CatalogComponent } from './catalog.component';
+import { PosPrivileges } from '../../layouts/guards/pos-permissions';
 
 export const CatalogRoutes: Routes = [
     {
@@ -15,12 +16,14 @@ export const CatalogRoutes: Routes = [
             {
                 path: 'items/new',
                 loadComponent: () => import('./items/item-form.component')
-                    .then(c => c.ItemFormComponent)
+                    .then(c => c.ItemFormComponent),
+                data: { privilegeKey: PosPrivileges.CATALOG_CREATE }
             },
             {
                 path: 'items/:uuid',
                 loadComponent: () => import('./items/item-form.component')
-                    .then(c => c.ItemFormComponent)
+                    .then(c => c.ItemFormComponent),
+                data: { privilegeKey: PosPrivileges.CATALOG_EDIT }
             },
             {
                 path: 'categories',

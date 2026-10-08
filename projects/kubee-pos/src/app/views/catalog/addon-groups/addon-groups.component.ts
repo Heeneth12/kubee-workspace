@@ -7,6 +7,8 @@ import { LucideAngularModule, Plus, Pencil, Trash2, ListPlus, X } from 'lucide-a
 import { CatalogService } from '../catalog.service';
 import { Addon, AddonGroup, AddonGroupRequest, FoodType } from '../catalog.models';
 import { applyServerErrors, blankToNull, controlError, numOrNull, readApiError } from '../catalog-errors';
+import { AuthService } from '../../../layouts/guards/auth.service';
+import { PosPrivileges } from '../../../layouts/guards/pos-permissions';
 
 /** Raw value of one add-on row in the form. */
 interface AddonRow {
@@ -28,6 +30,13 @@ export class AddonGroupsComponent implements OnInit {
   private catalogService = inject(CatalogService);
   private toastService = inject(ToastService);
   private confirmService = inject(ConfirmationModalService);
+  private authService = inject(AuthService);
+
+  readonly can = {
+    create: this.authService.hasPermission(PosPrivileges.CATALOG_CREATE),
+    edit: this.authService.hasPermission(PosPrivileges.CATALOG_EDIT),
+    delete: this.authService.hasPermission(PosPrivileges.CATALOG_DELETE),
+  };
 
   readonly icons = { plus: Plus, edit: Pencil, trash: Trash2, list: ListPlus, close: X };
   readonly foodTypes: FoodType[] = ['VEG', 'NON_VEG', 'EGG'];
@@ -103,6 +112,7 @@ export class AddonGroupsComponent implements OnInit {
   }
 
   openCreate() {
+    if (!this.can.create) return;
     this.editing = 'new';
     this.formError = null;
     this.form.reset({ name: '', minSelect: 0, maxSelect: null, active: true });
@@ -111,6 +121,7 @@ export class AddonGroupsComponent implements OnInit {
   }
 
   openEdit(group: AddonGroup) {
+    if (!this.can.edit) return;
     this.editing = group;
     this.formError = null;
     this.form.reset({ name: group.name, minSelect: group.minSelect, maxSelect: group.maxSelect, active: group.active });
@@ -185,6 +196,7 @@ export class AddonGroupsComponent implements OnInit {
   }
 
   async deleteGroup(group: AddonGroup) {
+    if (!this.can.delete) return;
     const confirmed = await this.confirmService.open({
       title: 'Delete add-on group',
       message: `Delete "${group.name}"? Groups still attached to items cannot be deleted.`,

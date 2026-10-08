@@ -4,10 +4,12 @@
   <section class="flex-1 min-w-0 p-6 overflow-y-auto">
     <div class="flex items-center justify-between mb-4">
       <p class="text-ez-sm text-ez-secondary">Extras like toppings or spice level, offered when an item is billed.</p>
+      @if (can.create) {
       <button (click)="openCreate()" class="ez-btn ez-btn-primary shrink-0">
         <lucide-icon [img]="icons.plus" class="w-4 h-4"></lucide-icon>
         New group
       </button>
+      }
     </div>
 
     @if (isLoading && !groups.length) {
@@ -25,12 +27,16 @@
             </p>
             <p class="text-ez-xs text-ez-muted">{{ selectionRule(group) }}</p>
           </div>
+          @if (can.edit) {
           <button (click)="openEdit(group)" title="Edit" class="text-ez-secondary hover:text-ez-primary outline-none">
             <lucide-icon [img]="icons.edit" class="w-4 h-4"></lucide-icon>
           </button>
+          }
+          @if (can.delete) {
           <button (click)="deleteGroup(group)" title="Delete" class="text-ez-secondary hover:text-red-500 outline-none">
             <lucide-icon [img]="icons.trash" class="w-4 h-4"></lucide-icon>
           </button>
+          }
         </div>
         <div class="flex flex-wrap gap-2">
           @for (addon of group.addons; track addon.uuid) {

@@ -7,6 +7,8 @@ import { LucideAngularModule, Plus, Pencil, Trash2, FolderTree, CornerDownRight,
 import { CatalogService } from '../catalog.service';
 import { Category, CategoryRequest } from '../catalog.models';
 import { applyServerErrors, blankToNull, controlError, numOrNull, readApiError } from '../catalog-errors';
+import { AuthService } from '../../../layouts/guards/auth.service';
+import { PosPrivileges } from '../../../layouts/guards/pos-permissions';
 
 interface CategoryNode {
   category: Category;
@@ -24,6 +26,13 @@ export class CategoriesComponent implements OnInit {
   private catalogService = inject(CatalogService);
   private toastService = inject(ToastService);
   private confirmService = inject(ConfirmationModalService);
+  private authService = inject(AuthService);
+
+  readonly can = {
+    create: this.authService.hasPermission(PosPrivileges.CATALOG_CREATE),
+    edit: this.authService.hasPermission(PosPrivileges.CATALOG_EDIT),
+    delete: this.authService.hasPermission(PosPrivileges.CATALOG_DELETE),
+  };
 
   readonly icons = { plus: Plus, edit: Pencil, trash: Trash2, tree: FolderTree, child: CornerDownRight, close: X };
   readonly controlError = controlError;
@@ -89,12 +98,14 @@ export class CategoriesComponent implements OnInit {
   }
 
   openCreate(parent?: Category) {
+    if (!this.can.create) return;
     this.editing = 'new';
     this.formError = null;
     this.form.reset({ name: '', parentUuid: parent?.uuid ?? '', imageUrl: '', sortOrder: 0, active: true });
   }
 
   openEdit(category: Category) {
+    if (!this.can.edit) return;
     this.editing = category;
     this.formError = null;
     this.form.reset({
@@ -149,6 +160,7 @@ export class CategoriesComponent implements OnInit {
   }
 
   async deleteCategory(category: Category) {
+    if (!this.can.delete) return;
     const confirmed = await this.confirmService.open({
       title: 'Delete category',
       message: `Delete "${category.name}"? Categories that still have items or sub-categories cannot be deleted.`,

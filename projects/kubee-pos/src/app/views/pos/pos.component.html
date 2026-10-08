@@ -91,9 +91,11 @@
       <button (click)="hold()" [disabled]="!order?.lines?.length" title="Hold this sale" class="ez-btn ez-btn-secondary !min-h-0 !px-2 !py-1.5">
         <lucide-icon [img]="icons.hold" class="w-4 h-4"></lucide-icon>
       </button>
+      @if (can.cancel) {
       <button (click)="cancelSale()" title="Cancel sale" class="ez-btn ez-btn-secondary !min-h-0 !px-2 !py-1.5 hover:!text-red-600">
         <lucide-icon [img]="icons.trash" class="w-4 h-4"></lucide-icon>
       </button>
+      }
       }
     </div>
 
@@ -165,7 +167,7 @@
         <span>Subtotal</span><span>{{ order.subTotal | currency:'INR' }}</span>
       </div>
       <div class="flex justify-between items-center text-ez-sm text-ez-secondary">
-        @if (order.status === 'OPEN') {
+        @if (order.status === 'OPEN' && can.discount) {
         <button (click)="openDiscount()" class="flex items-center gap-1 text-ez-primary hover:underline">
           <lucide-icon [img]="icons.discount" class="w-3.5 h-3.5"></lucide-icon>
           {{ order.discountType ? 'Discount' + (order.discountType === 'PERCENT' ? ' ' + order.discountValue + '%' : '') : 'Add discount' }}
@@ -293,12 +295,12 @@
       <div>
         <label class="ez-label">Line discount</label>
         <div class="flex gap-2">
-          <select [(ngModel)]="lineForm.discountType" class="ez-select w-24">
+          <select [(ngModel)]="lineForm.discountType" [disabled]="!can.discount" class="ez-select w-24">
             <option value="">None</option>
             <option value="PERCENT">%</option>
             <option value="FLAT">₹</option>
           </select>
-          <input type="number" min="0" step="0.01" [(ngModel)]="lineForm.discountValue" [disabled]="!lineForm.discountType"
+          <input type="number" min="0" step="0.01" [(ngModel)]="lineForm.discountValue" [disabled]="!can.discount || !lineForm.discountType"
             class="ez-input ez-input--default flex-1 min-w-0">
         </div>
       </div>
